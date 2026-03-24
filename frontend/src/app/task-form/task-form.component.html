@@ -1,0 +1,30 @@
+<section class="form-section" aria-labelledby="task-form-heading">
+  <h2 id="task-form-heading">New task</h2>
+
+  <form (ngSubmit)="submit()" #taskForm="ngForm" novalidate>
+    <div class="field">
+      <label for="task-title">Title</label>
+      <input
+        id="task-title"
+        name="title"
+        [(ngModel)]="title"
+        required
+        minlength="2"
+        maxlength="500"
+        #titleField="ngModel"
+        autocomplete="off"
+      />
+      @if (titleField.invalid && titleField.touched) {
+        <p class="field__hint">Enter at least 2 characters (max 500).</p>
+      }
+    </div>
+
+    <button type="submit" [disabled]="taskForm.invalid || submitting">
+      {{ submitting ? 'Saving…' : 'Add task' }}
+    </button>
+  </form>
+
+  @if (submitError) {
+    <p class="form-section__error" role="alert">{{ submitError }}</p>
+  }
+</section>

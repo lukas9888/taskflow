@@ -1,0 +1,15 @@
+@TaskFlow.API_HostAddress = http://localhost:5046
+
+GET {{TaskFlow.API_HostAddress}}/api/tasks
+Accept: application/json
+
+###
+
+POST {{TaskFlow.API_HostAddress}}/api/tasks
+Content-Type: application/json
+
+{
+  "title": "Hello from REST Client"
+}
+
+###

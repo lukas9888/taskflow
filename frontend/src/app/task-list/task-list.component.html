@@ -1,0 +1,15 @@
+<section class="list-section" aria-labelledby="task-list-heading">
+  <h2 id="task-list-heading">Your tasks</h2>
+
+  @if (tasks.length === 0) {
+    <p class="list-section__empty">No tasks yet. Add one above.</p>
+  } @else {
+    <ul class="list-section__ul">
+      @for (t of tasks; track t.id) {
+        <li class="list-section__li">
+          <app-task-row [task]="t" />
+        </li>
+      }
+    </ul>
+  }
+</section>
