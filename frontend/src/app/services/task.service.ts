@@ -18,4 +18,8 @@ export class TaskService {
   createTask(title: string): Observable<TaskItem> {
     return this.http.post<TaskItem>(this.baseUrl, { title });
   }
+
+  deleteTask(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
 }

@@ -35,6 +35,12 @@ public class TasksController : ControllerBase
         var created = _tasks.Create(trimmed);
         return CreatedAtAction(nameof(GetAll), new { id = created.Id }, created);
     }
+    [HttpDelete("{id}")]
+    public ActionResult Delete(int id)
+    {
+        var deleted = _tasks.Delete(id);
+        return deleted ? NoContent() : NotFound();
+    }
 }
 
 public class CreateTaskDto

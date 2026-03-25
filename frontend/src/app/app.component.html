@@ -9,5 +9,5 @@
   }
 
   <app-task-form (created)="refreshTasks()" />
-  <app-task-list [tasks]="tasks" />
+  <app-task-list [tasks]="tasks" (taskDeleted)="refreshTasks()" />
 </main>

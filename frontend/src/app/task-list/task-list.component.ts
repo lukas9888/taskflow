@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { TaskRowComponent } from '../task-row/task-row.component';
 import { TaskItem } from '../models/task-item';
 
@@ -10,4 +10,8 @@ import { TaskItem } from '../models/task-item';
 })
 export class TaskListComponent {
   @Input() tasks: TaskItem[] = [];
+  @Output() taskDeleted = new EventEmitter<void>();
+  onRowDeleted(): void {
+    this.taskDeleted.emit();
+  }
 }
