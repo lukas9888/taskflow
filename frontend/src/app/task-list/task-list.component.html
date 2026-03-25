@@ -7,7 +7,7 @@
     <ul class="list-section__ul">
       @for (t of tasks; track t.id) {
         <li class="list-section__li">
-          <app-task-row [task]="t" />
+          <app-task-row [task]="t" (deleted)="onRowDeleted()" />
         </li>
       }
     </ul>

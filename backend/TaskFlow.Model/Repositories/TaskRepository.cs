@@ -51,4 +51,16 @@ public class TaskRepository : BaseRepository
             CreatedAt = reader.GetFieldValue<DateTimeOffset>(2)
         };
     }
+
+    public bool Delete(int id)
+    {
+        using var conn = new NpgsqlConnection(ConnectionString);
+        using var cmd = new NpgsqlCommand(
+            "DELETE FROM tasks WHERE id = @id",
+            conn);
+        conn.Open();
+        cmd.Parameters.AddWithValue("id", id);
+        var affected = cmd.ExecuteNonQuery();
+        return affected > 0;
+    }
 }

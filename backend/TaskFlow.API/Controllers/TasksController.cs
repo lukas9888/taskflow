@@ -38,8 +38,8 @@ public class TasksController : ControllerBase
     [HttpDelete("{id}")]
     public ActionResult Delete(int id)
     {
-        _tasks.Delete(id);
-        return NoContent();
+        var deleted = _tasks.Delete(id);
+        return deleted ? NoContent() : NotFound();
     }
 }
 
