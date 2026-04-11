@@ -52,6 +52,33 @@ public class TaskRepository : BaseRepository
         };
     }
 
+    public TaskItem? Update(int id, string title)
+    {
+    using var conn = new NpgsqlConnection(ConnectionString);
+    using var cmd = new NpgsqlCommand(
+        @"UPDATE tasks
+          SET title = @title
+          WHERE id = @id
+          RETURNING id, title, created_at",
+        conn);
+
+    cmd.Parameters.AddWithValue("id", id);
+    cmd.Parameters.AddWithValue("title", title);
+
+    conn.Open();
+    using var reader = cmd.ExecuteReader();
+
+    if (!reader.Read())
+        return null;
+
+    return new TaskItem
+    {
+        Id = reader.GetInt32(0),
+        Title = reader.GetString(1),
+        CreatedAt = reader.GetFieldValue<DateTimeOffset>(2)
+    };
+    }
+
     public bool Delete(int id)
     {
         using var conn = new NpgsqlConnection(ConnectionString);

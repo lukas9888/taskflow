@@ -11,7 +11,13 @@ import { TaskItem } from '../models/task-item';
 export class TaskListComponent {
   @Input() tasks: TaskItem[] = [];
   @Output() taskDeleted = new EventEmitter<void>();
+  @Output() taskUpdated = new EventEmitter<void>();
+
   onRowDeleted(): void {
     this.taskDeleted.emit();
+  }
+
+  onRowUpdated(): void {
+    this.taskUpdated.emit();
   }
 }
