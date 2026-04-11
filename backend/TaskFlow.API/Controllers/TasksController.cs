@@ -35,6 +35,21 @@ public class TasksController : ControllerBase
         var created = _tasks.Create(trimmed);
         return CreatedAtAction(nameof(GetAll), new { id = created.Id }, created);
     }
+
+    [HttpPut("{id}")]
+    public ActionResult<TaskItem> Update(int id, [FromBody] UpdateTaskDto body)
+    {
+    if (!ModelState.IsValid)
+        return ValidationProblem(ModelState);
+
+    var trimmed = body.Title.Trim();
+    if (trimmed.Length < 2)
+        return BadRequest("Title must be at least 2 characters.");
+
+    var updated = _tasks.Update(id, trimmed);
+    return updated is null ? NotFound() : Ok(updated);
+    }
+
     [HttpDelete("{id}")]
     public ActionResult Delete(int id)
     {
@@ -44,6 +59,14 @@ public class TasksController : ControllerBase
 }
 
 public class CreateTaskDto
+{
+    [Required]
+    [MinLength(2)]
+    [MaxLength(500)]
+    public string Title { get; set; } = string.Empty;
+}
+
+public class UpdateTaskDto
 {
     [Required]
     [MinLength(2)]

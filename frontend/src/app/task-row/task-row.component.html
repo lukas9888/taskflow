@@ -1,5 +1,25 @@
 <div class="row">
-  <span class="row__title">{{ task.title }}</span>
-  <span class="row__meta">#{{ task.id }}</span>
-  <button type="button" (click)="delete()">Delete</button>
+  @if (!isEditing) {
+    <span class="row__title">{{ task.title }}</span>
+    <span class="row__meta">#{{ task.id }}</span>
+    <button type="button" (click)="startEdit()">Edit</button>
+    <button type="button" (click)="delete()">Delete</button>
+  } @else {
+    <input
+      type="text"
+      [(ngModel)]="editTitle"
+      minlength="2"
+      maxlength="500"
+    />
+    <button type="button" (click)="saveEdit()" [disabled]="saving">
+      {{ saving ? 'Saving…' : 'Save' }}
+    </button>
+    <button type="button" (click)="cancelEdit()" [disabled]="saving">
+      Cancel
+    </button>
+  }
 </div>
+
+@if (editError) {
+  <p class="row__error" role="alert">{{ editError }}</p>
+}
