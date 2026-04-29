@@ -19,6 +19,17 @@
       }
     </div>
 
+    <div class="field">
+      <label for="task-due-at">Due date and time</label>
+      <input
+        id="task-due-at"
+        name="dueAt"
+        type="datetime-local"
+        [(ngModel)]="dueAt"
+        [min]="minDueAt"
+      />
+    </div>
+
     <button type="submit" [disabled]="taskForm.invalid || submitting">
       {{ submitting ? 'Saving…' : 'Add task' }}
     </button>
