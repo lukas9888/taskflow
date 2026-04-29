@@ -2,13 +2,13 @@
 
 This repo is a **proof-of-concept** only: **Angular → C# Web API → PostgreSQL** for a single **Task** entity (`GET` / `POST`). Use it as a template to add the rest of your TaskFlow features.
 
-**Exam note:** the course guide expects more than this POC (e.g. **CRUD for at least two entities**, **several related tables with keys/FKs**, **four Angular components** — included here — **services**, **forms with two-way binding and validation**, **10+ seed rows** — included in `database/init.sql` — etc.). See **Exam checklist** below.
+**Exam note:** the course guide expects more than this POC (e.g. **CRUD for at least two entities**, **several related tables with keys/FKs**, **four Angular components** — included here — **services**, **forms with two-way binding and validation**, **10+ seed rows** — included in `database/seed.sql` — etc.). See **Exam checklist** below.
 
 ## Folder layout
 
 | Folder | Role |
 |--------|------|
-| `database/` | SQL to create the `tasks` table and seed data. |
+| `database/` | SQL migrations + seeds + helper scripts for PostgreSQL. |
 | `backend/` | .NET solution: `TaskFlow.API` (REST) + `TaskFlow.Model` (entities + Npgsql repositories). |
 | `frontend/` | Angular app: task form, list, row + `TaskService` calling the API. |
 
@@ -37,15 +37,48 @@ npx ng version
 
 Confirm PostgreSQL is running (Windows: Services; or connect with pgAdmin / `psql`).
 
-## One-time database setup
+## Database setup (migrations + seeds)
 
-1. Create a database named **`taskflow`** (pgAdmin: Databases → Create → Database, or `CREATE DATABASE taskflow;`).
-2. Open **Query Tool** on that database and run the script:  
-   [`database/init.sql`](database/init.sql)  
-3. Ensure the API connection string in your user/password/port does not differ:  
-   - [`backend/TaskFlow.API/appsettings.Development.json`](backend/TaskFlow.API/appsettings.Development.json)  
-   - Key: **`TaskFlowDb`** — format:  
-     `Host=localhost;Port=5432;Username=postgres;Password=1234;Database=taskflow`
+This repo uses a lightweight **SQL migration** approach (no external migration tool):
+
+- `database/migrations/`: schema changes (applied once, tracked in `schema_migrations`)
+- `database/seed.sql`: dev/demo data (safe to re-run)
+
+### One-time: create the database
+
+Create a database named **`taskflow`** (pgAdmin: Databases → Create → Database, or `CREATE DATABASE taskflow;`).
+
+### Apply schema migrations
+
+From repo root (PowerShell):
+
+```powershell
+.\database\apply-migrations.ps1
+```
+
+### Apply migrations + seeds (wrapper)
+
+```powershell
+.\database\apply-all.ps1
+```
+
+### Apply seed data (optional, re-runnable)
+
+```powershell
+.\database\apply-seeds.ps1
+```
+
+Similarly, you can pass `-PsqlPath` if needed.
+
+### Connection string (API)
+
+Ensure the API connection string in your user/password/port does not differ:
+
+- [`backend/TaskFlow.API/appsettings.Development.json`](backend/TaskFlow.API/appsettings.Development.json)
+- Key: **`TaskFlowDb`** — format:
+  `Host=localhost;Port=5432;Username=postgres;Password=1234;Database=taskflow`
+
+> Note: `database/init.sql` was removed. All database changes should be added as new files under `database/migrations/`.
 
 ## Run the backend
 
