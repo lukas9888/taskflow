@@ -2,6 +2,11 @@
   @if (!isEditing) {
     <span class="row__title">{{ task.title }}</span>
     <span class="row__meta">#{{ task.id }}</span>
+
+    @if (task.dueAt) {
+    <span class="row__meta">Due: {{ task.dueAt | date:'short' }}</span>
+    } 
+
     <button type="button" (click)="startEdit()">Edit</button>
     <button type="button" (click)="delete()">Delete</button>
   } @else {
@@ -10,6 +15,11 @@
       [(ngModel)]="editTitle"
       minlength="2"
       maxlength="500"
+    />
+    <input
+      type="datetime-local"
+      [(ngModel)]="editDueAt"
+      [min]="minDueAt"
     />
     <button type="button" (click)="saveEdit()" [disabled]="saving">
       {{ saving ? 'Saving…' : 'Save' }}

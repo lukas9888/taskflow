@@ -1,11 +1,12 @@
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TaskItem } from '../models/task-item';
 import { TaskService } from '../services/task.service';
 
 @Component({
   selector: 'app-task-row',
-  imports: [FormsModule],
+  imports: [FormsModule, DatePipe],
   templateUrl: './task-row.component.html',
   styleUrl: './task-row.component.css'
 })
@@ -18,18 +19,22 @@ export class TaskRowComponent {
 
   isEditing = false;
   editTitle = '';
+  editDueAt = '';
+  minDueAt = this.toDateTimeLocalValue(new Date());
   saving = false;
   editError: string | null = null;
 
   startEdit(): void {
     this.isEditing = true;
     this.editTitle = this.task.title;
+    this.editDueAt = this.toDateTimeLocalValue(this.task.dueAt);
     this.editError = null;
   }
 
   cancelEdit(): void {
     this.isEditing = false;
     this.editTitle = '';
+    this.editDueAt = '';
     this.editError = null;
     this.saving = false;
   }
@@ -42,10 +47,19 @@ export class TaskRowComponent {
       return;
     }
 
+    this.minDueAt = this.toDateTimeLocalValue(new Date());
+
+    if (this.editDueAt && new Date(this.editDueAt) < new Date()) {
+      this.editError = 'Due date and time cannot be in the past.';
+      return;
+    }
+
     this.saving = true;
     this.editError = null;
 
-    this.tasks.updateTask(this.task.id, trimmed).subscribe({
+    const dueAt = this.editDueAt ? new Date(this.editDueAt).toISOString() : null;
+
+    this.tasks.updateTask(this.task.id, trimmed, dueAt).subscribe({
       next: () => {
         this.saving = false;
         this.isEditing = false;
@@ -57,6 +71,15 @@ export class TaskRowComponent {
       }
     });
   }
+
+  private toDateTimeLocalValue(value: string | Date | null): string {
+  if (!value) return '';
+
+  const date = value instanceof Date ? value : new Date(value);
+  const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+
+  return localDate.toISOString().slice(0, 16);
+}
 
   delete(): void {
     this.tasks.deleteTask(this.task.id).subscribe({

@@ -32,7 +32,10 @@ public class TasksController : ControllerBase
         if (trimmed.Length < 2)
             return BadRequest("Title must be at least 2 characters.");
 
-        var created = _tasks.Create(trimmed);
+        if (body.DueAt.HasValue && body.DueAt.Value < DateTimeOffset.UtcNow)
+            return BadRequest("Due date cannot be in the past.");
+
+        var created = _tasks.Create(trimmed, body.DueAt);
         return CreatedAtAction(nameof(GetAll), new { id = created.Id }, created);
     }
 
@@ -46,7 +49,10 @@ public class TasksController : ControllerBase
     if (trimmed.Length < 2)
         return BadRequest("Title must be at least 2 characters.");
 
-    var updated = _tasks.Update(id, trimmed);
+    if (body.DueAt.HasValue && body.DueAt.Value < DateTimeOffset.UtcNow)
+        return BadRequest("Due date cannot be in the past.");
+
+    var updated = _tasks.Update(id, trimmed, body.DueAt);
     return updated is null ? NotFound() : Ok(updated);
     }
 
@@ -64,6 +70,7 @@ public class CreateTaskDto
     [MinLength(2)]
     [MaxLength(500)]
     public string Title { get; set; } = string.Empty;
+    public DateTimeOffset? DueAt { get; set; }
 }
 
 public class UpdateTaskDto
@@ -72,4 +79,5 @@ public class UpdateTaskDto
     [MinLength(2)]
     [MaxLength(500)]
     public string Title { get; set; } = string.Empty;
+    public DateTimeOffset? DueAt { get; set; }
 }

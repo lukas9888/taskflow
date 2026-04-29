@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Npgsql;
+using NpgsqlTypes;
 using TaskFlow.Model.Entities;
 
 namespace TaskFlow.Model.Repositories;
@@ -15,7 +16,7 @@ public class TaskRepository : BaseRepository
         var list = new List<TaskItem>();
         using var conn = new NpgsqlConnection(ConnectionString);
         using var cmd = new NpgsqlCommand(
-            "SELECT id, title, created_at FROM tasks ORDER BY id",
+            "SELECT id, title, created_at, due_at FROM tasks ORDER BY id",
             conn);
         conn.Open();
         using var reader = cmd.ExecuteReader();
@@ -25,20 +26,27 @@ public class TaskRepository : BaseRepository
             {
                 Id = reader.GetInt32(0),
                 Title = reader.GetString(1),
-                CreatedAt = reader.GetFieldValue<DateTimeOffset>(2)
+                CreatedAt = reader.GetFieldValue<DateTimeOffset>(2),
+                DueAt = reader.IsDBNull(3) ? null : reader.GetFieldValue<DateTimeOffset>(3)
             });
         }
 
         return list;
     }
 
-    public TaskItem Create(string title)
+    public TaskItem Create(string title, DateTimeOffset? dueAt)
     {
         using var conn = new NpgsqlConnection(ConnectionString);
         using var cmd = new NpgsqlCommand(
-            "INSERT INTO tasks (title) VALUES (@title) RETURNING id, title, created_at",
+              @"INSERT INTO tasks (title, due_at)
+                VALUES (@title, @due_at)
+                RETURNING id, title, created_at, due_at",
             conn);
         cmd.Parameters.AddWithValue("title", title);
+
+        var dueAtParam = cmd.Parameters.Add("due_at", NpgsqlDbType.TimestampTz);
+        dueAtParam.Value = dueAt.HasValue ? dueAt.Value : DBNull.Value;
+
         conn.Open();
         using var reader = cmd.ExecuteReader();
         if (!reader.Read())
@@ -48,22 +56,28 @@ public class TaskRepository : BaseRepository
         {
             Id = reader.GetInt32(0),
             Title = reader.GetString(1),
-            CreatedAt = reader.GetFieldValue<DateTimeOffset>(2)
+            CreatedAt = reader.GetFieldValue<DateTimeOffset>(2),
+            DueAt = reader.IsDBNull(3) ? null : reader.GetFieldValue<DateTimeOffset>(3)
+
         };
     }
 
-    public TaskItem? Update(int id, string title)
+    public TaskItem? Update(int id, string title, DateTimeOffset? dueAt)
     {
     using var conn = new NpgsqlConnection(ConnectionString);
     using var cmd = new NpgsqlCommand(
         @"UPDATE tasks
-          SET title = @title
+          SET title = @title,
+            due_at = @due_at
           WHERE id = @id
-          RETURNING id, title, created_at",
+          RETURNING id, title, created_at, due_at",
         conn);
 
     cmd.Parameters.AddWithValue("id", id);
     cmd.Parameters.AddWithValue("title", title);
+
+    var dueAtParam = cmd.Parameters.Add("due_at", NpgsqlDbType.TimestampTz);
+    dueAtParam.Value = dueAt.HasValue ? dueAt.Value : DBNull.Value;
 
     conn.Open();
     using var reader = cmd.ExecuteReader();
@@ -72,11 +86,13 @@ public class TaskRepository : BaseRepository
         return null;
 
     return new TaskItem
-    {
+        {
         Id = reader.GetInt32(0),
         Title = reader.GetString(1),
-        CreatedAt = reader.GetFieldValue<DateTimeOffset>(2)
-    };
+        CreatedAt = reader.GetFieldValue<DateTimeOffset>(2),
+        DueAt = reader.IsDBNull(3) ? null : reader.GetFieldValue<DateTimeOffset>(3)
+
+        };
     }
 
     public bool Delete(int id)
