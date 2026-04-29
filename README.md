@@ -56,16 +56,30 @@ From repo root (PowerShell):
 .\database\apply-migrations.ps1
 ```
 
+From repo root (macOS/Linux, bash):
+
+```bash
+./database/apply-migrations.sh
+```
+
 ### Apply migrations + seeds (wrapper)
 
 ```powershell
 .\database\apply-all.ps1
 ```
 
+```bash
+./database/apply-all.sh
+```
+
 ### Apply seed data (optional, re-runnable)
 
 ```powershell
 .\database\apply-seeds.ps1
+```
+
+```bash
+./database/apply-seeds.sh
 ```
 
 Similarly, you can pass `-PsqlPath` if needed.
