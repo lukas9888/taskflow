@@ -43,5 +43,14 @@ INSERT INTO tasks (user_id, title) VALUES
     ((SELECT id FROM users WHERE username = 'demo'), 'Zip source without node_modules'),
     ((SELECT id FROM users WHERE username = 'demo'), 'Write project report draft');
 
+
+INSERT INTO task_dependencies (task_id, depends_on)
+SELECT DISTINCT t1.id AS task_id, t2.id AS depends_on
+FROM tasks t1
+JOIN tasks t2 ON t2.id <> t1.id
+WHERE random() < 0.15
+LIMIT 12
+ON CONFLICT DO NOTHING;
+
 COMMIT;
 
