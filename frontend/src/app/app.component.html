@@ -3,15 +3,5 @@
     <h1>TaskFlow</h1>
     <p class="shell__sub">CBS Applied Programming — minimal full-stack POC</p>
   </header>
-
-  @if (loadError) {
-    <p class="shell__error" role="alert">{{ loadError }}</p>
-  }
-
-  <app-task-form (created)="refreshTasks()" />
-  <app-task-list 
-  [tasks]="tasks" 
-  (taskDeleted)="refreshTasks()" 
-  (taskUpdated)="refreshTasks()"
-/>
+  <router-outlet />
 </main>

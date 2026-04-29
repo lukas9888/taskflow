@@ -4,6 +4,9 @@
 
 BEGIN;
 
+-- Used only for generating bcrypt hashes in SQL seeds.
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 -- Truncate ALL user tables (future-proof as you add more).
 -- Excludes schema_migrations so applied migrations remain tracked.
 DO $$
@@ -23,18 +26,22 @@ BEGIN
   END IF;
 END $$;
 
-INSERT INTO tasks (title) VALUES
-    ('Set up PostgreSQL'),
-    ('Run the API and Swagger'),
-    ('Connect Angular to backend'),
-    ('Write project report draft'),
-    ('Design second entity and FK'),
-    ('Add PUT and DELETE endpoints'),
-    ('Add form validation messages'),
-    ('Test CRUD in Swagger'),
-    ('Prepare oral exam demo'),
-    ('Zip source without node_modules'),
-    ('Write project report draft');
+-- Default demo user. Password: demo1234
+INSERT INTO users (username, email, password_hash)
+VALUES ('demo', 'demo@taskflow.local', crypt('demo1234', gen_salt('bf')));
+
+INSERT INTO tasks (user_id, title) VALUES
+    ((SELECT id FROM users WHERE username = 'demo'), 'Set up PostgreSQL'),
+    ((SELECT id FROM users WHERE username = 'demo'), 'Run the API and Swagger'),
+    ((SELECT id FROM users WHERE username = 'demo'), 'Connect Angular to backend'),
+    ((SELECT id FROM users WHERE username = 'demo'), 'Write project report draft'),
+    ((SELECT id FROM users WHERE username = 'demo'), 'Design second entity and FK'),
+    ((SELECT id FROM users WHERE username = 'demo'), 'Add PUT and DELETE endpoints'),
+    ((SELECT id FROM users WHERE username = 'demo'), 'Add form validation messages'),
+    ((SELECT id FROM users WHERE username = 'demo'), 'Test CRUD in Swagger'),
+    ((SELECT id FROM users WHERE username = 'demo'), 'Prepare oral exam demo'),
+    ((SELECT id FROM users WHERE username = 'demo'), 'Zip source without node_modules'),
+    ((SELECT id FROM users WHERE username = 'demo'), 'Write project report draft');
 
 COMMIT;
 

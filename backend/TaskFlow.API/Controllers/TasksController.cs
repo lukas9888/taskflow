@@ -1,4 +1,7 @@
 using System.ComponentModel.DataAnnotations;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Model.Entities;
 using TaskFlow.Model.Repositories;
@@ -7,6 +10,7 @@ namespace TaskFlow.API.Controllers;
 
 [ApiController]
 [Route("api/tasks")]
+[Authorize]
 public class TasksController : ControllerBase
 {
     private readonly TaskRepository _tasks;
@@ -19,7 +23,8 @@ public class TasksController : ControllerBase
     [HttpGet]
     public ActionResult<IEnumerable<TaskItem>> GetAll()
     {
-        return Ok(_tasks.GetAll());
+        var userId = GetUserId();
+        return Ok(_tasks.GetAll(userId));
     }
 
     [HttpPost]
@@ -32,10 +37,11 @@ public class TasksController : ControllerBase
         if (trimmed.Length < 2)
             return BadRequest("Title must be at least 2 characters.");
 
+        var userId = GetUserId();
         if (body.DueAt.HasValue && body.DueAt.Value < DateTimeOffset.UtcNow)
             return BadRequest("Due date cannot be in the past.");
 
-        var created = _tasks.Create(trimmed, body.DueAt);
+        var created = _tasks.Create(userId, trimmed, body.DueAt);
         return CreatedAtAction(nameof(GetAll), new { id = created.Id }, created);
     }
 
@@ -49,18 +55,30 @@ public class TasksController : ControllerBase
     if (trimmed.Length < 2)
         return BadRequest("Title must be at least 2 characters.");
 
+    var userId = GetUserId();
     if (body.DueAt.HasValue && body.DueAt.Value < DateTimeOffset.UtcNow)
         return BadRequest("Due date cannot be in the past.");
 
-    var updated = _tasks.Update(id, trimmed, body.DueAt);
+    var updated = _tasks.Update(userId, id, trimmed, body.DueAt);
     return updated is null ? NotFound() : Ok(updated);
     }
 
     [HttpDelete("{id}")]
     public ActionResult Delete(int id)
     {
-        var deleted = _tasks.Delete(id);
+        var userId = GetUserId();
+        var deleted = _tasks.Delete(userId, id);
         return deleted ? NoContent() : NotFound();
+    }
+
+    private int GetUserId()
+    {
+        var raw =
+            User.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+        if (string.IsNullOrWhiteSpace(raw) || !int.TryParse(raw, out var userId))
+            throw new InvalidOperationException("Missing or invalid user id claim.");
+        return userId;
     }
 }
 
