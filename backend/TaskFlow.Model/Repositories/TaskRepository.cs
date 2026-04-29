@@ -10,13 +10,14 @@ public class TaskRepository : BaseRepository
     {
     }
 
-    public List<TaskItem> GetAll()
+    public List<TaskItem> GetAll(int userId)
     {
         var list = new List<TaskItem>();
         using var conn = new NpgsqlConnection(ConnectionString);
         using var cmd = new NpgsqlCommand(
-            "SELECT id, title, created_at FROM tasks ORDER BY id",
+            "SELECT id, title, created_at FROM tasks WHERE user_id = @user_id ORDER BY id",
             conn);
+        cmd.Parameters.AddWithValue("user_id", userId);
         conn.Open();
         using var reader = cmd.ExecuteReader();
         while (reader.Read())
@@ -32,12 +33,13 @@ public class TaskRepository : BaseRepository
         return list;
     }
 
-    public TaskItem Create(string title)
+    public TaskItem Create(int userId, string title)
     {
         using var conn = new NpgsqlConnection(ConnectionString);
         using var cmd = new NpgsqlCommand(
-            "INSERT INTO tasks (title) VALUES (@title) RETURNING id, title, created_at",
+            "INSERT INTO tasks (user_id, title) VALUES (@user_id, @title) RETURNING id, title, created_at",
             conn);
+        cmd.Parameters.AddWithValue("user_id", userId);
         cmd.Parameters.AddWithValue("title", title);
         conn.Open();
         using var reader = cmd.ExecuteReader();
@@ -52,16 +54,17 @@ public class TaskRepository : BaseRepository
         };
     }
 
-    public TaskItem? Update(int id, string title)
+    public TaskItem? Update(int userId, int id, string title)
     {
     using var conn = new NpgsqlConnection(ConnectionString);
     using var cmd = new NpgsqlCommand(
         @"UPDATE tasks
           SET title = @title
-          WHERE id = @id
+          WHERE id = @id AND user_id = @user_id
           RETURNING id, title, created_at",
         conn);
 
+    cmd.Parameters.AddWithValue("user_id", userId);
     cmd.Parameters.AddWithValue("id", id);
     cmd.Parameters.AddWithValue("title", title);
 
@@ -79,13 +82,14 @@ public class TaskRepository : BaseRepository
     };
     }
 
-    public bool Delete(int id)
+    public bool Delete(int userId, int id)
     {
         using var conn = new NpgsqlConnection(ConnectionString);
         using var cmd = new NpgsqlCommand(
-            "DELETE FROM tasks WHERE id = @id",
+            "DELETE FROM tasks WHERE id = @id AND user_id = @user_id",
             conn);
         conn.Open();
+        cmd.Parameters.AddWithValue("user_id", userId);
         cmd.Parameters.AddWithValue("id", id);
         var affected = cmd.ExecuteNonQuery();
         return affected > 0;

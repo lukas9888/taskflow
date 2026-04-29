@@ -1,0 +1,6 @@
+.tasks-page__topbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.75rem;
+}
+

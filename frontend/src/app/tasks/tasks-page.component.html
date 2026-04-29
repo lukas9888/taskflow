@@ -1,0 +1,15 @@
+@if (loadError) {
+  <p class="shell__error" role="alert">{{ loadError }}</p>
+}
+
+<div class="tasks-page__topbar">
+  <button type="button" (click)="logout()">Logout</button>
+</div>
+
+<app-task-form (created)="refreshTasks()" />
+<app-task-list
+  [tasks]="tasks"
+  (taskDeleted)="refreshTasks()"
+  (taskUpdated)="refreshTasks()"
+/>
+
