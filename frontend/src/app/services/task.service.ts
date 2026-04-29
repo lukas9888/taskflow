@@ -15,12 +15,12 @@ export class TaskService {
     return this.http.get<TaskItem[]>(this.baseUrl);
   }
 
-  createTask(title: string): Observable<TaskItem> {
-    return this.http.post<TaskItem>(this.baseUrl, { title });
+  createTask(title: string, dueAt: string | null): Observable<TaskItem> {
+    return this.http.post<TaskItem>(this.baseUrl, { title, dueAt });
   }
 
-  updateTask(id: number, title: string): Observable<TaskItem> {
-  return this.http.put<TaskItem>(`${this.baseUrl}/${id}`, { title });
+  updateTask(id: number, title: string, dueAt: string | null): Observable<TaskItem> {
+  return this.http.put<TaskItem>(`${this.baseUrl}/${id}`, { title, dueAt });
   }
 
   deleteTask(id: number): Observable<void> {
