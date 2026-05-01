@@ -4,7 +4,7 @@ import { TaskFormComponent } from '../task-form/task-form.component';
 import { TaskListComponent } from '../task-list/task-list.component';
 import { TaskItem } from '../models/task-item';
 import { TaskService } from '../services/task.service';
-import { AuthService } from '../auth/auth.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-tasks-page',
