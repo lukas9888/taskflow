@@ -32,7 +32,7 @@ VALUES ('demo', 'demo@taskflow.local', crypt('demo1234', gen_salt('bf')));
 
 INSERT INTO tasks (user_id, title) VALUES
     ((SELECT id FROM users WHERE username = 'demo'), 'Set up PostgreSQL'),
-    ((SELECT id FROM users WHERE username = 'demo'), 'Run the API and Swagger'),
+    ((SELECT id FROM users WHERE username = 'demo'), 'Set up the API and Swagger'),
     ((SELECT id FROM users WHERE username = 'demo'), 'Connect Angular to backend'),
     ((SELECT id FROM users WHERE username = 'demo'), 'Write project report draft'),
     ((SELECT id FROM users WHERE username = 'demo'), 'Design second entity and FK'),
@@ -40,8 +40,22 @@ INSERT INTO tasks (user_id, title) VALUES
     ((SELECT id FROM users WHERE username = 'demo'), 'Add form validation messages'),
     ((SELECT id FROM users WHERE username = 'demo'), 'Test CRUD in Swagger'),
     ((SELECT id FROM users WHERE username = 'demo'), 'Prepare oral exam demo'),
-    ((SELECT id FROM users WHERE username = 'demo'), 'Zip source without node_modules'),
-    ((SELECT id FROM users WHERE username = 'demo'), 'Write project report draft');
+    ((SELECT id FROM users WHERE username = 'demo'), 'Zip source without node_modules');
+
+
+INSERT INTO task_dependencies (task_id, depends_on) VALUES
+   (3,2),
+   (8,2),
+   (8,6),
+   (5,1), 
+   (10,1),
+   (10,2),
+   (10,3),
+   (10,5),
+   (10,6),
+   (10,7),
+   (10,8)
+  ON CONFLICT DO NOTHING;
 
 COMMIT;
 

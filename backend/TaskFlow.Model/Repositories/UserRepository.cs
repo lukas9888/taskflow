@@ -13,6 +13,7 @@ public class UserRepository : BaseRepository
     public User? FindByUsernameOrEmail(string login)
     {
         using var conn = new NpgsqlConnection(ConnectionString);
+
         using var cmd = new NpgsqlCommand(
             @"SELECT id, username, email, password_hash, created_at
               FROM users
@@ -20,6 +21,7 @@ public class UserRepository : BaseRepository
               LIMIT 1",
             conn);
         cmd.Parameters.AddWithValue("login", login);
+
         conn.Open();
         using var reader = cmd.ExecuteReader();
         if (!reader.Read())
@@ -38,6 +40,7 @@ public class UserRepository : BaseRepository
     public User Create(string username, string email, string passwordHash)
     {
         using var conn = new NpgsqlConnection(ConnectionString);
+
         using var cmd = new NpgsqlCommand(
             @"INSERT INTO users (username, email, password_hash)
               VALUES (@username, @email, @password_hash)
@@ -46,6 +49,7 @@ public class UserRepository : BaseRepository
         cmd.Parameters.AddWithValue("username", username);
         cmd.Parameters.AddWithValue("email", email);
         cmd.Parameters.AddWithValue("password_hash", passwordHash);
+
         conn.Open();
         using var reader = cmd.ExecuteReader();
         if (!reader.Read())
