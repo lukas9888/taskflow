@@ -1,10 +1,16 @@
 @if (loadError) {
-  <p class="shell__error" role="alert">{{ loadError }}</p>
+  <mat-card class="tasks-alert" appearance="outlined">
+    <mat-card-content>
+      <p class="form-error" role="alert">{{ loadError }}</p>
+    </mat-card-content>
+  </mat-card>
 }
 
-<div class="tasks-page__topbar">
-  <button type="button" (click)="logout()">Logout</button>
-</div>
+<mat-toolbar class="tasks-toolbar">
+  <span class="tasks-toolbar-title">Tasks</span>
+  <span class="spacer"></span>
+  <button mat-stroked-button type="button" (click)="logout()">Logout</button>
+</mat-toolbar>
 
 <app-task-form (created)="refreshTasks()" />
 <app-task-list
@@ -12,4 +18,3 @@
   (taskDeleted)="refreshTasks()"
   (taskUpdated)="refreshTasks()"
 />
-

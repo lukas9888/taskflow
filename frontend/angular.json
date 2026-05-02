@@ -52,7 +52,9 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "@angular/cdk/overlay-prebuilt.css",
+              "@angular/cdk/text-field-prebuilt.css",
+              "src/styles.scss"
             ],
             "scripts": []
           },
@@ -61,8 +63,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "850kB",
+                  "maximumError": "1.5MB"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -110,7 +112,9 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "@angular/cdk/overlay-prebuilt.css",
+              "@angular/cdk/text-field-prebuilt.css",
+              "src/styles.scss"
             ],
             "scripts": []
           }

@@ -1,28 +1,55 @@
-<section class="auth">
-  <h2>Login</h2>
+<div class="auth-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Login</mat-card-title>
+    </mat-card-header>
 
-  @if (error) {
-    <p class="auth__error" role="alert">{{ error }}</p>
-  }
+    <mat-card-content>
+      @if (error) {
+        <p class="form-error" role="alert">{{ error }}</p>
+      }
 
-  <form (ngSubmit)="submit()" class="auth__form">
-    <label>
-      Login (username or email)
-      <input type="text" [(ngModel)]="login" name="login" required minlength="3" />
-    </label>
+      <form (ngSubmit)="submit()" class="form-stack auth-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Login (username or email)</mat-label>
+          <input
+            matInput
+            type="text"
+            [(ngModel)]="login"
+            name="login"
+            required
+            minlength="3"
+            autocomplete="username"
+          />
+        </mat-form-field>
 
-    <label>
-      Password
-      <input type="password" [(ngModel)]="password" name="password" required minlength="8" />
-    </label>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input
+            matInput
+            type="password"
+            [(ngModel)]="password"
+            name="password"
+            required
+            minlength="8"
+            autocomplete="current-password"
+          />
+        </mat-form-field>
 
-    <button type="submit" [disabled]="submitting">
-      {{ submitting ? 'Signing in…' : 'Sign in' }}
-    </button>
-  </form>
+        <button
+          mat-flat-button
+          color="primary"
+          type="submit"
+          class="full-width"
+          [disabled]="submitting"
+        >
+          {{ submitting ? 'Signing in…' : 'Sign in' }}
+        </button>
+      </form>
+    </mat-card-content>
 
-  <p class="auth__muted">
-    No account? <a routerLink="/register">Register</a>
-  </p>
-</section>
-
+    <mat-card-actions align="end">
+      <span class="auth-muted">No account? <a routerLink="/register">Register</a></span>
+    </mat-card-actions>
+  </mat-card>
+</div>

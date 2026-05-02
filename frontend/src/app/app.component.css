@@ -1,22 +1,33 @@
-.shell {
-  max-width: 40rem;
+.app-toolbar {
+  flex-wrap: wrap;
+  height: auto;
+  min-height: 56px;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  align-items: flex-start;
+}
+
+.app-branding {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.app-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.app-subtitle {
+  font-size: 0.8rem;
+  font-weight: 400;
+  opacity: 0.9;
+}
+
+.app-main {
+  max-width: 48rem;
   margin: 0 auto;
-  padding: 1.5rem;
-  font-family: system-ui, sans-serif;
-}
-
-.shell__header h1 {
-  margin: 0 0 0.25rem;
-  font-size: 1.75rem;
-}
-
-.shell__sub {
-  margin: 0 0 1.5rem;
-  color: #444;
-  font-size: 0.95rem;
-}
-
-.shell__error {
-  color: #b00020;
-  margin-bottom: 1rem;
+  padding: 1rem 1rem 2rem;
+  box-sizing: border-box;
 }

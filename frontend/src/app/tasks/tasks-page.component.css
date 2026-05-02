@@ -1,6 +1,13 @@
-.tasks-page__topbar {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 0.75rem;
+.tasks-toolbar {
+  margin-bottom: var(--card-header-content-gap);
+  border-radius: 8px;
+  background-color: var(--mat-sys-surface-container);
 }
 
+.tasks-toolbar-title {
+  font-weight: 600;
+}
+
+.tasks-alert {
+  margin-bottom: 1rem;
+}

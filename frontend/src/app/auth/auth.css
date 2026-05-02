@@ -1,28 +1,24 @@
-.auth {
+.auth-container {
   max-width: 28rem;
-  margin: 1.25rem auto;
-  padding: 1rem;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 0.5rem;
-  background: rgba(255, 255, 255, 0.7);
+  margin: 1rem auto;
 }
 
-.auth__form {
-  display: grid;
-  gap: 0.75rem;
+/* .form-stack (global) supplies flex + gap */
+.auth-form {
+  margin-top: 0;
 }
 
-.auth__form label {
-  display: grid;
-  gap: 0.25rem;
+.auth-muted {
+  font-size: 0.875rem;
+  opacity: 0.85;
 }
 
-.auth__error {
-  color: #b42318;
+.auth-muted a {
+  color: var(--mat-sys-primary);
+  text-decoration: none;
+  font-weight: 500;
 }
 
-.auth__muted {
-  margin-top: 0.75rem;
-  opacity: 0.8;
+.auth-muted a:hover {
+  text-decoration: underline;
 }
-

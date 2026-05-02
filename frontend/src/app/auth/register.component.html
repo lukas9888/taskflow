@@ -1,46 +1,69 @@
-<section class="auth">
-  <h2>Register</h2>
+<div class="auth-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Register</mat-card-title>
+    </mat-card-header>
 
-  @if (error) {
-    <p class="auth__error" role="alert">{{ error }}</p>
-  }
+    <mat-card-content>
+      @if (error) {
+        <p class="form-error" role="alert">{{ error }}</p>
+      }
 
-  <form (ngSubmit)="submit()" class="auth__form">
-    <label>
-      Username
-      <input
-        type="text"
-        [(ngModel)]="username"
-        name="username"
-        required
-        minlength="3"
-        maxlength="100"
-      />
-    </label>
+      <form (ngSubmit)="submit()" class="form-stack auth-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Username</mat-label>
+          <input
+            matInput
+            type="text"
+            [(ngModel)]="username"
+            name="username"
+            required
+            minlength="3"
+            maxlength="100"
+            autocomplete="username"
+          />
+        </mat-form-field>
 
-    <label>
-      Email
-      <input type="email" [(ngModel)]="email" name="email" required maxlength="255" />
-    </label>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input
+            matInput
+            type="email"
+            [(ngModel)]="email"
+            name="email"
+            required
+            maxlength="255"
+            autocomplete="email"
+          />
+        </mat-form-field>
 
-    <label>
-      Password (min 8 chars)
-      <input
-        type="password"
-        [(ngModel)]="password"
-        name="password"
-        required
-        minlength="8"
-      />
-    </label>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password (min 8 chars)</mat-label>
+          <input
+            matInput
+            type="password"
+            [(ngModel)]="password"
+            name="password"
+            required
+            minlength="8"
+            autocomplete="new-password"
+          />
+        </mat-form-field>
 
-    <button type="submit" [disabled]="submitting">
-      {{ submitting ? 'Creating…' : 'Create account' }}
-    </button>
-  </form>
+        <button
+          mat-flat-button
+          color="primary"
+          type="submit"
+          class="full-width"
+          [disabled]="submitting"
+        >
+          {{ submitting ? 'Creating…' : 'Create account' }}
+        </button>
+      </form>
+    </mat-card-content>
 
-  <p class="auth__muted">
-    Already have an account? <a routerLink="/login">Login</a>
-  </p>
-</section>
-
+    <mat-card-actions align="end">
+      <span class="auth-muted">Already have an account? <a routerLink="/login">Login</a></span>
+    </mat-card-actions>
+  </mat-card>
+</div>

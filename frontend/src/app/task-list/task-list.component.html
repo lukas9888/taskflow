@@ -1,19 +1,21 @@
-<section class="list-section" aria-labelledby="task-list-heading">
-  <h2 id="task-list-heading">Your tasks</h2>
+<mat-card class="list-card">
+  <mat-card-header>
+    <mat-card-title>Your tasks</mat-card-title>
+  </mat-card-header>
 
-  @if (tasks.length === 0) {
-    <p class="list-section__empty">No tasks yet. Add one above.</p>
-  } @else {
-    <ul class="list-section__ul">
-      @for (t of tasks; track t.id) {
-        <li class="list-section__li">
-          <app-task-row 
-          [task]="t" 
-          (deleted)="onRowDeleted()"
-          (updated)="onRowUpdated()"
+  <mat-card-content>
+    @if (tasks.length === 0) {
+      <p class="list-empty">No tasks yet. Add one above.</p>
+    } @else {
+      <div class="task-stack">
+        @for (t of tasks; track t.id) {
+          <app-task-row
+            [task]="t"
+            (deleted)="onRowDeleted()"
+            (updated)="onRowUpdated()"
           />
-        </li>
-      }
-    </ul>
-  }
-</section>
+        }
+      </div>
+    }
+  </mat-card-content>
+</mat-card>

@@ -1,35 +1,94 @@
-<div class="row">
-  @if (!isEditing) {
-    <span class="row__title">{{ task.title }}</span>
-    <span class="row__meta">#{{ task.id }}</span>
+<mat-card class="task-row-card" appearance="outlined">
+  <mat-card-content>
+    @if (!isEditing) {
+      <div class="row-read">
+        <div class="row-text">
+          <span class="row-title">{{ task.title }}</span>
+          <div class="row-meta">
+            <span>#{{ task.id }}</span>
+            @if (task.dueAt) {
+              <span>Due: {{ task.dueAt | date: 'short' }}</span>
+            }
+          </div>
+        </div>
+        <div class="row-actions">
+          <button
+            mat-icon-button
+            type="button"
+            (click)="startEdit()"
+            aria-label="Edit task"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            type="button"
+            color="warn"
+            (click)="delete()"
+            aria-label="Delete task"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+    } @else {
+      <div class="row-edit form-stack">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Title</mat-label>
+          <input
+            matInput
+            type="text"
+            name="editTitle"
+            [(ngModel)]="editTitle"
+            minlength="2"
+            maxlength="500"
+          />
+        </mat-form-field>
 
-    @if (task.dueAt) {
-    <span class="row__meta">Due: {{ task.dueAt | date:'short' }}</span>
-    } 
+        <div class="datetime-row">
+          <mat-form-field appearance="outline" class="datetime-field">
+            <mat-label>Due date</mat-label>
+            <input
+              matInput
+              name="editDueDate"
+              [matDatepicker]="editDueDatePicker"
+              [(ngModel)]="editDueDate"
+              [min]="minDate"
+              (ngModelChange)="onEditDueDateChange()"
+              autocomplete="off"
+            />
+            <mat-datepicker-toggle matIconSuffix [for]="editDueDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #editDueDatePicker></mat-datepicker>
+          </mat-form-field>
 
-    <button type="button" (click)="startEdit()">Edit</button>
-    <button type="button" (click)="delete()">Delete</button>
-  } @else {
-    <input
-      type="text"
-      [(ngModel)]="editTitle"
-      minlength="2"
-      maxlength="500"
-    />
-    <input
-      type="datetime-local"
-      [(ngModel)]="editDueAt"
-      [min]="minDueAt"
-    />
-    <button type="button" (click)="saveEdit()" [disabled]="saving">
-      {{ saving ? 'Saving…' : 'Save' }}
-    </button>
-    <button type="button" (click)="cancelEdit()" [disabled]="saving">
-      Cancel
-    </button>
-  }
-</div>
+          <mat-form-field appearance="outline" class="datetime-field">
+            <mat-label>Due time</mat-label>
+            <input
+              matInput
+              name="editDueTime"
+              [matTimepicker]="editTimePicker"
+              [(ngModel)]="editDueTime"
+              [min]="editTimeMin"
+              autocomplete="off"
+            />
+            <mat-timepicker-toggle matIconSuffix [for]="editTimePicker"></mat-timepicker-toggle>
+            <mat-timepicker #editTimePicker interval="15min"></mat-timepicker>
+          </mat-form-field>
+        </div>
+
+        <div class="row-edit-actions">
+          <button mat-flat-button color="primary" type="button" (click)="saveEdit()" [disabled]="saving">
+            {{ saving ? 'Saving…' : 'Save' }}
+          </button>
+          <button mat-button type="button" (click)="cancelEdit()" [disabled]="saving">
+            Cancel
+          </button>
+        </div>
+      </div>
+    }
+  </mat-card-content>
+</mat-card>
 
 @if (editError) {
-  <p class="row__error" role="alert">{{ editError }}</p>
+  <p class="form-error row-error" role="alert">{{ editError }}</p>
 }

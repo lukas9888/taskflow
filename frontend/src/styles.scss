@@ -1,0 +1,104 @@
+@use '@angular/material' as mat;
+
+// Material 3 theme — TaskFlow (Stitch): Inter + indigo primary (#3525CD), warm tertiary
+:root {
+  // Vertical rhythm for stacked outlined mat-form-fields (label notch + subscript)
+  --form-stack-gap: 1rem;
+  // Space between mat-card title block and mat-card-content (floating labels need room)
+  --card-header-content-gap: 1.25rem;
+}
+
+html {
+  color-scheme: light;
+
+  @include mat.theme((
+    color: (
+      theme-type: light,
+      primary: mat.$violet-palette,
+      tertiary: mat.$orange-palette,
+    ),
+    typography: (
+      plain-family: 'Inter, sans-serif',
+      brand-family: 'Inter, sans-serif',
+      bold-weight: 700,
+      medium-weight: 500,
+      regular-weight: 400,
+    ),
+    density: 0,
+  ));
+
+  // Pin brand primary / tertiary to Stitch hex where system tokens allow overrides
+  @include mat.theme-overrides((
+    primary: #3525cd,
+    on-primary: #ffffff,
+    tertiary: #7e3000,
+  ));
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+}
+
+// Ensure date/time pickers sit above app chrome (toolbar, etc.)
+.cdk-overlay-container {
+  z-index: 2000;
+}
+
+// Shared utility classes for standalone screens
+.full-width {
+  width: 100%;
+}
+
+// Stack outlined fields, buttons, and action rows with consistent spacing
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--form-stack-gap);
+  align-items: stretch;
+}
+
+// Due date + time on one row (wraps on narrow viewports)
+.datetime-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--form-stack-gap);
+  align-items: flex-start;
+}
+
+.datetime-row .datetime-field {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.form-error {
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+  color: var(--mat-sys-error);
+}
+
+// Inline alert above the first field in a card (login/register)
+mat-card-content > .form-error:first-child {
+  margin: 0 0 var(--form-stack-gap);
+}
+
+// Card headers: outlined fields need clear separation from the title row
+mat-card mat-card-header {
+  display: block;
+  margin-bottom: var(--card-header-content-gap);
+}
+
+mat-card > mat-card-content {
+  padding-top: 0.5rem;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}

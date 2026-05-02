@@ -1,21 +1,46 @@
-.row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.5rem 0.65rem;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  background: #fff;
+.task-row-card {
+  --mat-card-outlined-outline-width: 1px;
 }
 
-.row__title {
+.row-read {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.row-text {
   flex: 1;
+  min-width: 0;
+}
+
+.row-title {
+  display: block;
+  font-weight: 500;
   word-break: break-word;
 }
 
-.row__meta {
+.row-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
   font-size: 0.8rem;
-  color: #666;
-  white-space: nowrap;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.row-actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.row-edit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.row-error {
+  margin: 0.25rem 0 0;
 }
