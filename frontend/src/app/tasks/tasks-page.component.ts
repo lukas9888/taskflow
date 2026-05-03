@@ -1,23 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { Router } from '@angular/router';
 import { TaskFormComponent } from '../task-form/task-form.component';
 import { TaskListComponent } from '../task-list/task-list.component';
 import { TaskItem } from '../models/task-item';
 import { TaskService } from '../services/task.service';
-import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-tasks-page',
-  imports: [
-    TaskFormComponent,
-    TaskListComponent,
-    MatToolbarModule,
-    MatButtonModule,
-    MatCardModule
-  ],
+  imports: [TaskFormComponent, TaskListComponent, MatCardModule],
   templateUrl: './tasks-page.component.html',
   styleUrl: './tasks-page.component.css'
 })
@@ -25,11 +15,7 @@ export class TasksPageComponent implements OnInit {
   tasks: TaskItem[] = [];
   loadError: string | null = null;
 
-  constructor(
-    private readonly taskService: TaskService,
-    private readonly auth: AuthService,
-    private readonly router: Router
-  ) {}
+  constructor(private readonly taskService: TaskService) {}
 
   ngOnInit(): void {
     this.refreshTasks();
@@ -45,9 +31,5 @@ export class TasksPageComponent implements OnInit {
     });
   }
 
-  logout(): void {
-    this.auth.logout();
-    this.router.navigateByUrl('/login');
-  }
 }
 

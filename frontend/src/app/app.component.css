@@ -1,28 +1,24 @@
 .app-toolbar {
-  flex-wrap: wrap;
+  min-height: 64px;
   height: auto;
-  min-height: 56px;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
-  align-items: flex-start;
+  align-items: center;
 }
 
-.app-branding {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
+.app-logout-btn {
+  border-color: color-mix(in srgb, var(--mat-sys-on-primary) 55%, transparent);
+  color: var(--mat-sys-on-primary);
+  flex-shrink: 0;
 }
 
-.app-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-.app-subtitle {
-  font-size: 0.8rem;
-  font-weight: 400;
-  opacity: 0.9;
+.app-toolbar-logo {
+  display: block;
+  height: 3rem;
+  width: auto;
+  max-width: min(14rem, 42vw);
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .app-main {

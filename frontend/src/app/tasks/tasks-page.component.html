@@ -1,3 +1,5 @@
+<h1 class="tasks-page-title">Tasks</h1>
+
 @if (loadError) {
   <mat-card class="tasks-alert" appearance="outlined">
     <mat-card-content>
@@ -5,12 +7,6 @@
     </mat-card-content>
   </mat-card>
 }
-
-<mat-toolbar class="tasks-toolbar">
-  <span class="tasks-toolbar-title">Tasks</span>
-  <span class="spacer"></span>
-  <button mat-stroked-button type="button" (click)="logout()">Logout</button>
-</mat-toolbar>
 
 <app-task-form (created)="refreshTasks()" />
 <app-task-list

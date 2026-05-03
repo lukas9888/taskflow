@@ -1,8 +1,15 @@
 <mat-toolbar color="primary" class="app-toolbar">
-  <div class="app-branding">
-    <span class="app-title">TaskFlow</span>
-    <span class="app-subtitle">CBS Applied Programming — minimal full-stack POC</span>
-  </div>
+  <img
+    class="app-toolbar-logo"
+    src="logo-taskflow.png"
+    alt="TaskFlow"
+  />
+  <span class="spacer"></span>
+  @if (auth.isLoggedIn()) {
+    <button mat-stroked-button type="button" class="app-logout-btn" (click)="logout()">
+      Logout
+    </button>
+  }
 </mat-toolbar>
 
 <main class="app-main">
