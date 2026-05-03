@@ -27,11 +27,24 @@ html {
     density: 0,
   ));
 
-  // Pin brand primary / tertiary to Stitch hex where system tokens allow overrides
+  // Brand colors + Stitch shape radii (px only; DESIGN.md)
   @include mat.theme-overrides((
     primary: #3525cd,
     on-primary: #ffffff,
     tertiary: #7e3000,
+    corner-none: 0,
+    // Outlined/filled text fields use `corner-extra-small` (buttons use `corner-full`)
+    corner-extra-small: 6px,
+    corner-extra-small-top: 6px 6px 0 0,
+    corner-small: 4px,
+    corner-medium: 8px,
+    corner-large: 12px,
+    corner-large-top: 12px 12px 0 0,
+    corner-large-end: 0 12px 12px 0,
+    corner-large-start: 12px 0 0 12px,
+    corner-extra-large: 12px,
+    corner-extra-large-top: 12px 12px 0 0,
+    corner-full: 6px,
   ));
 }
 

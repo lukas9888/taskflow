@@ -3,6 +3,10 @@
   margin: 1rem auto;
 }
 
+.auth-container mat-card {
+  --mat-card-outlined-outline-width: 1px;
+}
+
 /* .form-stack (global) supplies flex + gap */
 .auth-form {
   margin-top: 0;

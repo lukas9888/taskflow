@@ -71,7 +71,7 @@ Use **Body medium** for dense forms; **Title large** for card titles; **Headline
 ## Spacing & shape (Stitch reference)
 
 - **Spacing**: `xs` 4px, `base` 8px, `sm` 12px, `md` 24px, `margin` 32px, `lg` 48px, `xl` 64px, `gutter` 24px.
-- **Radius**: default 0.125rem (2px), `lg` 0.25rem, `xl` 0.5rem, full 0.75rem — prefer Material component defaults; use `mat-card` / `mat-form-field` for consistency.
+- **Radius** (px in code): default **2px**, `lg` **4px**, `xl` **8px**, full **12px**; buttons and outlined fields use **6px** where noted in `styles.scss` — applied via `mat.theme-overrides` (`--mat-sys-corner-*`).
 
 ## Angular Material — component guidelines
 
