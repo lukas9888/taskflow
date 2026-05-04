@@ -82,13 +82,16 @@ public class AuthController : ControllerBase
             new(JwtRegisteredClaimNames.Email, user.Email)
         };
 
-        // No `exp` claim — tokens do not expire until logout or signing key rotation.
+        var lifetimeHours = jwt.GetValue<double?>("AccessTokenLifetimeHours") ?? 24;
+        var now = DateTime.UtcNow;
+        var expires = now.AddHours(lifetimeHours);
+
         var token = new JwtSecurityToken(
             issuer: issuer,
             audience: audience,
             claims: claims,
-            notBefore: null,
-            expires: null,
+            notBefore: now,
+            expires: expires,
             signingCredentials: creds);
 
         var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
