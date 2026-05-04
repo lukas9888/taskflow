@@ -44,7 +44,8 @@ public static class ServiceCollectionExtensions
                     ValidIssuer = jwt.GetValue<string>("Issuer"),
                     ValidateAudience = true,
                     ValidAudience = jwt.GetValue<string>("Audience"),
-                    ValidateLifetime = true,
+                    // Access tokens omit `exp`; lifetime is managed client-side (logout) only.
+                    ValidateLifetime = false,
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey)),
                     ClockSkew = TimeSpan.FromSeconds(30)
