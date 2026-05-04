@@ -3,6 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { TaskItem } from '../models/task-item';
 
+export type UpdateTaskBody = {
+  title: string;
+  dueAt: string | null;
+  priority: string;
+  category: string;
+  description: string | null;
+};
+
 @Injectable({
   providedIn: 'root'
 })
@@ -19,8 +27,8 @@ export class TaskService {
     return this.http.post<TaskItem>(this.baseUrl, { title, dueAt });
   }
 
-  updateTask(id: number, title: string, dueAt: string | null): Observable<TaskItem> {
-  return this.http.put<TaskItem>(`${this.baseUrl}/${id}`, { title, dueAt });
+  updateTask(id: number, body: UpdateTaskBody): Observable<TaskItem> {
+    return this.http.put<TaskItem>(`${this.baseUrl}/${id}`, body);
   }
 
   deleteTask(id: number): Observable<void> {

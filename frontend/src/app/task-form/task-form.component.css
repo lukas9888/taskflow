@@ -1,4 +1,17 @@
-.task-form-card {
-  --mat-card-outlined-outline-width: 1px;
-  margin-bottom: 1.25rem;
+.task-composer {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.task-composer-field {
+  width: 100%;
+}
+
+.task-composer-prefix {
+  margin-right: 4px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.task-composer-error {
+  margin: -0.5rem 0 1rem;
 }

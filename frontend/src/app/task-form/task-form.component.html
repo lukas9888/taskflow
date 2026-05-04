@@ -1,71 +1,20 @@
-<mat-card class="task-form-card" appearance="outlined">
-  <mat-card-header>
-    <mat-card-title>New task</mat-card-title>
-  </mat-card-header>
+<form class="task-composer" (ngSubmit)="submit()" #taskForm="ngForm" novalidate>
+  <mat-form-field appearance="outline" class="task-composer-field" subscriptSizing="dynamic">
+    <mat-icon matPrefix class="task-composer-prefix" aria-hidden="true">add</mat-icon>
+    <input
+      matInput
+      name="composerTitle"
+      [(ngModel)]="title"
+      required
+      minlength="2"
+      maxlength="500"
+      placeholder="Add a new task…"
+      autocomplete="off"
+      [disabled]="submitting"
+    />
+  </mat-form-field>
+</form>
 
-  <mat-card-content>
-    <form class="form-stack" (ngSubmit)="submit()" #taskForm="ngForm" novalidate>
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Title</mat-label>
-        <input
-          id="task-title"
-          matInput
-          name="title"
-          [(ngModel)]="title"
-          required
-          minlength="2"
-          maxlength="500"
-          #titleField="ngModel"
-          autocomplete="off"
-        />
-        @if (titleField.invalid && titleField.touched) {
-          <mat-error>Enter at least 2 characters (max 500).</mat-error>
-        }
-      </mat-form-field>
-
-      <div class="datetime-row">
-        <mat-form-field appearance="outline" class="datetime-field">
-          <mat-label>Due date</mat-label>
-          <input
-            matInput
-            name="dueDate"
-            [matDatepicker]="dueDatePicker"
-            [(ngModel)]="dueDate"
-            [min]="minDate"
-            (ngModelChange)="onDueDateChange()"
-            autocomplete="off"
-          />
-          <mat-datepicker-toggle matIconSuffix [for]="dueDatePicker"></mat-datepicker-toggle>
-          <mat-datepicker #dueDatePicker></mat-datepicker>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="datetime-field">
-          <mat-label>Due time</mat-label>
-          <input
-            matInput
-            name="dueTime"
-            [matTimepicker]="dueTimePicker"
-            [(ngModel)]="dueTime"
-            [min]="timeMin"
-            autocomplete="off"
-          />
-          <mat-timepicker-toggle matIconSuffix [for]="dueTimePicker"></mat-timepicker-toggle>
-          <mat-timepicker #dueTimePicker interval="15min"></mat-timepicker>
-        </mat-form-field>
-      </div>
-
-      <button
-        mat-flat-button
-        color="primary"
-        type="submit"
-        [disabled]="taskForm.invalid || submitting"
-      >
-        {{ submitting ? 'Saving…' : 'Add task' }}
-      </button>
-    </form>
-
-    @if (submitError) {
-      <p class="form-error" role="alert">{{ submitError }}</p>
-    }
-  </mat-card-content>
-</mat-card>
+@if (submitError) {
+  <p class="form-error task-composer-error" role="alert">{{ submitError }}</p>
+}

@@ -8,9 +8,38 @@
   </mat-card>
 }
 
-<app-task-form (created)="refreshTasks()" />
-<app-task-list
-  [tasks]="tasks"
-  (taskDeleted)="refreshTasks()"
-  (taskUpdated)="refreshTasks()"
-/>
+<mat-sidenav-container
+  class="tasks-shell"
+  [hasBackdrop]="isNarrow()"
+  (backdropClick)="onDetailClosed()"
+>
+  <mat-sidenav
+    class="tasks-detail-drawer"
+    position="end"
+    [mode]="isNarrow() ? 'over' : 'side'"
+    [opened]="selectedTask !== null"
+    [fixedInViewport]="true"
+    [fixedTopGap]="toolbarTopGapPx"
+  >
+    @if (selectedTask; as task) {
+      <app-task-detail-pane
+        [task]="task"
+        (taskUpdated)="refreshTasks()"
+        (taskDeleted)="onTaskDeletedFromPane()"
+        (closed)="onDetailClosed()"
+      />
+    }
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <div class="tasks-page-content">
+      <app-task-form (created)="refreshTasks()" />
+
+      <app-task-list
+        [tasks]="tasks"
+        [selectedTaskId]="selectedTaskId"
+        (selectedTaskIdChange)="onSelectedTaskIdChange($event)"
+      />
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

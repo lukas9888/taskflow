@@ -6,10 +6,21 @@
   --form-stack-gap: 1rem;
   // Space between mat-card title block and mat-card-content (floating labels need room)
   --card-header-content-gap: 1.25rem;
+  // App chrome: must match .app-toolbar total block height (min-height 64px, border-box; see app.component.css)
+  --app-toolbar-total-height: 64px;
+  // Subtle separation for toolbar + sidesheet (Stitch-style)
+  --app-chrome-border: #eff0f3;
+  // Above overlays (e.g. mat-sidenav over mode) so toolbar + its bottom border aren’t covered if heights overlap slightly
+  --app-toolbar-z-index: 400;
+  // Fixed task detail sidesheet width (matches tasks-page padding-right)
+  --task-detail-sheet-width: min(480px, 100vw);
+  // Stitch: page canvas behind white list/sheet panels
+  --app-canvas-background: #f8f9fb;
 }
 
 html {
   color-scheme: light;
+  background-color: var(--app-canvas-background);
 
   @include mat.theme((
     color: (
@@ -32,6 +43,13 @@ html {
     primary: #3525cd,
     on-primary: #ffffff,
     tertiary: #7e3000,
+    // M3 default `surface` reads pink-tinted (~#fdf8fc); keep main panels / fields true white.
+    // Leave `surface-container*` to the theme so segmented controls etc. can use real greys.
+    background: #f8f9fb,
+    surface: #ffffff,
+    surface-bright: #ffffff,
+    surface-variant: #ffffff,
+    surface-tint: #ffffff,
     corner-none: 0,
     // Outlined/filled text fields use `corner-extra-small` (buttons use `corner-full`)
     corner-extra-small: 6px,
@@ -56,7 +74,7 @@ body {
 body {
   margin: 0;
   font-family: 'Inter', sans-serif;
-  background-color: var(--mat-sys-surface);
+  background-color: var(--app-canvas-background);
   color: var(--mat-sys-on-surface);
 }
 

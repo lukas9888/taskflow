@@ -1,9 +1,15 @@
 .app-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--app-toolbar-z-index, 400);
+  box-sizing: border-box;
+  width: 100%;
   min-height: 64px;
   height: auto;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   align-items: center;
+  border-bottom: 1px solid var(--app-chrome-border, #eff0f3);
 }
 
 .app-logout-btn {
@@ -22,8 +28,8 @@
 }
 
 .app-main {
-  max-width: 48rem;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem 1rem 2rem;
+  padding: 16px 16px 32px;
   box-sizing: border-box;
 }

@@ -1,21 +1,40 @@
-<mat-card class="list-card" appearance="outlined">
-  <mat-card-header>
-    <mat-card-title>Your tasks</mat-card-title>
-  </mat-card-header>
+<section class="task-list-section">
+  <div class="list-toolbar">
+    <mat-button-toggle-group
+      class="list-filter-toggle"
+      [(ngModel)]="listFilter"
+      aria-label="Filter tasks by due date"
+      hideSingleSelectionIndicator
+      appearance="standard"
+    >
+      <mat-button-toggle value="today">Today</mat-button-toggle>
+      <mat-button-toggle value="week">Next 7 days</mat-button-toggle>
+      <mat-button-toggle value="all">All</mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
 
-  <mat-card-content>
-    @if (tasks.length === 0) {
-      <p class="list-empty">No tasks yet. Add one above.</p>
+  <div class="list-surface">
+    @if (visibleTasks.length === 0) {
+      <p class="list-empty">
+        @if (tasks.length === 0) {
+          No tasks yet. Add one above.
+        } @else {
+          No tasks match this filter.
+        }
+      </p>
     } @else {
-      <div class="task-stack">
-        @for (t of tasks; track t.id) {
+      <mat-nav-list class="task-rows" aria-label="Tasks">
+        @for (t of visibleTasks; track t.id; let last = $last) {
           <app-task-row
             [task]="t"
-            (deleted)="onRowDeleted()"
-            (updated)="onRowUpdated()"
+            [selected]="selectedTaskId === t.id"
+            [completed]="completedTaskIds.has(t.id)"
+            [showDivider]="!last"
+            (select)="selectedTaskIdChange.emit(t.id)"
+            (completedChange)="onCompletedChange(t.id, $event)"
           />
         }
-      </div>
+      </mat-nav-list>
     }
-  </mat-card-content>
-</mat-card>
+  </div>
+</section>
