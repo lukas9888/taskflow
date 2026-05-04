@@ -1,0 +1,148 @@
+<mat-toolbar class="detail-toolbar">
+  <span class="detail-toolbar-title">Task Details</span>
+  <span class="detail-toolbar-spacer"></span>
+  <button
+    mat-icon-button
+    type="button"
+    (click)="requestClose()"
+    aria-label="Close task details"
+  >
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-toolbar>
+
+<section class="detail-body">
+  <form class="detail-form" (ngSubmit)="save()" novalidate>
+    <div class="detail-section">
+      <mat-form-field appearance="outline" class="full-width" subscriptSizing="dynamic">
+        <mat-label>Title</mat-label>
+        <input
+          matInput
+          name="detailTitle"
+          [(ngModel)]="title"
+          required
+          minlength="2"
+          maxlength="500"
+          autocomplete="off"
+        />
+      </mat-form-field>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-datetime-row datetime-row">
+        <mat-form-field appearance="outline" class="datetime-field" subscriptSizing="dynamic">
+          <mat-label>Date</mat-label>
+          <input
+            matInput
+            name="detailDueDate"
+            [matDatepicker]="duePicker"
+            [(ngModel)]="dueDate"
+            [min]="minDate"
+            (ngModelChange)="onDueDateChange()"
+            autocomplete="off"
+          />
+          <mat-datepicker-toggle matIconSuffix [for]="duePicker"></mat-datepicker-toggle>
+          <mat-datepicker #duePicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="datetime-field" subscriptSizing="dynamic">
+          <mat-label>Time</mat-label>
+          <input
+            matInput
+            name="detailDueTime"
+            [matTimepicker]="timePicker"
+            [(ngModel)]="dueTime"
+            [min]="timeMin"
+            autocomplete="off"
+          />
+          <mat-timepicker-toggle matIconSuffix [for]="timePicker"></mat-timepicker-toggle>
+          <mat-timepicker #timePicker interval="15min"></mat-timepicker>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-priority-category-row">
+        <mat-form-field appearance="outline" class="detail-pc-field" subscriptSizing="dynamic">
+          <mat-label>Priority</mat-label>
+          <mat-select name="detailPriority" [(ngModel)]="priority">
+            <mat-select-trigger>
+              <span class="detail-prio-option">
+                <mat-icon
+                  class="detail-prio-icon"
+                  inline
+                  [style.color]="priorityColor(priority)"
+                  aria-hidden="true"
+                >{{ priorityIcon(priority) }}</mat-icon>
+                {{ priorityLabel(priority) }}
+              </span>
+            </mat-select-trigger>
+            @for (p of priorityOptions; track p) {
+              <mat-option [value]="p">
+                <span class="detail-prio-option">
+                  <mat-icon
+                    class="detail-prio-icon"
+                    inline
+                    [style.color]="priorityColor(p)"
+                    aria-hidden="true"
+                  >{{ priorityIcon(p) }}</mat-icon>
+                  {{ priorityLabel(p) }}
+                </span>
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="detail-pc-field" subscriptSizing="dynamic">
+          <mat-label>Category</mat-label>
+          <mat-select name="detailCategory" [(ngModel)]="category">
+            @for (c of categorySelectOptions; track c) {
+              <mat-option [value]="c">{{ c }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <span class="detail-section-label">Description</span>
+      <mat-form-field appearance="outline" class="full-width" subscriptSizing="dynamic">
+        <textarea
+          matInput
+          name="detailDescription"
+          [(ngModel)]="description"
+          rows="4"
+          placeholder="Add detailed notes here…"
+          maxlength="8000"
+          autocomplete="off"
+        ></textarea>
+      </mat-form-field>
+    </div>
+
+    @if (formError) {
+      <p class="form-error" role="alert">{{ formError }}</p>
+    }
+
+    <div class="detail-footer">
+      <button
+        mat-flat-button
+        color="primary"
+        class="detail-save-btn"
+        type="submit"
+        [disabled]="saving || deleting"
+      >
+        {{ saving ? 'Saving…' : 'Save Changes' }}
+      </button>
+      <button
+        mat-icon-button
+        type="button"
+        class="detail-delete-btn"
+        (click)="deleteTask()"
+        [disabled]="saving || deleting"
+        aria-label="Delete task"
+      >
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  </form>
+</section>

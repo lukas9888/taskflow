@@ -1,6 +1,31 @@
-.tasks-page__topbar {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 0.75rem;
+:host {
+  display: block;
+  position: relative;
+  box-sizing: border-box;
 }
 
+.tasks-alert {
+  margin-bottom: 16px;
+}
+
+.tasks-page-content {
+  min-width: 0;
+}
+
+.tasks-shell {
+  min-height: calc(100vh - var(--app-toolbar-total-height) - 32px);
+}
+
+.tasks-detail-drawer {
+  width: var(--task-detail-sheet-width);
+  border-inline-start: 1px solid var(--app-chrome-border, #eff0f3);
+}
+
+@media (max-width: 900px) {
+  .tasks-detail-drawer {
+    width: 100vw;
+    max-width: none;
+    border-inline-start: none;
+    box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.12);
+  }
+}

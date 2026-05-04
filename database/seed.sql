@@ -30,17 +30,35 @@ END $$;
 INSERT INTO users (username, email, password_hash)
 VALUES ('demo', 'demo@taskflow.local', crypt('demo1234', gen_salt('bf')));
 
-INSERT INTO tasks (user_id, title) VALUES
-    ((SELECT id FROM users WHERE username = 'demo'), 'Set up PostgreSQL'),
-    ((SELECT id FROM users WHERE username = 'demo'), 'Set up the API and Swagger'),
-    ((SELECT id FROM users WHERE username = 'demo'), 'Connect Angular to backend'),
-    ((SELECT id FROM users WHERE username = 'demo'), 'Write project report draft'),
-    ((SELECT id FROM users WHERE username = 'demo'), 'Design second entity and FK'),
-    ((SELECT id FROM users WHERE username = 'demo'), 'Add PUT and DELETE endpoints'),
-    ((SELECT id FROM users WHERE username = 'demo'), 'Add form validation messages'),
-    ((SELECT id FROM users WHERE username = 'demo'), 'Test CRUD in Swagger'),
-    ((SELECT id FROM users WHERE username = 'demo'), 'Prepare oral exam demo'),
-    ((SELECT id FROM users WHERE username = 'demo'), 'Zip source without node_modules');
+-- due_at: nearest 15-minute boundary to "now", then +0 / +1 / +2 calendar days with small slot offsets.
+WITH anchor AS (
+  SELECT (
+    timestamptz 'epoch'
+    + round(extract(epoch FROM now()) / 900.0) * 900 * interval '1 second'
+  ) AS q
+),
+seed_tasks(title, day_off, slot) AS (
+  VALUES
+    ('Set up PostgreSQL', 0, 0),
+    ('Set up the API and Swagger', 0, 1),
+    ('Connect Angular to backend', 0, 2),
+    ('Write project report draft', 0, 3),
+    ('Design second entity and FK', 1, 0),
+    ('Add PUT and DELETE endpoints', 1, 1),
+    ('Add form validation messages', 1, 2),
+    ('Test CRUD in Swagger', 2, 0),
+    ('Prepare oral exam demo', 2, 1),
+    ('Zip source without node_modules', 2, 2)
+)
+INSERT INTO tasks (user_id, title, due_at)
+SELECT
+  (SELECT id FROM users WHERE username = 'demo'),
+  s.title,
+  a.q
+    + make_interval(days => s.day_off)
+    + make_interval(mins => (s.slot * 15))
+FROM seed_tasks s
+CROSS JOIN anchor a;
 
 
 INSERT INTO task_dependencies (task_id, depends_on) VALUES

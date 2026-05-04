@@ -70,11 +70,9 @@ public class AuthController : ControllerBase
         var audience = jwt.GetValue<string>("Audience") ?? "TaskFlow";
         var signingKey = jwt.GetValue<string>("SigningKey")
             ?? throw new InvalidOperationException("Missing config: Jwt:SigningKey");
-        var expiresMinutes = jwt.GetValue<int?>("ExpiresMinutes") ?? 60;
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        var expires = DateTime.UtcNow.AddMinutes(expiresMinutes);
 
         var claims = new List<Claim>
         {
@@ -84,21 +82,21 @@ public class AuthController : ControllerBase
             new(JwtRegisteredClaimNames.Email, user.Email)
         };
 
+        var lifetimeHours = jwt.GetValue<double?>("AccessTokenLifetimeHours") ?? 24;
+        var now = DateTime.UtcNow;
+        var expires = now.AddHours(lifetimeHours);
+
         var token = new JwtSecurityToken(
             issuer: issuer,
             audience: audience,
             claims: claims,
+            notBefore: now,
             expires: expires,
             signingCredentials: creds);
 
         var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-        var expiresInSeconds = (int)Math.Max(0, (expires - DateTime.UtcNow).TotalSeconds);
 
-        return Ok(new LoginResponseDto
-        {
-            AccessToken = tokenString,
-            ExpiresInSeconds = expiresInSeconds
-        });
+        return Ok(new LoginResponseDto { AccessToken = tokenString });
     }
 }
 
@@ -143,6 +141,5 @@ public class LoginRequestDto
 public class LoginResponseDto
 {
     public string AccessToken { get; set; } = string.Empty;
-    public int ExpiresInSeconds { get; set; }
 }
 

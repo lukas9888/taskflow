@@ -1,7 +1,17 @@
-<main class="shell">
-  <header class="shell__header">
-    <h1>TaskFlow</h1>
-    <p class="shell__sub">CBS Applied Programming — minimal full-stack POC</p>
-  </header>
+<mat-toolbar color="primary" class="app-toolbar">
+  <img
+    class="app-toolbar-logo"
+    src="logo-taskflow.png"
+    alt="TaskFlow"
+  />
+  <span class="spacer"></span>
+  @if (auth.isLoggedIn()) {
+    <button mat-stroked-button type="button" class="app-logout-btn" (click)="logout()">
+      Logout
+    </button>
+  }
+</mat-toolbar>
+
+<main class="app-main">
   <router-outlet />
 </main>

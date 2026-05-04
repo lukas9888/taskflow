@@ -1,35 +1,33 @@
-<div class="row">
-  @if (!isEditing) {
-    <span class="row__title">{{ task.title }}</span>
-    <span class="row__meta">#{{ task.id }}</span>
-
-    @if (task.dueAt) {
-    <span class="row__meta">Due: {{ task.dueAt | date:'short' }}</span>
-    } 
-
-    <button type="button" (click)="startEdit()">Edit</button>
-    <button type="button" (click)="delete()">Delete</button>
-  } @else {
-    <input
-      type="text"
-      [(ngModel)]="editTitle"
-      minlength="2"
-      maxlength="500"
+<mat-list-item [activated]="selected" (click)="onRowActivate($event)">
+  <span matListItemIcon class="task-row-leading">
+    <mat-checkbox
+      [checked]="completed"
+      (change)="completedChange.emit($event.checked)"
+      (click)="$event.stopPropagation()"
+      aria-label="Mark task complete"
     />
-    <input
-      type="datetime-local"
-      [(ngModel)]="editDueAt"
-      [min]="minDueAt"
-    />
-    <button type="button" (click)="saveEdit()" [disabled]="saving">
-      {{ saving ? 'Saving…' : 'Save' }}
-    </button>
-    <button type="button" (click)="cancelEdit()" [disabled]="saving">
-      Cancel
-    </button>
+  </span>
+
+  <span matListItemTitle>{{ task.title }}</span>
+
+  <span matListItemMeta class="task-row-meta">
+    @let pm = priorityMarker();
+    <mat-icon
+      class="task-row-prio-icon"
+      inline
+      [style.color]="pm.color"
+      aria-hidden="true"
+    >{{ pm.icon }}</mat-icon>
+    <span class="task-row-chip">{{ categoryLabel }}</span>
+    @if (task.dueAt; as due) {
+      <span class="task-row-due" [attr.aria-label]="'Due ' + (due | date: 'fullDate')">{{
+        due | date: 'MMM d, y'
+      }}</span>
+    }
+    <mat-icon class="task-row-chevron" aria-hidden="true">chevron_right</mat-icon>
+  </span>
+
+  @if (showDivider) {
+    <mat-divider />
   }
-</div>
-
-@if (editError) {
-  <p class="row__error" role="alert">{{ editError }}</p>
-}
+</mat-list-item>

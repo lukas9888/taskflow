@@ -41,26 +41,39 @@ public class TasksController : ControllerBase
         if (body.DueAt.HasValue && body.DueAt.Value < DateTimeOffset.UtcNow)
             return BadRequest("Due date cannot be in the past.");
 
-        var created = _tasks.Create(userId, trimmed, body.DueAt);
+        var created = _tasks.Create(
+            userId,
+            trimmed,
+            body.DueAt,
+            NormalizePriority(body.Priority),
+            NormalizeCategory(body.Category),
+            NormalizeDescription(body.Description));
         return CreatedAtAction(nameof(GetAll), new { id = created.Id }, created);
     }
 
     [HttpPut("{id}")]
     public ActionResult<TaskItem> Update(int id, [FromBody] UpdateTaskDto body)
     {
-    if (!ModelState.IsValid)
-        return ValidationProblem(ModelState);
+        if (!ModelState.IsValid)
+            return ValidationProblem(ModelState);
 
-    var trimmed = body.Title.Trim();
-    if (trimmed.Length < 2)
-        return BadRequest("Title must be at least 2 characters.");
+        var trimmed = body.Title.Trim();
+        if (trimmed.Length < 2)
+            return BadRequest("Title must be at least 2 characters.");
 
-    var userId = GetUserId();
-    if (body.DueAt.HasValue && body.DueAt.Value < DateTimeOffset.UtcNow)
-        return BadRequest("Due date cannot be in the past.");
+        var userId = GetUserId();
+        if (body.DueAt.HasValue && body.DueAt.Value < DateTimeOffset.UtcNow)
+            return BadRequest("Due date cannot be in the past.");
 
-    var updated = _tasks.Update(userId, id, trimmed, body.DueAt);
-    return updated is null ? NotFound() : Ok(updated);
+        var updated = _tasks.Update(
+            userId,
+            id,
+            trimmed,
+            body.DueAt,
+            NormalizePriority(body.Priority),
+            NormalizeCategory(body.Category),
+            NormalizeDescription(body.Description));
+        return updated is null ? NotFound() : Ok(updated);
     }
 
     [HttpDelete("{id}")]
@@ -80,6 +93,28 @@ public class TasksController : ControllerBase
             throw new InvalidOperationException("Missing or invalid user id claim.");
         return userId;
     }
+
+    private static string NormalizePriority(string? p) =>
+        p?.ToLowerInvariant() switch
+        {
+            "high" => "high",
+            "low" => "low",
+            _ => "medium"
+        };
+
+    private static string NormalizeCategory(string? c)
+    {
+        var t = string.IsNullOrWhiteSpace(c) ? "GENERAL" : c.Trim().ToUpperInvariant();
+        return t.Length > 64 ? t[..64] : t;
+    }
+
+    private static string? NormalizeDescription(string? d)
+    {
+        if (string.IsNullOrWhiteSpace(d))
+            return null;
+        var t = d.Trim();
+        return t.Length > 8000 ? t[..8000] : t;
+    }
 }
 
 public class CreateTaskDto
@@ -89,6 +124,9 @@ public class CreateTaskDto
     [MaxLength(500)]
     public string Title { get; set; } = string.Empty;
     public DateTimeOffset? DueAt { get; set; }
+    public string? Priority { get; set; }
+    public string? Category { get; set; }
+    public string? Description { get; set; }
 }
 
 public class UpdateTaskDto
@@ -98,4 +136,7 @@ public class UpdateTaskDto
     [MaxLength(500)]
     public string Title { get; set; } = string.Empty;
     public DateTimeOffset? DueAt { get; set; }
+    public string? Priority { get; set; }
+    public string? Category { get; set; }
+    public string? Description { get; set; }
 }

@@ -1,15 +1,45 @@
+<h1 class="tasks-page-title">Tasks</h1>
+
 @if (loadError) {
-  <p class="shell__error" role="alert">{{ loadError }}</p>
+  <mat-card class="tasks-alert" appearance="outlined">
+    <mat-card-content>
+      <p class="form-error" role="alert">{{ loadError }}</p>
+    </mat-card-content>
+  </mat-card>
 }
 
-<div class="tasks-page__topbar">
-  <button type="button" (click)="logout()">Logout</button>
-</div>
+<mat-sidenav-container
+  class="tasks-shell"
+  [hasBackdrop]="isNarrow()"
+  (backdropClick)="onDetailClosed()"
+>
+  <mat-sidenav
+    class="tasks-detail-drawer"
+    position="end"
+    [mode]="isNarrow() ? 'over' : 'side'"
+    [opened]="selectedTask !== null"
+    [fixedInViewport]="true"
+    [fixedTopGap]="toolbarTopGapPx"
+  >
+    @if (selectedTask; as task) {
+      <app-task-detail-pane
+        [task]="task"
+        (taskUpdated)="refreshTasks()"
+        (taskDeleted)="onTaskDeletedFromPane()"
+        (closed)="onDetailClosed()"
+      />
+    }
+  </mat-sidenav>
 
-<app-task-form (created)="refreshTasks()" />
-<app-task-list
-  [tasks]="tasks"
-  (taskDeleted)="refreshTasks()"
-  (taskUpdated)="refreshTasks()"
-/>
+  <mat-sidenav-content>
+    <div class="tasks-page-content">
+      <app-task-form (created)="refreshTasks()" />
 
+      <app-task-list
+        [tasks]="tasks"
+        [selectedTaskId]="selectedTaskId"
+        (selectedTaskIdChange)="onSelectedTaskIdChange($event)"
+      />
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

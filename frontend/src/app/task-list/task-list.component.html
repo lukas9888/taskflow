@@ -1,19 +1,40 @@
-<section class="list-section" aria-labelledby="task-list-heading">
-  <h2 id="task-list-heading">Your tasks</h2>
+<section class="task-list-section">
+  <div class="list-toolbar">
+    <mat-button-toggle-group
+      class="list-filter-toggle"
+      [(ngModel)]="listFilter"
+      aria-label="Filter tasks by due date"
+      hideSingleSelectionIndicator
+      appearance="standard"
+    >
+      <mat-button-toggle value="today">Today</mat-button-toggle>
+      <mat-button-toggle value="week">Next 7 days</mat-button-toggle>
+      <mat-button-toggle value="all">All</mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
 
-  @if (tasks.length === 0) {
-    <p class="list-section__empty">No tasks yet. Add one above.</p>
-  } @else {
-    <ul class="list-section__ul">
-      @for (t of tasks; track t.id) {
-        <li class="list-section__li">
-          <app-task-row 
-          [task]="t" 
-          (deleted)="onRowDeleted()"
-          (updated)="onRowUpdated()"
+  <div class="list-surface">
+    @if (visibleTasks.length === 0) {
+      <p class="list-empty">
+        @if (tasks.length === 0) {
+          No tasks yet. Add one above.
+        } @else {
+          No tasks match this filter.
+        }
+      </p>
+    } @else {
+      <mat-nav-list class="task-rows" aria-label="Tasks">
+        @for (t of visibleTasks; track t.id; let last = $last) {
+          <app-task-row
+            [task]="t"
+            [selected]="selectedTaskId === t.id"
+            [completed]="completedTaskIds.has(t.id)"
+            [showDivider]="!last"
+            (select)="selectedTaskIdChange.emit(t.id)"
+            (completedChange)="onCompletedChange(t.id, $event)"
           />
-        </li>
-      }
-    </ul>
-  }
+        }
+      </mat-nav-list>
+    }
+  </div>
 </section>

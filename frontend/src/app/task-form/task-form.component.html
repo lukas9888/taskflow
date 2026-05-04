@@ -1,41 +1,20 @@
-<section class="form-section" aria-labelledby="task-form-heading">
-  <h2 id="task-form-heading">New task</h2>
+<form class="task-composer" (ngSubmit)="submit()" #taskForm="ngForm" novalidate>
+  <mat-form-field appearance="outline" class="task-composer-field" subscriptSizing="dynamic">
+    <mat-icon matPrefix class="task-composer-prefix" aria-hidden="true">add</mat-icon>
+    <input
+      matInput
+      name="composerTitle"
+      [(ngModel)]="title"
+      required
+      minlength="2"
+      maxlength="500"
+      placeholder="Add a new task…"
+      autocomplete="off"
+      [disabled]="submitting"
+    />
+  </mat-form-field>
+</form>
 
-  <form (ngSubmit)="submit()" #taskForm="ngForm" novalidate>
-    <div class="field">
-      <label for="task-title">Title</label>
-      <input
-        id="task-title"
-        name="title"
-        [(ngModel)]="title"
-        required
-        minlength="2"
-        maxlength="500"
-        #titleField="ngModel"
-        autocomplete="off"
-      />
-      @if (titleField.invalid && titleField.touched) {
-        <p class="field__hint">Enter at least 2 characters (max 500).</p>
-      }
-    </div>
-
-    <div class="field">
-      <label for="task-due-at">Due date and time</label>
-      <input
-        id="task-due-at"
-        name="dueAt"
-        type="datetime-local"
-        [(ngModel)]="dueAt"
-        [min]="minDueAt"
-      />
-    </div>
-
-    <button type="submit" [disabled]="taskForm.invalid || submitting">
-      {{ submitting ? 'Saving…' : 'Add task' }}
-    </button>
-  </form>
-
-  @if (submitError) {
-    <p class="form-section__error" role="alert">{{ submitError }}</p>
-  }
-</section>
+@if (submitError) {
+  <p class="form-error task-composer-error" role="alert">{{ submitError }}</p>
+}

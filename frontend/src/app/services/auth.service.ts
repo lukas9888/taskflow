@@ -2,7 +2,6 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs';
 
-type LoginResponse = { accessToken: string; expiresInSeconds: number };
 type RegisterResponse = { id: number; username: string; email: string };
 
 @Injectable({ providedIn: 'root' })
@@ -22,7 +21,7 @@ export class AuthService {
 
   login(login: string, password: string) {
     return this.http
-      .post<LoginResponse>(`${this.baseUrl}/login`, { login, password })
+      .post<{ accessToken: string }>(`${this.baseUrl}/login`, { login, password })
       .pipe(tap((res) => localStorage.setItem(this.tokenKey, res.accessToken)));
   }
 
