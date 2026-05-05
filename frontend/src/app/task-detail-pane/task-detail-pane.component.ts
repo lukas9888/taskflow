@@ -69,8 +69,6 @@ export class TaskDetailPaneComponent implements OnChanges {
   category = 'GENERAL';
   description = '';
 
-  readonly minDate = this.due.startOfToday();
-
   saving = false;
   deleting = false;
   formError: string | null = null;
@@ -140,15 +138,11 @@ export class TaskDetailPaneComponent implements OnChanges {
       return;
     }
 
-    const combined = this.due.combine(this.dueDate, this.dueTime);
-    if (this.due.isBeforeNow(combined)) {
-      this.formError = 'Due date and time cannot be in the past.';
-      return;
-    }
-
     this.saving = true;
     this.formError = null;
-    const dueAt = this.due.toIsoOrNull(this.dueDate, this.dueTime);
+    const effectiveDate = this.dueDate ?? this.due.startOfToday();
+    const effectiveTime = this.dueTime ?? new Date(1970, 0, 1, 0, 0, 0);
+    const dueAt = this.due.toIsoOrNull(effectiveDate, effectiveTime);
     const desc = this.description.trim();
 
     this.tasksApi
