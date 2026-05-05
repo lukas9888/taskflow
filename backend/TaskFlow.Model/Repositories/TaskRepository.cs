@@ -82,7 +82,8 @@ public class TaskRepository : BaseRepository
         dueAtParam.Value = dueAt.HasValue ? dueAt.Value : DBNull.Value;
 
         cmd.Parameters.AddWithValue("priority", priority);
-        cmd.Parameters.AddWithValue("category", (object?)category ?? DBNull.Value);
+        var categoryParam = cmd.Parameters.Add("category", NpgsqlDbType.Text);
+        categoryParam.Value = (object?)category ?? DBNull.Value;
         var descParam = cmd.Parameters.Add("description", NpgsqlDbType.Text);
         descParam.Value = description ?? (object)DBNull.Value;
 
@@ -138,7 +139,8 @@ public class TaskRepository : BaseRepository
         dueAtParam.Value = dueAt.HasValue ? dueAt.Value : DBNull.Value;
 
         cmd.Parameters.AddWithValue("priority", priority);
-        cmd.Parameters.AddWithValue("category", (object?)category ?? DBNull.Value);
+        var categoryParam = cmd.Parameters.Add("category", NpgsqlDbType.Text);
+        categoryParam.Value = (object?)category ?? DBNull.Value;
         var descParam = cmd.Parameters.Add("description", NpgsqlDbType.Text);
         descParam.Value = description ?? (object)DBNull.Value;
 

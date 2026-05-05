@@ -8,7 +8,7 @@ using TaskFlow.Model.Repositories;
 namespace TaskFlow.API.Controllers;
 
 [ApiController]
-[Route("api/tasks/{taskId:int}/dependencies")]
+[Route("api/tasks")]
 [Authorize]
 public class DependenciesController : ControllerBase
 {
@@ -19,8 +19,17 @@ public class DependenciesController : ControllerBase
         _deps = deps;
     }
 
+    // GET /api/tasks/dependencies
+    [HttpGet("dependencies")]
+    public ActionResult GetAllForUser()
+    {
+        var userId = GetUserId();
+        var result = _deps.GetAllForUser(userId);
+        return Ok(result);
+    }
+
     // GET /api/tasks/{taskId}/dependencies
-    [HttpGet]
+    [HttpGet("{taskId:int}/dependencies")]
     public ActionResult GetAll(int taskId)
     {
         var userId = GetUserId();
@@ -29,7 +38,7 @@ public class DependenciesController : ControllerBase
     }
 
     // POST /api/tasks/{taskId}/dependencies
-    [HttpPost]
+    [HttpPost("{taskId:int}/dependencies")]
     public ActionResult Add(int taskId, [FromBody] AddDependencyDto body)
     {
         if (!ModelState.IsValid)
@@ -47,7 +56,7 @@ public class DependenciesController : ControllerBase
     }
 
     // DELETE /api/tasks/{taskId}/dependencies/{dependsOnId}
-    [HttpDelete("{dependsOnId:int}")]
+    [HttpDelete("{taskId:int}/dependencies/{dependsOnId:int}")]
     public ActionResult Remove(int taskId, int dependsOnId)
     {
         var userId = GetUserId();

@@ -3,6 +3,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { TaskFormComponent } from '../task-form/task-form.component';
 import { TaskListComponent } from '../task-list/task-list.component';
@@ -10,7 +11,6 @@ import { TaskDetailPaneComponent } from '../task-detail-pane/task-detail-pane.co
 import { TaskItem } from '../models/task-item';
 import { TaskService } from '../services/task.service';
 import { DependencyService } from '../services/dependency.service';
-import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-tasks-page',
@@ -27,7 +27,7 @@ import { forkJoin } from 'rxjs';
 export class TasksPageComponent implements OnInit {
   blockedTaskIds = new Set<number>();
   blockingTaskIds = new Set<number>();
-  private readonly depService = inject(DependencyService);
+  private readonly deps = inject(DependencyService);
   private readonly taskService = inject(TaskService);
   private readonly breakpoint = inject(BreakpointObserver);
 
@@ -69,61 +69,9 @@ export class TasksPageComponent implements OnInit {
     this.refreshTasks();
   }
 
-  refreshTasks(): void {
-    this.loadError = null;
-    this.taskService.getTasks().subscribe({
-      next: (tasks) => {
-        this.tasks = tasks;
-        if (
-          this.selectedTaskId != null &&
-          !tasks.some((t) => t.id === this.selectedTaskId)
-        ) {
-          this.selectedTaskId = null;
-        }
-        this.refreshDependencies();
-      },
-      error: () =>
-        (this.loadError =
-          'Could not load tasks. Are you logged in, and is the API running?')
-    });
-  }
-
-  refreshDependencies(): void {
-  const blocked = new Set<number>();
-  const blocking = new Set<number>();
-
-  const taskById = new Map(this.tasks.map((task) => [task.id, task]));
-
-  const calls = this.tasks.map((task) =>
-    this.depService.getAll(task.id).pipe(
-      map((deps) => {
-        for (const d of deps) {
-          const dependencyTask = taskById.get(d.dependsOn);
-
-          if (dependencyTask && !dependencyTask.done) {
-            blocked.add(task.id);
-          }
-
-          blocking.add(d.dependsOn);
-        }
-      })
-    )
-  );
-
-  if (calls.length === 0) {
-    this.blockedTaskIds = blocked;
-    this.blockingTaskIds = blocking;
-    return;
-  }
-
-  forkJoin(calls).subscribe(() => {
-    this.blockedTaskIds = blocked;
-    this.blockingTaskIds = blocking;
-  });
-}
-
   onOpenNewTaskDetail(prefillTitle: string): void {
-    const title = prefillTitle.trim().length >= 2 ? prefillTitle.trim() : 'New Task';
+    const title =
+      prefillTitle.trim().length >= 2 ? prefillTitle.trim() : 'New Task';
 
     this.taskService.createTask(title, null).subscribe({
       next: (created) => {
@@ -141,5 +89,59 @@ export class TasksPageComponent implements OnInit {
     this.tasks = [...this.tasks, created];
     this.selectedTaskId = created.id;
     this.refreshDependencies();
+  }
+
+  refreshTasks(): void {
+    this.loadError = null;
+    forkJoin({
+      tasks: this.taskService.getTasks(),
+      dependencies: this.deps.loadAllForUser()
+    }).subscribe({
+      next: ({ tasks, dependencies }) => {
+        this.tasks = tasks;
+        if (
+          this.selectedTaskId != null &&
+          !tasks.some((t) => t.id === this.selectedTaskId)
+        ) {
+          this.selectedTaskId = null;
+        }
+
+        this.applyDependencyState(tasks, dependencies);
+      },
+      error: () =>
+        (this.loadError =
+          'Could not load tasks. Are you logged in, and is the API running?')
+    });
+  }
+
+  refreshDependencies(): void {
+    this.deps
+      .loadAllForUser(true)
+      .subscribe((deps) => this.applyDependencyState(this.tasks, deps));
+  }
+
+  private applyDependencyState(
+    tasks: TaskItem[],
+    deps: { taskId: number; dependsOn: number }[]
+  ): void {
+    if (tasks.length === 0) {
+      this.blockedTaskIds = new Set<number>();
+      this.blockingTaskIds = new Set<number>();
+      return;
+    }
+
+    const doneByTaskId = new Map(tasks.map((task) => [task.id, task.done]));
+    const blocked = new Set<number>();
+    const blocking = new Set<number>();
+
+    for (const dep of deps) {
+      if (doneByTaskId.get(dep.dependsOn) === false) {
+        blocked.add(dep.taskId);
+        blocking.add(dep.dependsOn);
+      }
+    }
+
+    this.blockedTaskIds = blocked;
+    this.blockingTaskIds = blocking;
   }
 }

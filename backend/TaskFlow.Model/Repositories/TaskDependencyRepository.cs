@@ -11,6 +11,41 @@ public class TaskDependencyRepository : BaseRepository
     }
 
     /// <summary>
+    /// Returns all dependency relationships between the requesting user's tasks.
+    /// </summary>
+    public List<TaskDependency> GetAllForUser(int userId)
+    {
+        var list = new List<TaskDependency>();
+
+        using var conn = new NpgsqlConnection(ConnectionString);
+        using var cmd = new NpgsqlCommand(
+            @"SELECT td.task_id, td.depends_on, t2.title
+              FROM task_dependencies td
+              JOIN tasks t1 ON t1.id = td.task_id
+              JOIN tasks t2 ON t2.id = td.depends_on
+              WHERE t1.user_id = @user_id
+                AND t2.user_id = @user_id
+              ORDER BY td.task_id, td.depends_on",
+            conn);
+
+        cmd.Parameters.AddWithValue("user_id", userId);
+
+        conn.Open();
+        using var reader = cmd.ExecuteReader();
+        while (reader.Read())
+        {
+            list.Add(new TaskDependency
+            {
+                TaskId = reader.GetInt32(0),
+                DependsOn = reader.GetInt32(1),
+                DependsOnTitle = reader.GetString(2)
+            });
+        }
+
+        return list;
+    }
+
+    /// <summary>
     /// Returns all tasks that the given task depends on.
     /// Also checks that the task belongs to the requesting user (ownership guard).
     /// </summary>

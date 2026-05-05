@@ -1,10 +1,13 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
+import { Subject, of } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 import { TaskItem } from '../models/task-item';
 import { TaskDependency } from '../models/task-dependency';
 import { DependencyService } from '../services/dependency.service';
@@ -27,6 +30,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 })
 export class TaskDependenciesComponent implements OnChanges {
   private readonly depService = inject(DependencyService);
+  private readonly destroyRef = inject(DestroyRef);
 
   @Input({ required: true }) task!: TaskItem;
   @Input({ required: true }) allTasks: TaskItem[] = [];
@@ -39,6 +43,25 @@ export class TaskDependenciesComponent implements OnChanges {
   adding = false;
 
   searchText = '';
+
+  private readonly loadTrigger$ = new Subject<{ taskId: number; force: boolean }>();
+
+  constructor() {
+    this.loadTrigger$.pipe(
+      switchMap(({ taskId, force }) =>
+        this.depService.loadAllForUser(force).pipe(
+          switchMap(() => this.depService.getForTask(taskId)),
+          catchError(() => {
+            this.loadError = 'Could not load dependencies.';
+            return of([] as TaskDependency[]);
+          })
+        )
+      ),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(deps => {
+      this.dependencies = deps;
+    });
+  }
 
   get filteredTasks(): TaskItem[] {
     const q = this.searchText.toLowerCase();
@@ -65,24 +88,23 @@ export class TaskDependenciesComponent implements OnChanges {
     }
   }
 
-  load(): void {
+  load(force = false): void {
     this.loadError = null;
-    this.depService.getAll(this.task.id).subscribe({
-      next: deps => (this.dependencies = deps),
-      error: () => (this.loadError = 'Could not load dependencies.')
-    });
+    this.loadTrigger$.next({ taskId: this.task.id, force });
   }
 
   add(): void {
     if (this.selectedDependsOnId == null) return;
     this.adding = true;
     this.addError = null;
-    this.depService.add(this.task.id, this.selectedDependsOnId).subscribe({
+    this.depService.add(this.task.id, this.selectedDependsOnId).pipe(
+      switchMap(() => this.depService.loadAllForUser(true)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: () => {
         this.adding = false;
         this.selectedDependsOnId = null;
         this.searchText = '';
-        this.load();
         this.dependenciesChanged.emit();
       },
       error: () => {
@@ -93,8 +115,13 @@ export class TaskDependenciesComponent implements OnChanges {
   }
 
   remove(dependsOnId: number): void {
-    this.depService.remove(this.task.id, dependsOnId).subscribe({
-      next: () => { this.load(); this.dependenciesChanged.emit(); },
+    this.depService.remove(this.task.id, dependsOnId).pipe(
+      switchMap(() => this.depService.loadAllForUser(true)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: () => {
+        this.dependenciesChanged.emit();
+      },
       error: () => (this.loadError = 'Could not remove dependency.')
     });
   }
