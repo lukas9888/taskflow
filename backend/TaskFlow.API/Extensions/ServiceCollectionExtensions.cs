@@ -24,6 +24,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         services.AddScoped<TaskRepository>();
+        services.AddScoped<CategoryRepository>();
         services.AddScoped<UserRepository>();
         return services;
     }
