@@ -157,7 +157,8 @@ export class TaskDetailPaneComponent implements OnChanges {
         dueAt,
         priority: this.priority,
         category: this.category,
-        description: desc.length > 0 ? desc : null
+        description: desc.length > 0 ? desc : null,
+        done: this.task.done
       })
       .subscribe({
         next: () => {

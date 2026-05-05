@@ -1,0 +1,6 @@
+BEGIN;
+
+ALTER TABLE tasks
+ADD COLUMN IF NOT EXISTS done boolean NOT NULL DEFAULT false;
+
+COMMIT;

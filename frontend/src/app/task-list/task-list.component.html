@@ -13,30 +13,67 @@
     </mat-button-toggle-group>
   </div>
 
-  <div class="list-surface">
-    @if (visibleTasks.length === 0) {
-      <p class="list-empty">
-        @if (tasks.length === 0) {
-          No tasks yet. Add one above.
+     @if (visibleTasks.length === 0) {
+    <mat-card class="task-section-card">
+      <mat-card-content>
+        <p class="list-empty">
+          @if (tasks.length === 0) {
+            No tasks yet. Add one above.
+          } @else {
+            No tasks match this filter.
+          }
+        </p>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    <mat-card class="task-section-card">
+      <mat-card-header>
+        <mat-card-title>To-do</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content class="task-section-content">
+        @if (activeTasks.length === 0) {
+          <p class="list-empty">No active tasks in this view.</p>
         } @else {
-          No tasks match this filter.
+          <mat-nav-list class="task-rows" aria-label="Active tasks">
+            @for (t of activeTasks; track t.id; let last = $last) {
+              <app-task-row
+                [task]="t"
+                [selected]="selectedTaskId === t.id"
+                [completed]="t.done"
+                [isBlocked]="blockedTaskIds.has(t.id)"
+                [isBlocking]="blockingTaskIds.has(t.id)"
+                [showDivider]="!last"
+                (select)="selectedTaskIdChange.emit(t.id)"
+                (completedChange)="onCompletedChange(t, $event)"
+              />
+            }
+          </mat-nav-list>
         }
-      </p>
-    } @else {
-      <mat-nav-list class="task-rows" aria-label="Tasks">
-        @for (t of visibleTasks; track t.id; let last = $last) {
-          <app-task-row
-          [task]="t"
-          [selected]="t.id === selectedTaskId"
-          [completed]="completedTaskIds.has(t.id)"
-          [showDivider]="!last"
-          [isBlocked]="blockedTaskIds.has(t.id)"
-          [isBlocking]="blockingTaskIds.has(t.id)"
-          (completedChange)="onCompletedChange(t.id, $event)"
-          (select)="selectedTaskIdChange.emit(t.id)"
-        />
-        }
-      </mat-nav-list>
+      </mat-card-content>
+    </mat-card>
+
+    @if (doneTasks.length > 0) {
+      <mat-card class="task-section-card done-section-card">
+        <mat-card-header>
+          <mat-card-title>Done</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content class="task-section-content">
+          <mat-nav-list class="task-rows" aria-label="Completed tasks">
+            @for (t of doneTasks; track t.id; let last = $last) {
+              <app-task-row
+                [task]="t"
+                [selected]="selectedTaskId === t.id"
+                [completed]="t.done"
+                [showDivider]="!last"
+                (select)="selectedTaskIdChange.emit(t.id)"
+                (completedChange)="onCompletedChange(t, $event)"
+              />
+            }
+          </mat-nav-list>
+        </mat-card-content>
+      </mat-card>
     }
-  </div>
+  }
 </section>
