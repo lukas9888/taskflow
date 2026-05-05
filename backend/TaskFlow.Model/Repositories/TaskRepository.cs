@@ -125,9 +125,9 @@ public class TaskRepository : BaseRepository
                 WHERE id = @id AND user_id = @user_id
                 RETURNING id, title, created_at, due_at, priority::text,
                           (SELECT name FROM user_categories WHERE id = user_category_id) AS category,
-                          description
+                          description, done
               )
-              SELECT * FROM upd, done",
+              SELECT * FROM upd;",
             conn);
 
         cmd.Parameters.AddWithValue("user_id", userId);

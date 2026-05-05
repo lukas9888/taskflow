@@ -12,6 +12,10 @@ CREATE TABLE IF NOT EXISTS user_categories (
 
 ALTER TABLE tasks
     ADD COLUMN IF NOT EXISTS user_category_id INT,
+    ADD CONSTRAINT tasks_user_category_id_fkey
+         FOREIGN KEY (user_category_id) REFERENCES user_categories(id) ON DELETE SET NULL,
     DROP COLUMN IF EXISTS category;
+    
+
 
 COMMIT;
