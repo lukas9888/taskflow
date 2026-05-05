@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { catchError, finalize, map, shareReplay, tap } from 'rxjs/operators';
+import { finalize, map, shareReplay, tap } from 'rxjs/operators';
 import { TaskDependency } from '../models/task-dependency';
 
 @Injectable({ providedIn: 'root' })
@@ -29,7 +29,6 @@ export class DependencyService {
     }
 
     const req$ = this.getAllForUser().pipe(
-      catchError(() => of([] as TaskDependency[])),
       tap((deps) => this.depsSubject.next(deps)),
       finalize(() => {
         if (this.inFlight$ === req$) this.inFlight$ = null;
