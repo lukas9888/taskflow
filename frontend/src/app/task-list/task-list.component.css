@@ -24,13 +24,6 @@
   font-weight: 700;
 }
 
-.list-surface {
-  border: 1px solid var(--mat-sys-outline-variant);
-  border-radius: 8px;
-  background-color: var(--mat-sys-surface);
-  overflow: hidden;
-}
-
 .list-empty {
   margin: 0;
   padding: 20px 16px;
@@ -39,17 +32,37 @@
 }
 
 /* Match card-style rows: flat active strip + bold title (Material nav list defaults to pill). */
-.list-surface .task-rows {
+.task-rows {
   padding: 0;
   --mat-list-active-indicator-shape: 0;
   --mat-list-active-indicator-color: color-mix(in srgb, var(--mat-sys-primary) 6%, var(--mat-sys-surface));
 }
 
-.list-surface .task-rows .mat-mdc-list-item-title {
+.task-rows .mat-mdc-list-item-title {
   font-size: 15px;
   font-weight: 700;
 }
 
-.list-surface .task-rows .mat-mdc-list-item.mdc-list-item--activated {
+.task-rows .mat-mdc-list-item.mdc-list-item--activated {
   box-shadow: inset 4px 0 0 0 var(--mat-sys-primary);
 }
+
+.task-section-card {
+  margin-bottom: 16px;
+  overflow: hidden;
+
+  /* Angular Material card container styling */
+  --mdc-elevated-card-container-color: var(--mat-sys-surface);
+  --mat-card-elevated-container-color: var(--mat-sys-surface);
+}
+
+.done-section-card {
+  /* Slightly muted Material surface for completed tasks */
+  --mdc-elevated-card-container-color: var(--mat-sys-surface-container-high);
+  --mat-card-elevated-container-color: var(--mat-sys-surface-container-high);
+}
+
+.task-section-content {
+  padding: 0;
+}
+
