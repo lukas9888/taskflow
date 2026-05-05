@@ -121,4 +121,25 @@ export class TasksPageComponent implements OnInit {
     this.blockingTaskIds = blocking;
   });
 }
+
+  onOpenNewTaskDetail(prefillTitle: string): void {
+    const title = prefillTitle.trim().length >= 2 ? prefillTitle.trim() : 'New Task';
+
+    this.taskService.createTask(title, null).subscribe({
+      next: (created) => {
+        this.tasks = [...this.tasks, created];
+        this.selectedTaskId = created.id;
+        this.refreshDependencies();
+      },
+      error: () => {
+        this.loadError = 'Could not create task.';
+      }
+    });
+  }
+
+  onQuickCreated(created: TaskItem): void {
+    this.tasks = [...this.tasks, created];
+    this.selectedTaskId = created.id;
+    this.refreshDependencies();
+  }
 }

@@ -1,7 +1,8 @@
-<form class="task-composer" (ngSubmit)="submit()" #taskForm="ngForm" novalidate>
+<form class="task-composer" (ngSubmit)="submit(taskForm)" #taskForm="ngForm" novalidate>
   <mat-form-field appearance="outline" class="task-composer-field" subscriptSizing="dynamic">
     <mat-icon matPrefix class="task-composer-prefix" aria-hidden="true">add</mat-icon>
     <input
+      #composerInput
       matInput
       name="composerTitle"
       [(ngModel)]="title"
@@ -11,7 +12,19 @@
       placeholder="Add a new task…"
       autocomplete="off"
       [disabled]="submitting"
+      (input)="focused.emit()"
     />
+    <button
+      matSuffix
+      mat-icon-button
+      type="button"
+      aria-label="Open details"
+      matTooltip="Add with details"
+      [disabled]="submitting"
+      (click)="openWithDetails(taskForm)"
+    >
+      <mat-icon>open_in_new</mat-icon>
+    </button>
   </mat-form-field>
 </form>
 
