@@ -13,11 +13,14 @@
  <span matListItemMeta class="task-row-meta">
   @let pm = priorityMarker();
   @if (isBlocked) {
-    <mat-icon style="color: var(--mat-sys-error); font-size: 18px;" matTooltip="Blocked">block</mat-icon>
-  }
-  @if (isBlocking) {
-    <mat-icon style="color: #f5c000; font-size: 18px;" matTooltip="Blocking other tasks">warning</mat-icon>
-  }
+  <mat-icon style="color: var(--mat-sys-error); font-size: 18px;" matTooltip="Blocked">
+    block
+  </mat-icon>
+} @else if (isBlocking) {
+  <mat-icon style="color: #f5c000; font-size: 18px;" matTooltip="Blocking other tasks">
+    warning
+  </mat-icon>
+}
   <mat-icon
     class="task-row-prio-icon"
     inline
