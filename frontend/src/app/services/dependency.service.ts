@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { catchError, finalize, map, shareReplay, tap } from 'rxjs/operators';
 import { TaskDependency } from '../models/task-dependency';
 
 @Injectable({ providedIn: 'root' })
@@ -8,8 +9,44 @@ export class DependencyService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = 'http://localhost:5046/api/tasks';
 
-  getAll(taskId: number): Observable<TaskDependency[]> {
-    return this.http.get<TaskDependency[]>(`${this.baseUrl}/${taskId}/dependencies`);
+  private readonly depsSubject = new BehaviorSubject<TaskDependency[] | null>(null);
+  readonly dependencies$ = this.depsSubject.pipe(map((v) => v ?? []));
+
+  private inFlight$: Observable<TaskDependency[]> | null = null;
+
+  /**
+   * Loads the user's dependency relationships once and caches them in memory.
+   * Use `force=true` after add/remove to refresh.
+   */
+  loadAllForUser(force = false): Observable<TaskDependency[]> {
+    const current = this.depsSubject.value;
+    if (!force && current != null) {
+      return of(current);
+    }
+
+    if (!force && this.inFlight$) {
+      return this.inFlight$;
+    }
+
+    const req$ = this.getAllForUser().pipe(
+      catchError(() => of([] as TaskDependency[])),
+      tap((deps) => this.depsSubject.next(deps)),
+      finalize(() => {
+        if (this.inFlight$ === req$) this.inFlight$ = null;
+      }),
+      shareReplay(1)
+    );
+
+    this.inFlight$ = req$;
+    return req$;
+  }
+
+  getForTask(taskId: number): Observable<TaskDependency[]> {
+    return this.dependencies$.pipe(map((deps) => deps.filter((d) => d.taskId === taskId)));
+  }
+
+  getAllForUser(): Observable<TaskDependency[]> {
+    return this.http.get<TaskDependency[]>(`${this.baseUrl}/dependencies`);
   }
 
   add(taskId: number, dependsOnId: number): Observable<void> {

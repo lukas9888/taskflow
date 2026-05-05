@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -27,6 +28,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 })
 export class TaskDependenciesComponent implements OnChanges {
   private readonly depService = inject(DependencyService);
+  private readonly destroyRef = inject(DestroyRef);
 
   @Input({ required: true }) task!: TaskItem;
   @Input({ required: true }) allTasks: TaskItem[] = [];
@@ -67,10 +69,15 @@ export class TaskDependenciesComponent implements OnChanges {
 
   load(): void {
     this.loadError = null;
-    this.depService.getAll(this.task.id).subscribe({
-      next: deps => (this.dependencies = deps),
-      error: () => (this.loadError = 'Could not load dependencies.')
-    });
+    this.depService
+      .loadAllForUser()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.depService
+          .getForTask(this.task.id)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe((deps) => (this.dependencies = deps));
+      });
   }
 
   add(): void {
@@ -82,8 +89,10 @@ export class TaskDependenciesComponent implements OnChanges {
         this.adding = false;
         this.selectedDependsOnId = null;
         this.searchText = '';
-        this.load();
-        this.dependenciesChanged.emit();
+        this.depService.loadAllForUser(true).subscribe(() => {
+          this.load();
+          this.dependenciesChanged.emit();
+        });
       },
       error: () => {
         this.adding = false;
@@ -94,7 +103,11 @@ export class TaskDependenciesComponent implements OnChanges {
 
   remove(dependsOnId: number): void {
     this.depService.remove(this.task.id, dependsOnId).subscribe({
-      next: () => { this.load(); this.dependenciesChanged.emit(); },
+      next: () =>
+        this.depService.loadAllForUser(true).subscribe(() => {
+          this.load();
+          this.dependenciesChanged.emit();
+        }),
       error: () => (this.loadError = 'Could not remove dependency.')
     });
   }

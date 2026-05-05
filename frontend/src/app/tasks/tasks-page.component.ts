@@ -3,6 +3,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { TaskFormComponent } from '../task-form/task-form.component';
 import { TaskListComponent } from '../task-list/task-list.component';
@@ -10,7 +11,6 @@ import { TaskDetailPaneComponent } from '../task-detail-pane/task-detail-pane.co
 import { TaskItem } from '../models/task-item';
 import { TaskService } from '../services/task.service';
 import { DependencyService } from '../services/dependency.service';
-import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-tasks-page',
@@ -27,7 +27,7 @@ import { forkJoin } from 'rxjs';
 export class TasksPageComponent implements OnInit {
   blockedTaskIds = new Set<number>();
   blockingTaskIds = new Set<number>();
-  private readonly depService = inject(DependencyService);
+  private readonly deps = inject(DependencyService);
   private readonly taskService = inject(TaskService);
   private readonly breakpoint = inject(BreakpointObserver);
 
@@ -71,8 +71,11 @@ export class TasksPageComponent implements OnInit {
 
   refreshTasks(): void {
     this.loadError = null;
-    this.taskService.getTasks().subscribe({
-      next: (tasks) => {
+    forkJoin({
+      tasks: this.taskService.getTasks(),
+      dependencies: this.deps.loadAllForUser()
+    }).subscribe({
+      next: ({ tasks, dependencies }) => {
         this.tasks = tasks;
         if (
           this.selectedTaskId != null &&
@@ -80,7 +83,8 @@ export class TasksPageComponent implements OnInit {
         ) {
           this.selectedTaskId = null;
         }
-        this.refreshDependencies();
+
+        this.applyDependencyState(tasks, dependencies);
       },
       error: () =>
         (this.loadError =
@@ -89,22 +93,33 @@ export class TasksPageComponent implements OnInit {
   }
 
   refreshDependencies(): void {
-  const blocked = new Set<number>();
-  const blocking = new Set<number>();
-  const calls = this.tasks.map(task =>
-    this.depService.getAll(task.id).pipe(
-      map(deps => {
-        if (deps.length > 0) blocked.add(task.id);
-        for (const d of deps) blocking.add(d.dependsOn);
-      })
-    )
-  );
+    this.deps
+      .loadAllForUser(true)
+      .subscribe((deps) => this.applyDependencyState(this.tasks, deps));
+  }
 
-  if (calls.length === 0) return;
+  private applyDependencyState(
+    tasks: TaskItem[],
+    deps: { taskId: number; dependsOn: number }[]
+  ): void {
+    if (tasks.length === 0) {
+      this.blockedTaskIds = new Set<number>();
+      this.blockingTaskIds = new Set<number>();
+      return;
+    }
 
-  forkJoin(calls).subscribe(() => {
-    this.blockedTaskIds = new Set(blocked);
-    this.blockingTaskIds = new Set(blocking);
-  });
-}
+    const doneByTaskId = new Map(tasks.map((task) => [task.id, task.done]));
+    const blocked = new Set<number>();
+    const blocking = new Set<number>();
+
+    for (const dep of deps) {
+      if (doneByTaskId.get(dep.dependsOn) === false) {
+        blocked.add(dep.taskId);
+        blocking.add(dep.dependsOn);
+      }
+    }
+
+    this.blockedTaskIds = blocked;
+    this.blockingTaskIds = blocking;
+  }
 }
