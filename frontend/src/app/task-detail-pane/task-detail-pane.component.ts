@@ -140,12 +140,6 @@ export class TaskDetailPaneComponent implements OnChanges {
       return;
     }
 
-    const combined = this.due.combine(this.dueDate, this.dueTime);
-    if (this.due.isBeforeNow(combined)) {
-      this.formError = 'Due date and time cannot be in the past.';
-      return;
-    }
-
     this.saving = true;
     this.formError = null;
     const dueAt = this.due.toIsoOrNull(this.dueDate, this.dueTime);

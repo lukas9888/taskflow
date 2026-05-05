@@ -15,3 +15,13 @@
 .task-composer-error {
   margin: -0.5rem 0 1rem;
 }
+
+.task-composer-field .ng-invalid {
+  color: inherit;
+}
+
+::ng-deep .task-composer-field.mat-form-field-invalid .mdc-notched-outline__leading,
+::ng-deep .task-composer-field.mat-form-field-invalid .mdc-notched-outline__notch,
+::ng-deep .task-composer-field.mat-form-field-invalid .mdc-notched-outline__trailing {
+  border-color: var(--mdc-outlined-text-field-outline-color) !important;
+}
