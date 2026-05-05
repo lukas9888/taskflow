@@ -16,6 +16,11 @@
   min-height: calc(100vh - var(--app-toolbar-total-height) - 32px);
 }
 
+.tasks-shell .mat-drawer-content {
+  overflow-x: hidden;
+}
+
+
 .tasks-detail-drawer {
   width: var(--task-detail-sheet-width);
   border-inline-start: 1px solid var(--app-chrome-border, #eff0f3);
