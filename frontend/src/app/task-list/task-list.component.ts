@@ -10,6 +10,7 @@ export type TaskListFilter = 'today' | 'week' | 'all';
 
 @Component({
   selector: 'app-task-list',
+  standalone: true,
   imports: [TaskRowComponent, MatButtonToggleModule, MatNavList, FormsModule],
   templateUrl: './task-list.component.html',
   styleUrl: './task-list.component.css',
@@ -19,6 +20,8 @@ export class TaskListComponent {
 
   @Input() tasks: TaskItem[] = [];
   @Input() selectedTaskId: number | null = null;
+  @Input() blockedTaskIds = new Set<number>();
+  @Input() blockingTaskIds = new Set<number>();
   @Output() readonly selectedTaskIdChange = new EventEmitter<number | null>();
 
   listFilter: TaskListFilter = 'today';

@@ -24,9 +24,11 @@
     @if (selectedTask; as task) {
       <app-task-detail-pane
         [task]="task"
+        [allTasks]="tasks"
         (taskUpdated)="refreshTasks()"
         (taskDeleted)="onTaskDeletedFromPane()"
         (closed)="onDetailClosed()"
+        (dependenciesChanged)="refreshDependencies()"
       />
     }
   </mat-sidenav>
@@ -38,6 +40,8 @@
       <app-task-list
         [tasks]="tasks"
         [selectedTaskId]="selectedTaskId"
+        [blockedTaskIds]="blockedTaskIds"
+        [blockingTaskIds]="blockingTaskIds"
         (selectedTaskIdChange)="onSelectedTaskIdChange($event)"
       />
     </div>

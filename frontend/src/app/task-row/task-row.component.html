@@ -10,22 +10,28 @@
 
   <span matListItemTitle>{{ task.title }}</span>
 
-  <span matListItemMeta class="task-row-meta">
-    @let pm = priorityMarker();
-    <mat-icon
-      class="task-row-prio-icon"
-      inline
-      [style.color]="pm.color"
-      aria-hidden="true"
+ <span matListItemMeta class="task-row-meta">
+  @let pm = priorityMarker();
+  @if (isBlocked) {
+    <mat-icon style="color: var(--mat-sys-error); font-size: 18px;" matTooltip="Blocked">block</mat-icon>
+  }
+  @if (isBlocking) {
+    <mat-icon style="color: #f5c000; font-size: 18px;" matTooltip="Blocking other tasks">warning</mat-icon>
+  }
+  <mat-icon
+    class="task-row-prio-icon"
+    inline
+    [style.color]="pm.color"
+    aria-hidden="true"
     >{{ pm.icon }}</mat-icon>
-    <span class="task-row-chip">{{ categoryLabel }}</span>
-    @if (task.dueAt; as due) {
-      <span class="task-row-due" [attr.aria-label]="'Due ' + (due | date: 'fullDate')">{{
-        due | date: 'MMM d, y'
-      }}</span>
-    }
-    <mat-icon class="task-row-chevron" aria-hidden="true">chevron_right</mat-icon>
-  </span>
+  <span class="task-row-chip">{{ categoryLabel }}</span>
+  @if (task.dueAt; as due) {
+    <span class="task-row-due" [attr.aria-label]="'Due ' + (due | date: 'fullDate')">{{
+      due | date: 'MMM d, y'
+    }}</span>
+  }
+  <mat-icon class="task-row-chevron" aria-hidden="true">chevron_right</mat-icon>
+</span>
 
   @if (showDivider) {
     <mat-divider />

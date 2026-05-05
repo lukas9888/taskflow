@@ -122,6 +122,8 @@
     @if (formError) {
       <p class="form-error" role="alert">{{ formError }}</p>
     }
+    
+    <app-task-dependencies [task]="task" [allTasks]="allTasks" (dependenciesChanged)="dependenciesChanged.emit()" />
 
     <div class="detail-footer">
       <button

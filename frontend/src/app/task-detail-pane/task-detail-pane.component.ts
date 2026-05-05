@@ -19,6 +19,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { TaskItem, TaskPriorityLevel } from '../models/task-item';
 import { DueDatetimeService } from '../services/due-datetime.service';
 import { TaskService } from '../services/task.service';
+import { TaskDependenciesComponent } from '../task-dependencies/task-dependencies.component';
 import {
   TASK_CATEGORY_OPTIONS,
   TASK_PRIORITY_OPTIONS,
@@ -38,7 +39,8 @@ import {
     MatButtonModule,
     MatSelectModule,
     MatDatepickerModule,
-    MatTimepickerModule
+    MatTimepickerModule,
+    TaskDependenciesComponent,
   ],
   templateUrl: './task-detail-pane.component.html',
   styleUrl: './task-detail-pane.component.css'
@@ -48,8 +50,10 @@ export class TaskDetailPaneComponent implements OnChanges {
   private readonly due = inject(DueDatetimeService);
 
   @Input({ required: true }) task!: TaskItem;
+  @Input() allTasks: TaskItem[] = [];
   @Output() readonly taskUpdated = new EventEmitter<void>();
   @Output() readonly taskDeleted = new EventEmitter<void>();
+  @Output() readonly dependenciesChanged = new EventEmitter<void>();
   /** Close/dismiss the sheet (clears selection in parent). */
   @Output() readonly closed = new EventEmitter<void>();
 

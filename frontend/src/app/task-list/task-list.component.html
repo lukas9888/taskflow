@@ -26,13 +26,15 @@
       <mat-nav-list class="task-rows" aria-label="Tasks">
         @for (t of visibleTasks; track t.id; let last = $last) {
           <app-task-row
-            [task]="t"
-            [selected]="selectedTaskId === t.id"
-            [completed]="completedTaskIds.has(t.id)"
-            [showDivider]="!last"
-            (select)="selectedTaskIdChange.emit(t.id)"
-            (completedChange)="onCompletedChange(t.id, $event)"
-          />
+          [task]="t"
+          [selected]="t.id === selectedTaskId"
+          [completed]="completedTaskIds.has(t.id)"
+          [showDivider]="!last"
+          [isBlocked]="blockedTaskIds.has(t.id)"
+          [isBlocking]="blockingTaskIds.has(t.id)"
+          (completedChange)="onCompletedChange(t.id, $event)"
+          (select)="selectedTaskIdChange.emit(t.id)"
+        />
         }
       </mat-nav-list>
     }
