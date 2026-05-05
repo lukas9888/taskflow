@@ -8,4 +8,5 @@ export interface TaskItem {
   priority: TaskPriorityLevel;
   category: string;
   description: string | null;
+  done: boolean;
 }

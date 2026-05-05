@@ -1,4 +1,4 @@
-<mat-list-item [activated]="selected" (click)="onRowActivate($event)">
+<mat-list-item [activated]="selected" [class.task-row-completed]="completed" (click)="onRowActivate($event)">
   <span matListItemIcon class="task-row-leading">
     <mat-checkbox
       [checked]="completed"
@@ -8,7 +8,7 @@
     />
   </span>
 
-  <span matListItemTitle>{{ task.title }}</span>
+  <span matListItemTitle [class.task-title-done]="completed">{{ task.title }}</span>
 
   <span matListItemMeta class="task-row-meta">
     @let pm = priorityMarker();

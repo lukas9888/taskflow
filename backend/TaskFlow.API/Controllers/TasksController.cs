@@ -72,7 +72,8 @@ public class TasksController : ControllerBase
             body.DueAt,
             NormalizePriority(body.Priority),
             NormalizeCategory(body.Category),
-            NormalizeDescription(body.Description));
+            NormalizeDescription(body.Description),
+            body.Done);
         return updated is null ? NotFound() : Ok(updated);
     }
 
@@ -139,4 +140,6 @@ public class UpdateTaskDto
     public string? Priority { get; set; }
     public string? Category { get; set; }
     public string? Description { get; set; }
+    public bool Done { get; set; }
+
 }
