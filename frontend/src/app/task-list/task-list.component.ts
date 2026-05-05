@@ -30,12 +30,18 @@ export class TaskListComponent {
   listFilter: TaskListFilter = 'today';
 
   get visibleTasks(): TaskItem[] {
-    const list = this.filterByTab(this.tasks);
-    return [...list].sort((a, b) => this.compareTasks(a, b));
+  const list = this.filterByTab(this.tasks);
+  return [...list].sort((a, b) => this.compareTasks(a, b));
+  }
+
+  get overdueTasks(): TaskItem[] {
+    return this.tasks
+      .filter((t) => this.isOverdue(t))
+      .sort((a, b) => this.compareTasks(a, b));
   }
 
   get activeTasks(): TaskItem[] {
-    return this.visibleTasks.filter((t) => !t.done);
+    return this.visibleTasks.filter((t) => !t.done && !this.isOverdue(t));
   }
 
   get doneTasks(): TaskItem[] {
@@ -83,6 +89,14 @@ export class TaskListComponent {
       default:
         return all;
     }
+  }
+
+  private isOverdue(task: TaskItem): boolean {
+  if (task.done || !task.dueAt) {
+    return false;
+  }
+
+  return new Date(task.dueAt).getTime() < Date.now();
   }
 
   private compareTasks(a: TaskItem, b: TaskItem): number {
