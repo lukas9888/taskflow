@@ -66,6 +66,7 @@
   padding: 0;
 }
 
+/*Overdue card CSS START*/
 .overdue-section-card {
   --mdc-elevated-card-container-color: color-mix(
     in srgb,
@@ -80,4 +81,13 @@
 
   border: 1px solid color-mix(in srgb, var(--mat-sys-error) 20%, transparent);
 }
+
+.overdue-section-card .task-rows {
+  --mat-list-active-indicator-color: color-mix(
+    in srgb,
+    var(--mat-sys-error) 20%,
+    var(--mat-sys-surface)
+  );
+}
+/*Overdue card CSS END*/
 

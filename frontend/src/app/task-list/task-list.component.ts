@@ -26,6 +26,7 @@ export class TaskListComponent {
   @Input() blockedTaskIds = new Set<number>();
   @Input() blockingTaskIds = new Set<number>();
   @Output() readonly selectedTaskIdChange = new EventEmitter<number | null>();
+  @Output() readonly taskUpdated = new EventEmitter<void>();
 
   listFilter: TaskListFilter = 'today';
 
@@ -61,6 +62,7 @@ export class TaskListComponent {
     .subscribe({
       next: (updated) => {
         this.tasks = this.tasks.map((t) => (t.id === updated.id ? updated : t));
+        this.taskUpdated.emit();
       }
     });
   }
