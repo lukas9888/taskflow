@@ -41,6 +41,8 @@
                 [task]="t"
                 [selected]="selectedTaskId === t.id"
                 [completed]="t.done"
+                [isBlocked]="blockedTaskIds.has(t.id)"
+                [isBlocking]="blockingTaskIds.has(t.id)"
                 [showDivider]="!last"
                 (select)="selectedTaskIdChange.emit(t.id)"
                 (completedChange)="onCompletedChange(t, $event)"

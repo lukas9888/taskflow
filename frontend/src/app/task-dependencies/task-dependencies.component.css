@@ -1,0 +1,26 @@
+.deps-section {
+  margin-top: 16px;
+}
+
+.deps-empty {
+  font-size: 13px;
+  color: var(--mat-sys-on-surface-variant);
+  margin: 4px 0 8px;
+}
+
+.deps-error {
+  font-size: 13px;
+  color: var(--mat-sys-error);
+  margin: 4px 0 8px;
+}
+
+.deps-add-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.deps-select {
+  flex: 1 1 auto;
+}

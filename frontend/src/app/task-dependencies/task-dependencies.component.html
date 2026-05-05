@@ -1,0 +1,55 @@
+<div class="deps-section">
+  <span class="detail-section-label">Blocking tasks</span>
+
+  @if (loadError) {
+    <p class="deps-error">{{ loadError }}</p>
+  }
+
+  @if (dependencies.length === 0) {
+    <p class="deps-empty">Choose tasks that need to be completed first.</p>
+  } @else {
+    <mat-list dense>
+      @for (dep of dependencies; track dep.dependsOn) {
+        <mat-list-item>
+          <mat-icon matListItemIcon>link</mat-icon>
+          <span matListItemTitle>{{ dep.dependsOnTitle }}</span>
+          <button mat-icon-button matListItemMeta
+                  (click)="remove(dep.dependsOn)"
+                  aria-label="Remove dependency">
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-list-item>
+      }
+    </mat-list>
+  }
+
+  <div class="deps-add-row">
+  <mat-form-field appearance="outline" class="deps-select">
+    <mat-label>Add blocking tasks</mat-label>
+    <input
+      matInput
+      [(ngModel)]="searchText"
+      [matAutocomplete]="auto"
+      (ngModelChange)="onSearchTextChange()"
+      placeholder="Search tasks…"
+    />
+    <mat-autocomplete
+      #auto="matAutocomplete"
+      (optionSelected)="selectTask($event.option.value)"
+    >
+      @for (t of filteredTasks; track t.id) {
+        <mat-option [value]="t">{{ t.title }}</mat-option>
+      }
+    </mat-autocomplete>
+  </mat-form-field>
+  <button mat-flat-button
+          [disabled]="selectedDependsOnId == null || adding"
+          (click)="add()">
+    <mat-icon>add</mat-icon>
+    {{ adding ? 'Adding…' : 'Add' }}
+  </button>
+</div>
+@if (addError) {
+  <p class="deps-error">{{ addError }}</p>
+}
+</div>
