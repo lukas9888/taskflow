@@ -102,9 +102,11 @@ public class TasksController : ControllerBase
             _ => "medium"
         };
 
-    private static string NormalizeCategory(string? c)
+    private static string? NormalizeCategory(string? c)
     {
-        var t = string.IsNullOrWhiteSpace(c) ? "GENERAL" : c.Trim().ToUpperInvariant();
+        if (string.IsNullOrWhiteSpace(c))
+            return null;
+        var t = c.Trim().ToUpperInvariant();
         return t.Length > 64 ? t[..64] : t;
     }
 

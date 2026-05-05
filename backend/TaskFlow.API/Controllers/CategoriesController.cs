@@ -25,6 +25,21 @@ public class CategoriesController : ControllerBase
         return Ok(_categories.GetAllNames(userId));
     }
 
+    [HttpPost]
+    public ActionResult<string> Create([FromBody] CreateCategoryDto body)
+    {
+        if (!ModelState.IsValid)
+            return ValidationProblem(ModelState);
+
+        var userId = GetUserId();
+        var name = NormalizeCategory(body.Name);
+        if (name is null)
+            return BadRequest("Category name cannot be empty.");
+
+        var created = _categories.UpsertName(userId, name);
+        return Ok(created);
+    }
+
     private int GetUserId()
     {
         var raw =
@@ -34,5 +49,21 @@ public class CategoriesController : ControllerBase
             throw new InvalidOperationException("Missing or invalid user id claim.");
         return userId;
     }
+
+    private static string? NormalizeCategory(string? c)
+    {
+        if (string.IsNullOrWhiteSpace(c))
+            return null;
+        var t = c.Trim().ToUpperInvariant();
+        return t.Length > 64 ? t[..64] : t;
+    }
+}
+
+public class CreateCategoryDto
+{
+    [System.ComponentModel.DataAnnotations.Required]
+    [System.ComponentModel.DataAnnotations.MinLength(1)]
+    [System.ComponentModel.DataAnnotations.MaxLength(64)]
+    public string Name { get; set; } = string.Empty;
 }
 

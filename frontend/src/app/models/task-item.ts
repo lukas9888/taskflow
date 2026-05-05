@@ -6,6 +6,6 @@ export interface TaskItem {
   createdAt: string;
   dueAt: string | null;
   priority: TaskPriorityLevel;
-  category: string;
+  category: string | null;
   description: string | null;
 }

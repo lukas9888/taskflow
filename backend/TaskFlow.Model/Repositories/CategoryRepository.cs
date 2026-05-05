@@ -9,6 +9,23 @@ public class CategoryRepository : BaseRepository
     {
     }
 
+    public string UpsertName(int userId, string name)
+    {
+        using var conn = new NpgsqlConnection(ConnectionString);
+        using var cmd = new NpgsqlCommand(
+            @"INSERT INTO user_categories (user_id, name)
+              VALUES (@user_id, @name)
+              ON CONFLICT (user_id, name) DO UPDATE SET name = EXCLUDED.name
+              RETURNING name",
+            conn);
+        cmd.Parameters.AddWithValue("user_id", userId);
+        cmd.Parameters.AddWithValue("name", name);
+
+        conn.Open();
+        var result = cmd.ExecuteScalar();
+        return (result as string) ?? name;
+    }
+
     public List<string> GetAllNames(int userId)
     {
         var list = new List<string>();
