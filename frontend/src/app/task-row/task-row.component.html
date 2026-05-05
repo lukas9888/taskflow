@@ -24,14 +24,16 @@
     [style.color]="pm.color"
     aria-hidden="true"
     >{{ pm.icon }}</mat-icon>
-  <span class="task-row-chip">{{ categoryLabel }}</span>
-  @if (task.dueAt; as due) {
-    <span class="task-row-due" [attr.aria-label]="'Due ' + (due | date: 'fullDate')">{{
-      due | date: 'MMM d, y'
-    }}</span>
-  }
-  <mat-icon class="task-row-chevron" aria-hidden="true">chevron_right</mat-icon>
-</span>
+    @if (categoryLabel) {
+      <span class="task-row-chip">{{ categoryLabel }}</span>
+    }
+    @if (task.dueAt; as due) {
+      <span class="task-row-due" [attr.aria-label]="'Due ' + (due | date: 'fullDate')">{{
+        due | date: 'MMM d, y'
+      }}</span>
+    }
+    <mat-icon class="task-row-chevron" aria-hidden="true">chevron_right</mat-icon>
+  </span>
 
   @if (showDivider) {
     <mat-divider />

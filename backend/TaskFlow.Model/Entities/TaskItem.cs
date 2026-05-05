@@ -7,7 +7,7 @@ public class TaskItem
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset? DueAt { get; set; }
     public string Priority { get; set; } = "medium";
-    public string Category { get; set; } = "GENERAL";
+    public string? Category { get; set; }
     public string? Description { get; set; }
     public bool Done {get; set; }
 }

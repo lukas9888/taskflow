@@ -1,17 +1,5 @@
 import { TaskItem, TaskPriorityLevel } from './models/task-item';
 
-/** Select options — aligned with Stitch-style chips. */
-export const TASK_CATEGORY_OPTIONS = [
-  'DEVELOPMENT',
-  'TECHNICAL',
-  'API',
-  'FINANCE',
-  'DESIGN',
-  'GENERAL'
-] as const;
-
-export type TaskCategoryOption = (typeof TASK_CATEGORY_OPTIONS)[number];
-
 /** Priority values for selects (API order). */
 export const TASK_PRIORITY_OPTIONS: readonly TaskPriorityLevel[] = ['high', 'medium', 'low'];
 
@@ -49,5 +37,5 @@ export function taskPriorityFromModel(task: TaskItem): TaskPriorityLevel {
 }
 
 export function taskCategoryFromModel(task: TaskItem): string {
-  return task.category?.trim() || 'GENERAL';
+  return task.category?.trim() || '';
 }

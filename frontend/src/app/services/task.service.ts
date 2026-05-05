@@ -7,7 +7,7 @@ export type UpdateTaskBody = {
   title: string;
   dueAt: string | null;
   priority: string;
-  category: string;
+  category: string | null;
   description: string | null;
   done: boolean;
 };

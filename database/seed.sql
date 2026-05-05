@@ -30,6 +30,21 @@ END $$;
 INSERT INTO users (username, email, password_hash)
 VALUES ('demo', 'demo@taskflow.local', crypt('demo1234', gen_salt('bf')));
 
+-- Demo categories (scoped to the demo user).
+INSERT INTO user_categories (user_id, name)
+SELECT u.id, c.name
+FROM users u
+CROSS JOIN (
+  VALUES
+    ('DEVELOPMENT'),
+    ('TECHNICAL'),
+    ('API'),
+    ('DESIGN'),
+    ('GENERAL')
+) AS c(name)
+WHERE u.username = 'demo'
+ON CONFLICT (user_id, name) DO NOTHING;
+
 -- due_at: nearest 15-minute boundary to "now", then +0 / +1 / +2 calendar days with small slot offsets.
 WITH anchor AS (
   SELECT (
@@ -37,28 +52,33 @@ WITH anchor AS (
     + round(extract(epoch FROM now()) / 900.0) * 900 * interval '1 second'
   ) AS q
 ),
-seed_tasks(title, day_off, slot) AS (
+seed_tasks(title, category, day_off, slot) AS (
   VALUES
-    ('Set up PostgreSQL', 0, 0),
-    ('Set up the API and Swagger', 0, 1),
-    ('Connect Angular to backend', 0, 2),
-    ('Write project report draft', 0, 3),
-    ('Design second entity and FK', 1, 0),
-    ('Add PUT and DELETE endpoints', 1, 1),
-    ('Add form validation messages', 1, 2),
-    ('Test CRUD in Swagger', 2, 0),
-    ('Prepare oral exam demo', 2, 1),
-    ('Zip source without node_modules', 2, 2)
+    ('Set up PostgreSQL', 'TECHNICAL', 0, 0),
+    ('Set up the API and Swagger', 'API', 0, 1),
+    ('Connect Angular to backend', 'DEVELOPMENT', 0, 2),
+    ('Write project report draft', 'GENERAL', 0, 3),
+    ('Design second entity and FK', 'DESIGN', 1, 0),
+    ('Add PUT and DELETE endpoints', 'API', 1, 1),
+    ('Add form validation messages', 'DEVELOPMENT', 1, 2),
+    ('Test CRUD in Swagger', 'TECHNICAL', 2, 0),
+    ('Prepare oral exam demo', 'GENERAL', 2, 1),
+    ('Zip source without node_modules', 'GENERAL', 2, 2)
 )
-INSERT INTO tasks (user_id, title, due_at)
+INSERT INTO tasks (user_id, title, due_at, user_category_id)
 SELECT
-  (SELECT id FROM users WHERE username = 'demo'),
+  u.id,
   s.title,
   a.q
     + make_interval(days => s.day_off)
-    + make_interval(mins => (s.slot * 15))
+    + make_interval(mins => (s.slot * 15)),
+  uc.id
 FROM seed_tasks s
-CROSS JOIN anchor a;
+CROSS JOIN anchor a
+JOIN users u ON u.username = 'demo'
+JOIN user_categories uc
+  ON uc.user_id = u.id
+ AND uc.name = s.category;
 
 
 INSERT INTO task_dependencies (task_id, depends_on) VALUES

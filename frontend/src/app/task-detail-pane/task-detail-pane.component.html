@@ -94,11 +94,44 @@
 
         <mat-form-field appearance="outline" class="detail-pc-field" subscriptSizing="dynamic">
           <mat-label>Category</mat-label>
-          <mat-select name="detailCategory" [(ngModel)]="category">
-            @for (c of categorySelectOptions; track c) {
+          <mat-chip-grid #categoryChipGrid aria-label="Selected category">
+            @if (category) {
+              <mat-chip-row (removed)="clearCategory()">
+                {{ category }}
+                <button matChipRemove type="button" aria-label="Remove category">
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-chip-row>
+            }
+          </mat-chip-grid>
+          <input
+            matInput
+            #categoryInputEl
+            name="detailCategory"
+            [(ngModel)]="categoryInput"
+            [matChipInputFor]="categoryChipGrid"
+            [matAutocomplete]="categoryAuto"
+            (blur)="onCategoryBlur()"
+            (keydown.enter)="$event.preventDefault()"
+            autocomplete="off"
+          />
+          <mat-autocomplete
+            #categoryAuto="matAutocomplete"
+            autoActiveFirstOption
+            [displayWith]="categoryDisplay"
+            (optionSelected)="onCategoryOptionSelected($event.option.value)"
+          >
+            @for (c of categoryOptions; track c) {
               <mat-option [value]="c">{{ c }}</mat-option>
             }
-          </mat-select>
+            @if (canCreateCategory) {
+              <mat-option
+                [value]="'__create__:' + normalizeCategoryOrEmpty(categoryInput)"
+              >
+                {{ createCategoryLabel }}
+              </mat-option>
+            }
+          </mat-autocomplete>
         </mat-form-field>
       </div>
     </div>
