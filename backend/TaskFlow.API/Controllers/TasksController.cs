@@ -38,8 +38,6 @@ public class TasksController : ControllerBase
             return BadRequest("Title must be at least 2 characters.");
 
         var userId = GetUserId();
-        if (body.DueAt.HasValue && body.DueAt.Value < DateTimeOffset.UtcNow)
-            return BadRequest("Due date cannot be in the past.");
 
         var created = _tasks.Create(
             userId,
@@ -62,8 +60,6 @@ public class TasksController : ControllerBase
             return BadRequest("Title must be at least 2 characters.");
 
         var userId = GetUserId();
-        if (body.DueAt.HasValue && body.DueAt.Value < DateTimeOffset.UtcNow)
-            return BadRequest("Due date cannot be in the past.");
 
         var updated = _tasks.Update(
             userId,
@@ -103,9 +99,11 @@ public class TasksController : ControllerBase
             _ => "medium"
         };
 
-    private static string NormalizeCategory(string? c)
+    private static string? NormalizeCategory(string? c)
     {
-        var t = string.IsNullOrWhiteSpace(c) ? "GENERAL" : c.Trim().ToUpperInvariant();
+        if (string.IsNullOrWhiteSpace(c))
+            return null;
+        var t = c.Trim().ToUpperInvariant();
         return t.Length > 64 ? t[..64] : t;
     }
 

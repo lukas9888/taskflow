@@ -91,20 +91,34 @@ export class TasksPageComponent implements OnInit {
   refreshDependencies(): void {
   const blocked = new Set<number>();
   const blocking = new Set<number>();
-  const calls = this.tasks.map(task =>
+
+  const taskById = new Map(this.tasks.map((task) => [task.id, task]));
+
+  const calls = this.tasks.map((task) =>
     this.depService.getAll(task.id).pipe(
-      map(deps => {
-        if (deps.length > 0) blocked.add(task.id);
-        for (const d of deps) blocking.add(d.dependsOn);
+      map((deps) => {
+        for (const d of deps) {
+          const dependencyTask = taskById.get(d.dependsOn);
+
+          if (dependencyTask && !dependencyTask.done) {
+            blocked.add(task.id);
+          }
+
+          blocking.add(d.dependsOn);
+        }
       })
     )
   );
 
-  if (calls.length === 0) return;
+  if (calls.length === 0) {
+    this.blockedTaskIds = blocked;
+    this.blockingTaskIds = blocking;
+    return;
+  }
 
   forkJoin(calls).subscribe(() => {
-    this.blockedTaskIds = new Set(blocked);
-    this.blockingTaskIds = new Set(blocking);
+    this.blockedTaskIds = blocked;
+    this.blockingTaskIds = blocking;
   });
 }
 

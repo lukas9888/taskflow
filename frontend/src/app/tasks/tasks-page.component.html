@@ -43,6 +43,7 @@
         [blockedTaskIds]="blockedTaskIds"
         [blockingTaskIds]="blockingTaskIds"
         (selectedTaskIdChange)="onSelectedTaskIdChange($event)"
+        (taskUpdated)="refreshTasks()"
       />
     </div>
   </mat-sidenav-content>
