@@ -38,8 +38,6 @@ public class TasksController : ControllerBase
             return BadRequest("Title must be at least 2 characters.");
 
         var userId = GetUserId();
-        if (body.DueAt.HasValue && body.DueAt.Value < DateTimeOffset.UtcNow)
-            return BadRequest("Due date cannot be in the past.");
 
         var created = _tasks.Create(
             userId,
@@ -62,8 +60,6 @@ public class TasksController : ControllerBase
             return BadRequest("Title must be at least 2 characters.");
 
         var userId = GetUserId();
-        if (body.DueAt.HasValue && body.DueAt.Value < DateTimeOffset.UtcNow)
-            return BadRequest("Due date cannot be in the past.");
 
         var updated = _tasks.Update(
             userId,
@@ -72,7 +68,8 @@ public class TasksController : ControllerBase
             body.DueAt,
             NormalizePriority(body.Priority),
             NormalizeCategory(body.Category),
-            NormalizeDescription(body.Description));
+            NormalizeDescription(body.Description),
+            body.Done);
         return updated is null ? NotFound() : Ok(updated);
     }
 
@@ -141,4 +138,6 @@ public class UpdateTaskDto
     public string? Priority { get; set; }
     public string? Category { get; set; }
     public string? Description { get; set; }
+    public bool Done { get; set; }
+
 }

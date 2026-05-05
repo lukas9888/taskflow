@@ -26,6 +26,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<TaskRepository>();
         services.AddScoped<CategoryRepository>();
         services.AddScoped<UserRepository>();
+        services.AddScoped<TaskDependencyRepository>();
         return services;
     }
 

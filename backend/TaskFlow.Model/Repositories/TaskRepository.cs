@@ -17,7 +17,7 @@ public class TaskRepository : BaseRepository
         using var conn = new NpgsqlConnection(ConnectionString);
 
         using var cmd = new NpgsqlCommand(
-            @"SELECT t.id, t.title, t.created_at, t.due_at, t.priority::text, uc.name AS category, t.description
+            @"SELECT t.id, t.title, t.created_at, t.due_at, t.priority::text, uc.name AS category, t.description, t.done
               FROM tasks t
               LEFT JOIN user_categories uc ON uc.id = t.user_category_id
               WHERE t.user_id = @user_id
@@ -36,7 +36,8 @@ public class TaskRepository : BaseRepository
                 DueAt = reader.IsDBNull(3) ? null : reader.GetFieldValue<DateTimeOffset>(3),
                 Priority = reader.GetString(4),
                 Category = reader.IsDBNull(5) ? null : reader.GetString(5),
-                Description = reader.IsDBNull(6) ? null : reader.GetString(6)
+                Description = reader.IsDBNull(6) ? null : reader.GetString(6),
+                Done = reader.GetBoolean(7)
             });
         }
 
@@ -72,7 +73,7 @@ public class TaskRepository : BaseRepository
               )
               RETURNING id, title, created_at, due_at, priority::text,
                         (SELECT name FROM user_categories WHERE id = user_category_id) AS category,
-                        description",
+                        description, done",
             conn);
         cmd.Parameters.AddWithValue("user_id", userId);
         cmd.Parameters.AddWithValue("title", title);
@@ -100,7 +101,8 @@ public class TaskRepository : BaseRepository
         DateTimeOffset? dueAt,
         string priority,
         string? category,
-        string? description)
+        string? description,
+        bool done)
     {
         using var conn = new NpgsqlConnection(ConnectionString);
 
@@ -118,13 +120,14 @@ public class TaskRepository : BaseRepository
                     due_at = @due_at,
                     priority = CAST(@priority AS task_priority),
                     user_category_id = (SELECT id FROM cat),
-                    description = @description
+                    description = @description,
+                  done = @done
                 WHERE id = @id AND user_id = @user_id
                 RETURNING id, title, created_at, due_at, priority::text,
                           (SELECT name FROM user_categories WHERE id = user_category_id) AS category,
                           description
               )
-              SELECT * FROM upd",
+              SELECT * FROM upd, done",
             conn);
 
         cmd.Parameters.AddWithValue("user_id", userId);
@@ -138,6 +141,8 @@ public class TaskRepository : BaseRepository
         cmd.Parameters.AddWithValue("category", (object?)category ?? DBNull.Value);
         var descParam = cmd.Parameters.Add("description", NpgsqlDbType.Text);
         descParam.Value = description ?? (object)DBNull.Value;
+
+        cmd.Parameters.AddWithValue("done", done);
 
         conn.Open();
         using var reader = cmd.ExecuteReader();
@@ -172,7 +177,8 @@ public class TaskRepository : BaseRepository
             DueAt = reader.IsDBNull(3) ? null : reader.GetFieldValue<DateTimeOffset>(3),
             Priority = reader.GetString(4),
             Category = reader.IsDBNull(5) ? null : reader.GetString(5),
-            Description = reader.IsDBNull(6) ? null : reader.GetString(6)
+            Description = reader.IsDBNull(6) ? null : reader.GetString(6),
+            Done = reader.GetBoolean(7)
         };
     }
 }

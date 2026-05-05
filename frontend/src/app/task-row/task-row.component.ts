@@ -19,6 +19,7 @@ import {
 
 @Component({
   selector: 'app-task-row',
+  standalone: true,
   imports: [
     DatePipe,
     MatCheckboxModule,
@@ -38,6 +39,8 @@ export class TaskRowComponent {
   @Input() completed = false;
   /** When false, no bottom divider (e.g. last row in the list). */
   @Input() showDivider = true;
+  @Input() isBlocked = false;
+  @Input() isBlocking = false;
   @Output() readonly completedChange = new EventEmitter<boolean>();
   @Output() readonly select = new EventEmitter<void>();
 

@@ -9,4 +9,5 @@ public class TaskItem
     public string Priority { get; set; } = "medium";
     public string? Category { get; set; }
     public string? Description { get; set; }
+    public bool Done {get; set; }
 }

@@ -9,6 +9,8 @@ import { TaskListComponent } from '../task-list/task-list.component';
 import { TaskDetailPaneComponent } from '../task-detail-pane/task-detail-pane.component';
 import { TaskItem } from '../models/task-item';
 import { TaskService } from '../services/task.service';
+import { DependencyService } from '../services/dependency.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-tasks-page',
@@ -23,6 +25,9 @@ import { TaskService } from '../services/task.service';
   styleUrl: './tasks-page.component.css'
 })
 export class TasksPageComponent implements OnInit {
+  blockedTaskIds = new Set<number>();
+  blockingTaskIds = new Set<number>();
+  private readonly depService = inject(DependencyService);
   private readonly taskService = inject(TaskService);
   private readonly breakpoint = inject(BreakpointObserver);
 
@@ -38,6 +43,7 @@ export class TasksPageComponent implements OnInit {
   tasks: TaskItem[] = [];
   loadError: string | null = null;
   selectedTaskId: number | null = null;
+  
 
   get selectedTask(): TaskItem | null {
     if (this.selectedTaskId == null) {
@@ -74,10 +80,31 @@ export class TasksPageComponent implements OnInit {
         ) {
           this.selectedTaskId = null;
         }
+        this.refreshDependencies();
       },
       error: () =>
         (this.loadError =
           'Could not load tasks. Are you logged in, and is the API running?')
     });
   }
+
+  refreshDependencies(): void {
+  const blocked = new Set<number>();
+  const blocking = new Set<number>();
+  const calls = this.tasks.map(task =>
+    this.depService.getAll(task.id).pipe(
+      map(deps => {
+        if (deps.length > 0) blocked.add(task.id);
+        for (const d of deps) blocking.add(d.dependsOn);
+      })
+    )
+  );
+
+  if (calls.length === 0) return;
+
+  forkJoin(calls).subscribe(() => {
+    this.blockedTaskIds = new Set(blocked);
+    this.blockingTaskIds = new Set(blocking);
+  });
+}
 }

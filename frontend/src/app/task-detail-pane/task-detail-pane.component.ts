@@ -24,6 +24,7 @@ import { TaskItem, TaskPriorityLevel } from '../models/task-item';
 import { CategoryService } from '../services/category.service';
 import { DueDatetimeService } from '../services/due-datetime.service';
 import { TaskService } from '../services/task.service';
+import { TaskDependenciesComponent } from '../task-dependencies/task-dependencies.component';
 import {
   TASK_PRIORITY_OPTIONS,
   priorityIconCssColor,
@@ -44,7 +45,8 @@ import {
     MatButtonModule,
     MatSelectModule,
     MatDatepickerModule,
-    MatTimepickerModule
+    MatTimepickerModule,
+    TaskDependenciesComponent,
   ],
   templateUrl: './task-detail-pane.component.html',
   styleUrl: './task-detail-pane.component.css'
@@ -57,8 +59,10 @@ export class TaskDetailPaneComponent implements OnChanges {
   @ViewChild('categoryInputEl') private categoryInputEl?: ElementRef<HTMLInputElement>;
 
   @Input({ required: true }) task!: TaskItem;
+  @Input() allTasks: TaskItem[] = [];
   @Output() readonly taskUpdated = new EventEmitter<void>();
   @Output() readonly taskDeleted = new EventEmitter<void>();
+  @Output() readonly dependenciesChanged = new EventEmitter<void>();
   /** Close/dismiss the sheet (clears selection in parent). */
   @Output() readonly closed = new EventEmitter<void>();
 
@@ -76,8 +80,6 @@ export class TaskDetailPaneComponent implements OnChanges {
   /** Free text input bound to the autocomplete input. */
   categoryInput = '';
   description = '';
-
-  readonly minDate = this.due.startOfToday();
 
   saving = false;
   deleting = false;
@@ -223,15 +225,11 @@ export class TaskDetailPaneComponent implements OnChanges {
       return;
     }
 
-    const combined = this.due.combine(this.dueDate, this.dueTime);
-    if (this.due.isBeforeNow(combined)) {
-      this.formError = 'Due date and time cannot be in the past.';
-      return;
-    }
-
     this.saving = true;
     this.formError = null;
-    const dueAt = this.due.toIsoOrNull(this.dueDate, this.dueTime);
+    const effectiveDate = this.dueDate ?? this.due.startOfToday();
+    const effectiveTime = this.dueTime ?? new Date(1970, 0, 1, 0, 0, 0);
+    const dueAt = this.due.toIsoOrNull(effectiveDate, effectiveTime);
     const desc = this.description.trim();
 
     this.tasksApi
@@ -240,7 +238,8 @@ export class TaskDetailPaneComponent implements OnChanges {
         dueAt,
         priority: this.priority,
         category: this.toApiCategoryOrNull(this.category),
-        description: desc.length > 0 ? desc : null
+        description: desc.length > 0 ? desc : null,
+        done: this.task.done
       })
       .subscribe({
         next: () => {

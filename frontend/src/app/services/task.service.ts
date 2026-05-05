@@ -9,6 +9,7 @@ export type UpdateTaskBody = {
   priority: string;
   category: string | null;
   description: string | null;
+  done: boolean;
 };
 
 @Injectable({

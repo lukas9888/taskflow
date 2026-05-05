@@ -30,7 +30,9 @@ export class TaskFormComponent {
 
     this.submitting = true;
     this.submitError = null;
-    this.taskService.createTask(trimmed, null).subscribe({
+    const today = new Date();
+    const todayIso = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 45, 0).toISOString();
+    this.taskService.createTask(trimmed, todayIso).subscribe({
       next: () => {
         this.title = '';
         this.submitting = false;
