@@ -25,6 +25,7 @@ public class TaskRepository : BaseRepository
             conn);
         cmd.Parameters.AddWithValue("user_id", userId);
         conn.Open();
+        SetUserId(conn, userId);
         using var reader = cmd.ExecuteReader();
         while (reader.Read())
         {
@@ -88,6 +89,7 @@ public class TaskRepository : BaseRepository
         descParam.Value = description ?? (object)DBNull.Value;
 
         conn.Open();
+        SetUserId(conn, userId);
         using var reader = cmd.ExecuteReader();
         if (!reader.Read())
             throw new InvalidOperationException("Insert did not return a row.");
@@ -147,6 +149,7 @@ public class TaskRepository : BaseRepository
         cmd.Parameters.AddWithValue("done", done);
 
         conn.Open();
+        SetUserId(conn, userId);
         using var reader = cmd.ExecuteReader();
 
         if (!reader.Read())
@@ -163,6 +166,7 @@ public class TaskRepository : BaseRepository
             "DELETE FROM tasks WHERE id = @id AND user_id = @user_id",
             conn);
         conn.Open();
+        SetUserId(conn, userId);
         cmd.Parameters.AddWithValue("user_id", userId);
         cmd.Parameters.AddWithValue("id", id);
         var affected = cmd.ExecuteNonQuery();
@@ -182,5 +186,12 @@ public class TaskRepository : BaseRepository
             Description = reader.IsDBNull(6) ? null : reader.GetString(6),
             Done = reader.GetBoolean(7)
         };
+    }
+
+    private static void SetUserId(NpgsqlConnection conn, int userId)
+    {
+        using var cmd = new NpgsqlCommand("SELECT set_config('app.current_user_id', @uid, true)", conn);
+        cmd.Parameters.AddWithValue("uid", userId.ToString());
+        cmd.ExecuteNonQuery();
     }
 }
