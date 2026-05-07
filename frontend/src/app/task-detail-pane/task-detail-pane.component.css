@@ -122,13 +122,9 @@
   margin-top: 12px;
 }
 
-.detail-save-btn {
-  flex: 1 1 auto;
-}
-
 .detail-delete-btn {
   flex-shrink: 0;
-  color: var(--mat-sys-error);
+  background-color: var(--mat-sys-error);
 }
 
 .detail-delete-btn[disabled] {

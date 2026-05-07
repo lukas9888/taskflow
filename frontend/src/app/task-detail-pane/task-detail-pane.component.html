@@ -27,7 +27,7 @@
 </mat-toolbar>
 
 <section class="detail-body">
-  <form class="detail-form" (ngSubmit)="save()" novalidate>
+  <form class="detail-form" novalidate>
     <div class="detail-section">
       <mat-form-field appearance="outline" class="full-width" subscriptSizing="dynamic">
         <mat-label>Title</mat-label>
@@ -41,6 +41,9 @@
           maxlength="500"
           autocomplete="off"
         />
+        @if (titleError) {
+          <mat-error>{{ titleError }}</mat-error>
+        }
       </mat-form-field>
     </div>
 
@@ -54,14 +57,17 @@
             name="detailDueDate"
             [matDatepicker]="duePicker"
             [(ngModel)]="dueDate"
-            (ngModelChange)="onDueDateChange(); onDateTimeChanged('date', dueDateModel.invalid === true)"
+            (ngModelChange)="onDueDateSelected()"
+            readonly
+            inputmode="none"
+            (keydown)="$event.preventDefault()"
+            (paste)="$event.preventDefault()"
+            (click)="duePicker.open()"
+            (focus)="duePicker.open()"
             autocomplete="off"
           />
           <mat-datepicker-toggle matIconSuffix [for]="duePicker"></mat-datepicker-toggle>
           <mat-datepicker #duePicker></mat-datepicker>
-          @if (dateError) {
-        <mat-error>{{ dateError }}</mat-error>
-          }
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="datetime-field" subscriptSizing="dynamic">
@@ -72,15 +78,18 @@
             name="detailDueTime"
             [matTimepicker]="timePicker"
             [(ngModel)]="dueTime"
-            (ngModelChange)="onDateTimeChanged('time', dueTimeModel.invalid === true)"
+            (ngModelChange)="onDueTimeSelected()"
             [min]="timeMin"
+            readonly
+            inputmode="none"
+            (keydown)="$event.preventDefault()"
+            (paste)="$event.preventDefault()"
+            (click)="timePicker.open()"
+            (focus)="timePicker.open()"
             autocomplete="off"
           />
           <mat-timepicker-toggle matIconSuffix [for]="timePicker"></mat-timepicker-toggle>
           <mat-timepicker #timePicker interval="15min"></mat-timepicker>
-          @if (timeError) {
-            <mat-error>{{ timeError }}</mat-error>
-          }
         </mat-form-field>
       </div>
     </div>
@@ -177,31 +186,23 @@
       </mat-form-field>
     </div>
 
-    @if (formError) {
-      <p class="form-error" role="alert">{{ formError }}</p>
-    }
-    
-    <app-task-dependencies [task]="task" [allTasks]="allTasks" (dependenciesChanged)="dependenciesChanged.emit()" />
+    <app-task-dependencies
+      [task]="task"
+      [allTasks]="allTasks"
+      (saveStateChanged)="onDependencySaveStateChanged($event)"
+    />
 
     <div class="detail-footer">
       <button
         mat-flat-button
-        color="primary"
-        class="detail-save-btn"
-        type="submit"
-        [disabled]="saving || deleting"
-      >
-        {{ saving ? 'Saving…' : 'Save Changes' }}
-      </button>
-      <button
-        mat-icon-button
+        color="warn"
         type="button"
         class="detail-delete-btn"
         (click)="deleteTask()"
-        [disabled]="saving || deleting"
-        aria-label="Delete task"
+        [disabled]="deleting"
       >
         <mat-icon>delete</mat-icon>
+        {{ deleting ? 'Deleting…' : 'Delete' }}
       </button>
     </div>
   </form>

@@ -34,7 +34,7 @@ import {
 } from '../task-ux';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EMPTY, Subject } from 'rxjs';
-import { catchError, debounceTime, switchMap, tap } from 'rxjs/operators';
+import { catchError, debounceTime, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-task-detail-pane',
@@ -66,15 +66,10 @@ export class TaskDetailPaneComponent implements OnChanges {
     this.autosaveTrigger$
       .pipe(
         debounceTime(1000),
-        tap(() => {
-          this.saveState = 'saving';
-          this.formError = null;
-        }),
         switchMap(() =>
           this.saveCurrentTask().pipe(
             catchError(() => {
               this.saveState = 'error';
-              this.formError = 'Could not update task.';
               return EMPTY;
             })
           )
@@ -112,16 +107,9 @@ export class TaskDetailPaneComponent implements OnChanges {
   categoryInput = '';
   description = '';
 
-  saving = false;
   deleting = false;
-  formError: string | null = null;
   saveState: 'idle' | 'saving' | 'saved' | 'error' = 'idle';
-
-  dateError: string | null = null;
-  timeError: string | null = null;
-
-  private dueDateInvalid = false;
-  private dueTimeInvalid = false;
+  titleError: string | null = null;
   private currentTaskId: number | null = null;
 
   readonly priorityOptions = TASK_PRIORITY_OPTIONS;
@@ -182,13 +170,8 @@ export class TaskDetailPaneComponent implements OnChanges {
   this.patchFormFromTask();
   this.ensureCategoriesLoaded();
 
-  this.formError = null;
-  this.dateError = null;
-  this.timeError = null;
-  this.saving = false;
+  this.titleError = null;
   this.deleting = false;
-  this.dueDateInvalid = false;
-  this.dueTimeInvalid = false;
 
   if (openedDifferentTask) {
     this.saveState = 'idle';
@@ -197,11 +180,6 @@ export class TaskDetailPaneComponent implements OnChanges {
 
   onDueDateChange(): void {
     this.timeMin = this.due.timeMinForDate(this.dueDate);
-  }
-
-  resetForm(): void {
-    this.patchFormFromTask();
-    this.formError = null;
   }
 
   onCategoryBlur(): void {
@@ -264,104 +242,48 @@ export class TaskDetailPaneComponent implements OnChanges {
     this.onFieldChanged();
   }
 
-  save(): void {
-    const trimmed = this.title.trim();
-    if (trimmed.length < 2) {
-      this.formError = 'Enter at least 2 characters.';
-      return;
-    }
-    if (this.dueDate && !this.dueTime) {
-      this.formError = 'Select a due time, or clear the due date.';
-      return;
-    }
-    if (!this.dueDate && this.dueTime) {
-      this.formError = 'Select a due date, or clear the due time.';
-      return;
-    }
-
-    this.saving = true;
-    this.formError = null;
-    const effectiveDate = this.dueDate ?? this.due.startOfToday();
-    const effectiveTime = this.dueTime ?? new Date(1970, 0, 1, 0, 0, 0);
-    const dueAt = this.due.toIsoOrNull(effectiveDate, effectiveTime);
-    const desc = this.description.trim();
-
-    this.tasksApi
-      .updateTask(this.task.id, {
-        title: trimmed,
-        dueAt,
-        priority: this.priority,
-        category: this.toApiCategoryOrNull(this.category),
-        description: desc.length > 0 ? desc : null,
-        done: this.task.done
-      })
-      .subscribe({
-        next: () => {
-          this.saving = false;
-          this.taskUpdated.emit();
-        },
-        error: () => {
-          this.saving = false;
-          this.formError = 'Could not update task.';
-        }
-      });
-    }
-
-    onFieldChanged(): void {
-    this.saveState = 'saving';
-    this.formError = null;
-    this.autosaveTrigger$.next();
-    }
-
-    onDateTimeChanged(field: 'date' | 'time', invalid: boolean): void {
-  if (field === 'date') {
-    this.dueDateInvalid = invalid;
-    this.dateError = invalid ? 'Enter a valid date.' : null;
-  } else {
-    this.dueTimeInvalid = invalid;
-    this.timeError = invalid ? 'Enter a valid time.' : null;
-  }
-
-  this.formError = null;
-
-  if (!this.dueDateInvalid && this.dueDate && !this.dueTime) {
-    this.timeError = 'Select a valid time.';
-  }
-
-  if (!this.dueTimeInvalid && !this.dueDate && this.dueTime) {
-    this.dateError = 'Select a valid date.';
-  }
-
-  if (this.dateError || this.timeError) {
-    this.saveState = 'idle';
-    return;
-  }
-
-  this.onFieldChanged();
-}
-    private saveCurrentTask() {
+  onFieldChanged(): void {
     const trimmed = this.title.trim();
 
+    // Title validation (autosave-only UX)
     if (trimmed.length < 2) {
+      this.titleError = 'Enter at least 2 characters.';
       this.saveState = 'error';
-      this.formError = 'Enter at least 2 characters.';
-      return EMPTY;
+      return;
+    }
+    this.titleError = null;
+
+    // Due date/time must be either both set or both cleared
+    if ((this.dueDate && !this.dueTime) || (!this.dueDate && this.dueTime)) {
+      this.saveState = 'error';
+      return;
     }
 
-    if (this.dueDateInvalid || this.dueTimeInvalid || this.dateError || this.timeError) {
-      this.saveState = 'idle';
+    this.saveState = 'saving';
+    this.autosaveTrigger$.next();
+  }
+
+  onDueDateSelected(): void {
+    this.onDueDateChange();
+    this.onFieldChanged();
+  }
+
+  onDueTimeSelected(): void {
+    this.onFieldChanged();
+  }
+
+  private saveCurrentTask() {
+    const trimmed = this.title.trim();
+
+    if (trimmed.length < 2) {
+      this.titleError = 'Enter at least 2 characters.';
+      this.saveState = 'error';
       return EMPTY;
     }
+    this.titleError = null;
 
-    if (this.dueDate && !this.dueTime) {
-      this.timeError = 'Select a valid time.';
-      this.saveState = 'idle';
-      return EMPTY;
-    }
-
-    if (!this.dueDate && this.dueTime) {
-      this.dateError = 'Select a valid date.';
-      this.saveState = 'idle';
+    if ((this.dueDate && !this.dueTime) || (!this.dueDate && this.dueTime)) {
+      this.saveState = 'error';
       return EMPTY;
     }
 
@@ -385,7 +307,6 @@ export class TaskDetailPaneComponent implements OnChanges {
       return;
     }
     this.deleting = true;
-    this.formError = null;
     this.tasksApi.deleteTask(this.task.id).subscribe({
       next: () => {
         this.deleting = false;
@@ -393,9 +314,15 @@ export class TaskDetailPaneComponent implements OnChanges {
       },
       error: () => {
         this.deleting = false;
-        this.formError = 'Could not delete task.';
       }
     });
+  }
+
+  onDependencySaveStateChanged(state: 'saving' | 'saved' | 'error'): void {
+    this.saveState = state;
+    if (state === 'saved') {
+      this.dependenciesChanged.emit();
+    }
   }
 
   private patchFormFromTask(): void {
