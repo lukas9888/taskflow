@@ -1,5 +1,19 @@
 <mat-toolbar class="detail-toolbar">
   <span class="detail-toolbar-title">Task Details</span>
+
+  <div class="autosave-status" aria-live="polite">
+      @if (saveState === 'saving') {
+        <mat-icon inline aria-hidden="true">sync</mat-icon>
+        <span>Saving…</span>
+      } @else if (saveState === 'saved') {
+        <mat-icon inline aria-hidden="true">check_circle</mat-icon>
+        <span>Saved</span>
+      } @else if (saveState === 'error') {
+        <mat-icon inline aria-hidden="true">error</mat-icon>
+        <span>Could not save</span>
+      }
+  </div>
+
   <span class="detail-toolbar-spacer"></span>
   <button
     mat-icon-button
@@ -9,6 +23,7 @@
   >
     <mat-icon>close</mat-icon>
   </button>
+
 </mat-toolbar>
 
 <section class="detail-body">
@@ -20,6 +35,7 @@
           matInput
           name="detailTitle"
           [(ngModel)]="title"
+          (ngModelChange)="onFieldChanged()"
           required
           minlength="2"
           maxlength="500"
@@ -34,10 +50,11 @@
           <mat-label>Date</mat-label>
           <input
             matInput
+            #dueDateModel="ngModel"
             name="detailDueDate"
             [matDatepicker]="duePicker"
             [(ngModel)]="dueDate"
-            (ngModelChange)="onDueDateChange()"
+            (ngModelChange)="onDueDateChange(); onDateTimeChanged('date', dueDateModel.invalid === true)"
             autocomplete="off"
           />
           <mat-datepicker-toggle matIconSuffix [for]="duePicker"></mat-datepicker-toggle>
@@ -48,9 +65,11 @@
           <mat-label>Time</mat-label>
           <input
             matInput
+            #dueTimeModel="ngModel"
             name="detailDueTime"
             [matTimepicker]="timePicker"
             [(ngModel)]="dueTime"
+            (ngModelChange)="onDateTimeChanged('time', dueTimeModel.invalid === true)"
             [min]="timeMin"
             autocomplete="off"
           />
@@ -64,7 +83,7 @@
       <div class="detail-priority-category-row">
         <mat-form-field appearance="outline" class="detail-pc-field" subscriptSizing="dynamic">
           <mat-label>Priority</mat-label>
-          <mat-select name="detailPriority" [(ngModel)]="priority">
+          <mat-select name="detailPriority" [(ngModel)]="priority" (ngModelChange)="onFieldChanged()">
             <mat-select-trigger>
               <span class="detail-prio-option">
                 <mat-icon
@@ -143,6 +162,7 @@
           matInput
           name="detailDescription"
           [(ngModel)]="description"
+          (ngModelChange)="onFieldChanged()"
           rows="4"
           placeholder="Add detailed notes here…"
           maxlength="8000"
