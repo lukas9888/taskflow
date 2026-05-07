@@ -27,12 +27,8 @@ BEGIN
 END $$;
 
 -- Default demo user. Password: demo1234
-INSERT INTO users (username, email, password_hash)
-VALUES ('demo', 'demo@taskflow.local', crypt('demo1234', gen_salt('bf')));
-
--- Empty demo user. Password: demo1234
-INSERT INTO users (username, email, password_hash)
-VALUES ('demo2', 'demo2@taskflow.local', crypt('demo1234', gen_salt('bf')));
+INSERT INTO users (username, password_hash)
+VALUES ('demo', crypt('demo1234', gen_salt('bf')));
 
 -- Demo categories (scoped to the demo user).
 INSERT INTO user_categories (user_id, name)

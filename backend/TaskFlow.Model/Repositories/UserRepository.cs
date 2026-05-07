@@ -10,17 +10,17 @@ public class UserRepository : BaseRepository
     {
     }
 
-    public User? FindByUsernameOrEmail(string login)
+    public User? FindByUsername(string username)
     {
         using var conn = new NpgsqlConnection(ConnectionString);
 
         using var cmd = new NpgsqlCommand(
-            @"SELECT id, username, email, password_hash, created_at
+            @"SELECT id, username, password_hash, created_at
               FROM users
-              WHERE username = @login OR email = @login
+              WHERE username = @username
               LIMIT 1",
             conn);
-        cmd.Parameters.AddWithValue("login", login);
+        cmd.Parameters.AddWithValue("username", username);
 
         conn.Open();
         using var reader = cmd.ExecuteReader();
@@ -31,23 +31,21 @@ public class UserRepository : BaseRepository
         {
             Id = reader.GetInt32(0),
             Username = reader.GetString(1),
-            Email = reader.GetString(2),
-            PasswordHash = reader.GetString(3),
-            CreatedAt = reader.GetFieldValue<DateTimeOffset>(4)
+            PasswordHash = reader.GetString(2),
+            CreatedAt = reader.GetFieldValue<DateTimeOffset>(3)
         };
     }
 
-    public User Create(string username, string email, string passwordHash)
+    public User Create(string username, string passwordHash)
     {
         using var conn = new NpgsqlConnection(ConnectionString);
 
         using var cmd = new NpgsqlCommand(
-            @"INSERT INTO users (username, email, password_hash)
-              VALUES (@username, @email, @password_hash)
-              RETURNING id, username, email, password_hash, created_at",
+            @"INSERT INTO users (username, password_hash)
+              VALUES (@username, @password_hash)
+              RETURNING id, username, password_hash, created_at",
             conn);
         cmd.Parameters.AddWithValue("username", username);
-        cmd.Parameters.AddWithValue("email", email);
         cmd.Parameters.AddWithValue("password_hash", passwordHash);
 
         conn.Open();
@@ -59,9 +57,8 @@ public class UserRepository : BaseRepository
         {
             Id = reader.GetInt32(0),
             Username = reader.GetString(1),
-            Email = reader.GetString(2),
-            PasswordHash = reader.GetString(3),
-            CreatedAt = reader.GetFieldValue<DateTimeOffset>(4)
+            PasswordHash = reader.GetString(2),
+            CreatedAt = reader.GetFieldValue<DateTimeOffset>(3)
         };
     }
 }

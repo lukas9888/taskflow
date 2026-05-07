@@ -30,23 +30,21 @@ public class AuthController : ControllerBase
             return ValidationProblem(ModelState);
 
         var username = body.Username.Trim();
-        var email = body.Email.Trim().ToLowerInvariant();
 
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(body.Password);
 
         try
         {
-            var created = _users.Create(username, email, passwordHash);
+            var created = _users.Create(username, passwordHash);
             return Created("", new RegisterResponseDto
             {
                 Id = created.Id,
                 Username = created.Username,
-                Email = created.Email
             });
         }
         catch (PostgresException ex) when (ex.SqlState == "23505")
         {
-            return Conflict("Username or email already exists.");
+            return Conflict("Username already exists.");
         }
     }
 
@@ -57,7 +55,7 @@ public class AuthController : ControllerBase
             return ValidationProblem(ModelState);
 
         var login = body.Login.Trim();
-        var user = _users.FindByUsernameOrEmail(login);
+        var user = _users.FindByUsername(login);
         if (user is null)
             return Unauthorized();
 
@@ -79,7 +77,6 @@ public class AuthController : ControllerBase
             new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(JwtRegisteredClaimNames.UniqueName, user.Username),
-            new(JwtRegisteredClaimNames.Email, user.Email)
         };
 
         var lifetimeHours = jwt.GetValue<double?>("AccessTokenLifetimeHours") ?? 24;
@@ -108,11 +105,6 @@ public class RegisterRequestDto
     public string Username { get; set; } = string.Empty;
 
     [Required]
-    [EmailAddress]
-    [MaxLength(255)]
-    public string Email { get; set; } = string.Empty;
-
-    [Required]
     [MinLength(8)]
     [MaxLength(200)]
     public string Password { get; set; } = string.Empty;
@@ -122,7 +114,6 @@ public class RegisterResponseDto
 {
     public int Id { get; set; }
     public string Username { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
 }
 
 public class LoginRequestDto
