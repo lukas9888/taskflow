@@ -5,57 +5,62 @@
     </mat-card-header>
 
     <mat-card-content>
-      @if (error) {
-        <p class="form-error" role="alert">{{ error }}</p>
+      <form #registerForm="ngForm" (ngSubmit)="submit()" class="form-stack auth-form">
+        <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Username</mat-label>
+      <input
+        matInput
+        type="text"
+        [(ngModel)]="username"
+        name="username"
+        required
+        minlength="3"
+        maxlength="100"
+        autocomplete="username"
+        #usernameInput="ngModel"
+        (ngModelChange)="clearUsernameServerError()"
+      />
+
+      @if (usernameInput.hasError('required') && usernameInput.touched) {
+        <mat-error>Username is required.</mat-error>
+      } @else if (usernameInput.hasError('minlength') && usernameInput.touched) {
+        <mat-error>Username must be at least 3 characters.</mat-error>
+      } @else if (usernameInput.hasError('maxlength') && usernameInput.touched) {
+        <mat-error>Username cannot be longer than 100 characters.</mat-error>
+      } @else if (usernameServerError) {
+        <mat-error>{{ usernameServerError }}</mat-error>
       }
-
-      <form (ngSubmit)="submit()" class="form-stack auth-form">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Username</mat-label>
-          <input
-            matInput
-            type="text"
-            [(ngModel)]="username"
-            name="username"
-            required
-            minlength="3"
-            maxlength="100"
-            autocomplete="username"
-          />
-        </mat-form-field>
+  </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Email</mat-label>
-          <input
-            matInput
-            type="email"
-            [(ngModel)]="email"
-            name="email"
-            required
-            maxlength="255"
-            autocomplete="email"
-          />
-        </mat-form-field>
+  <mat-label>Password</mat-label>
+    <input
+      matInput
+      type="password"
+      [(ngModel)]="password"
+      name="password"
+      required
+      minlength="8"
+      autocomplete="new-password"
+      #passwordInput="ngModel"
+    />
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Password (min 8 chars)</mat-label>
-          <input
-            matInput
-            type="password"
-            [(ngModel)]="password"
-            name="password"
-            required
-            minlength="8"
-            autocomplete="new-password"
-          />
-        </mat-form-field>
+    @if (passwordInput.hasError('required') && passwordInput.touched) {
+      <mat-error>Password is required.</mat-error>
+    } @else if (passwordInput.hasError('minlength') && passwordInput.touched) {
+      <mat-error>Password must be at least 8 characters.</mat-error>
+    }
+  </mat-form-field>
 
+    @if (serverError) {
+  <p class="form-error" role="alert">{{ serverError }}</p>
+  } 
         <button
           mat-flat-button
           color="primary"
           type="submit"
           class="full-width"
-          [disabled]="submitting"
+          [disabled]="submitting || registerForm.invalid"
         >
           {{ submitting ? 'Creating…' : 'Create account' }}
         </button>

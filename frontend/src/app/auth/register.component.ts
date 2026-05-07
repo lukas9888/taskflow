@@ -22,10 +22,10 @@ import { AuthService } from '../services/auth.service';
 })
 export class RegisterComponent {
   username = '';
-  email = '';
   password = '';
   submitting = false;
-  error: string | null = null;
+  serverError: string | null = null;
+  usernameServerError: string | null = null;
 
   constructor(
     private readonly auth: AuthService,
@@ -33,25 +33,35 @@ export class RegisterComponent {
   ) {}
 
   submit(): void {
-    const username = this.username.trim();
-    const email = this.email.trim();
-    if (!username || !email || !this.password) return;
+  const username = this.username.trim();
 
-    this.submitting = true;
-    this.error = null;
-    this.auth.register(username, email, this.password).subscribe({
-      next: () => {
-        this.submitting = false;
-        this.router.navigateByUrl('/login');
-      },
-      error: (err) => {
-        this.submitting = false;
-        this.error =
-          err?.status === 409
-            ? 'Username or email already exists.'
-            : 'Could not register.';
+  this.serverError = null;
+  this.usernameServerError = null;
+
+  if (!username || !this.password) return;
+
+  this.submitting = true;
+
+  this.auth.register(username, this.password).subscribe({
+    next: () => {
+      this.submitting = false;
+      this.router.navigateByUrl('/login');
+    },
+    error: (err) => {
+      this.submitting = false;
+
+      if (err?.status === 409) {
+        this.usernameServerError = 'Username already exists.';
+      } else {
+        this.serverError = 'Could not register. Please try again.';
       }
+    }
     });
   }
+
+  clearUsernameServerError(): void {
+    this.usernameServerError = null;
+  }
+  
 }
 

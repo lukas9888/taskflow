@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs';
 
-type RegisterResponse = { id: number; username: string; email: string };
+type RegisterResponse = { id: number; username: string };
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -25,10 +25,9 @@ export class AuthService {
       .pipe(tap((res) => localStorage.setItem(this.tokenKey, res.accessToken)));
   }
 
-  register(username: string, email: string, password: string) {
+  register(username: string, password: string) {
     return this.http.post<RegisterResponse>(`${this.baseUrl}/register`, {
       username,
-      email,
       password
     });
   }
