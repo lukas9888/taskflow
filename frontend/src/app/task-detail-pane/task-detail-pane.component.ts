@@ -117,8 +117,12 @@ export class TaskDetailPaneComponent implements OnChanges {
   formError: string | null = null;
   saveState: 'idle' | 'saving' | 'saved' | 'error' = 'idle';
 
+  dateError: string | null = null;
+  timeError: string | null = null;
+
   private dueDateInvalid = false;
   private dueTimeInvalid = false;
+  private currentTaskId: number | null = null;
 
   readonly priorityOptions = TASK_PRIORITY_OPTIONS;
 
@@ -172,15 +176,23 @@ export class TaskDetailPaneComponent implements OnChanges {
     return;
   }
 
+  const openedDifferentTask = this.currentTaskId !== this.task.id;
+  this.currentTaskId = this.task.id;
+
   this.patchFormFromTask();
   this.ensureCategoriesLoaded();
 
   this.formError = null;
+  this.dateError = null;
+  this.timeError = null;
   this.saving = false;
   this.deleting = false;
-  this.saveState = 'idle';
   this.dueDateInvalid = false;
   this.dueTimeInvalid = false;
+
+  if (openedDifferentTask) {
+    this.saveState = 'idle';
+  }
 }
 
   onDueDateChange(): void {
@@ -304,38 +316,29 @@ export class TaskDetailPaneComponent implements OnChanges {
     onDateTimeChanged(field: 'date' | 'time', invalid: boolean): void {
   if (field === 'date') {
     this.dueDateInvalid = invalid;
+    this.dateError = invalid ? 'Enter a valid date.' : null;
   } else {
     this.dueTimeInvalid = invalid;
+    this.timeError = invalid ? 'Enter a valid time.' : null;
   }
 
   this.formError = null;
 
-  if (this.dueDateInvalid) {
-    this.saveState = 'error';
-    this.formError = 'Enter a valid date.';
-    return;
+  if (!this.dueDateInvalid && this.dueDate && !this.dueTime) {
+    this.timeError = 'Select a valid time.';
   }
 
-  if (this.dueTimeInvalid) {
-    this.saveState = 'error';
-    this.formError = 'Enter a valid time.';
-    return;
+  if (!this.dueTimeInvalid && !this.dueDate && this.dueTime) {
+    this.dateError = 'Select a valid date.';
   }
 
-  if (this.dueDate && !this.dueTime) {
-    this.saveState = 'error';
-    this.formError = 'Select a valid time.';
-    return;
-  }
-
-  if (!this.dueDate && this.dueTime) {
-    this.saveState = 'error';
-    this.formError = 'Select a valid date.';
+  if (this.dateError || this.timeError) {
+    this.saveState = 'idle';
     return;
   }
 
   this.onFieldChanged();
-  }
+}
     private saveCurrentTask() {
     const trimmed = this.title.trim();
 
@@ -345,15 +348,20 @@ export class TaskDetailPaneComponent implements OnChanges {
       return EMPTY;
     }
 
+    if (this.dueDateInvalid || this.dueTimeInvalid || this.dateError || this.timeError) {
+      this.saveState = 'idle';
+      return EMPTY;
+    }
+
     if (this.dueDate && !this.dueTime) {
-      this.saveState = 'error';
-      this.formError = 'Select a due time, or clear the due date.';
+      this.timeError = 'Select a valid time.';
+      this.saveState = 'idle';
       return EMPTY;
     }
 
     if (!this.dueDate && this.dueTime) {
-      this.saveState = 'error';
-      this.formError = 'Select a due date, or clear the due time.';
+      this.dateError = 'Select a valid date.';
+      this.saveState = 'idle';
       return EMPTY;
     }
 

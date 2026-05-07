@@ -59,6 +59,9 @@
           />
           <mat-datepicker-toggle matIconSuffix [for]="duePicker"></mat-datepicker-toggle>
           <mat-datepicker #duePicker></mat-datepicker>
+          @if (dateError) {
+        <mat-error>{{ dateError }}</mat-error>
+          }
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="datetime-field" subscriptSizing="dynamic">
@@ -75,6 +78,9 @@
           />
           <mat-timepicker-toggle matIconSuffix [for]="timePicker"></mat-timepicker-toggle>
           <mat-timepicker #timePicker interval="15min"></mat-timepicker>
+          @if (timeError) {
+            <mat-error>{{ timeError }}</mat-error>
+          }
         </mat-form-field>
       </div>
     </div>
