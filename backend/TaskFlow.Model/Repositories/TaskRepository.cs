@@ -11,7 +11,7 @@ public class TaskRepository : BaseRepository
     {
     }
 
-    public List<TaskItem> GetAll(int userId)
+    public virtual List<TaskItem> GetAll(int userId)
     {
         var list = new List<TaskItem>();
         using var conn = new NpgsqlConnection(ConnectionString);
@@ -45,7 +45,7 @@ public class TaskRepository : BaseRepository
         return list;
     }
 
-    public TaskItem Create(
+    public virtual TaskItem Create(
         int userId,
         string title,
         DateTimeOffset? dueAt,
@@ -97,7 +97,7 @@ public class TaskRepository : BaseRepository
         return ReadTaskRow(reader);
     }
 
-    public TaskItem? Update(
+    public virtual TaskItem? Update(
         int userId,
         int id,
         string title,
@@ -158,7 +158,7 @@ public class TaskRepository : BaseRepository
         return ReadTaskRow(reader);
     }
 
-    public bool Delete(int userId, int id)
+    public virtual bool Delete(int userId, int id)
     {
         using var conn = new NpgsqlConnection(ConnectionString);
 
