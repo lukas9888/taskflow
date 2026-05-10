@@ -199,7 +199,7 @@
         type="button"
         class="detail-delete-btn"
         (click)="deleteTask()"
-        [disabled]="deleting"
+        [disabled]="deleting || saveState === 'saving'"
       >
         <mat-icon>delete</mat-icon>
         {{ deleting ? 'Deleting…' : 'Delete' }}
