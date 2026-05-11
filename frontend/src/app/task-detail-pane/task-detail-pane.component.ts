@@ -110,6 +110,7 @@ export class TaskDetailPaneComponent implements OnChanges {
   deleting = false;
   saveState: 'idle' | 'saving' | 'saved' | 'error' = 'idle';
   titleError: string | null = null;
+  deleteError: string | null = null;
   private currentTaskId: number | null = null;
 
   readonly priorityOptions = TASK_PRIORITY_OPTIONS;
@@ -171,6 +172,7 @@ export class TaskDetailPaneComponent implements OnChanges {
   this.ensureCategoriesLoaded();
 
   this.titleError = null;
+  this.deleteError = null;
   this.deleting = false;
 
   if (openedDifferentTask) {
@@ -307,6 +309,7 @@ export class TaskDetailPaneComponent implements OnChanges {
       return;
     }
     this.deleting = true;
+    this.deleteError = null;
     this.tasksApi.deleteTask(this.task.id).subscribe({
       next: () => {
         this.deleting = false;
@@ -314,6 +317,7 @@ export class TaskDetailPaneComponent implements OnChanges {
       },
       error: () => {
         this.deleting = false;
+        this.deleteError = 'Could not delete task. Please try again.';
       }
     });
   }
