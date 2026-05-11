@@ -5,7 +5,8 @@
 .list-toolbar {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 12px;
   margin-bottom: 12px;
   flex-wrap: wrap;
 }
@@ -91,3 +92,54 @@
 }
 /*Overdue card CSS END*/
 
+.filter-menu-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.task-filter-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: var(--mat-sys-surface-container-low);
+  flex-wrap: wrap;
+}
+
+.filter-field {
+  width: 220px;
+  flex: 0 0 220px;
+}
+
+.task-filter-panel button {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 800px) {
+  .filter-field {
+    width: 100%;
+    flex: 1 1 100%;
+  }
+}
+
+.priority-filter-icon {
+  margin-right: 12px;
+  vertical-align: middle;
+}
+
+.blocked-filter-icon,
+.blocking-filter-icon {
+  margin-right: 12px;
+  vertical-align: middle;
+}
+
+.blocked-filter-icon {
+  color: var(--mat-sys-error);
+}
+
+.blocking-filter-icon {
+  color: #f5c000;
+}

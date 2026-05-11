@@ -1,19 +1,80 @@
 <section class="task-list-section">
-  <div class="list-toolbar">
-    <mat-button-toggle-group
-      class="list-filter-toggle"
-      [(ngModel)]="listFilter"
-      aria-label="Filter tasks by due date"
-      hideSingleSelectionIndicator
-      appearance="standard"
-    >
-      <mat-button-toggle value="today">Today</mat-button-toggle>
-      <mat-button-toggle value="week">Next 7 days</mat-button-toggle>
-      <mat-button-toggle value="all">All</mat-button-toggle>
-    </mat-button-toggle-group>
-  </div>
+<div class="list-toolbar">
+  <mat-button-toggle-group
+    class="list-filter-toggle"
+    [(ngModel)]="listFilter"
+    aria-label="Filter tasks by due date"
+    hideSingleSelectionIndicator
+    appearance="standard"
+  >
+    <mat-button-toggle value="today">Today</mat-button-toggle>
+    <mat-button-toggle value="week">Next 7 days</mat-button-toggle>
+    <mat-button-toggle value="all">All</mat-button-toggle>
+  </mat-button-toggle-group>
 
-  @if (overdueTasks.length > 0) {
+  <button
+    type="button"
+    mat-stroked-button
+    class="filter-menu-button"
+    (click)="showFilters = !showFilters"
+  >
+    <mat-icon>filter_list</mat-icon>
+    Filters
+  </button>
+</div>
+
+@if (showFilters) {
+  <div class="task-filter-panel">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="filter-field">
+        <mat-label>Categories</mat-label>
+        <mat-select [(ngModel)]="selectedCategories" multiple>
+          @for (category of categoryOptions; track category) {
+            <mat-option [value]="category">{{ category }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="filter-field">
+        <mat-label>Priorities</mat-label>
+        <mat-select [(ngModel)]="selectedPriorities" multiple>
+          @for (priority of priorityOptions; track priority) {
+            <mat-option [value]="priority">
+              <mat-icon
+                class="priority-filter-icon"
+                [style.color]="priorityColor(priority)"
+              >
+                {{ priorityIcon(priority) }}
+              </mat-icon>
+              <span>{{ priority[0].toUpperCase() + priority.slice(1) }}</span>
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="filter-field">
+        <mat-label>Dependency</mat-label>
+        <mat-select [(ngModel)]="dependencyFilter">
+          <mat-option value="all">All</mat-option>
+
+          <mat-option value="blocked">
+            <mat-icon class="blocked-filter-icon">block</mat-icon>
+            <span>Blocked</span>
+          </mat-option>
+
+          <mat-option value="blocking">
+            <mat-icon class="blocking-filter-icon">warning</mat-icon>
+            <span>Blocking other tasks</span>
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button type="button" mat-button (click)="clearTaskFilters()">
+        Clear filters
+      </button>
+  </div>
+}
+
+@if (overdueTasks.length > 0) {
     <mat-card class="task-section-card overdue-section-card">
       <mat-card-header>
         <mat-card-title>Overdue</mat-card-title>
