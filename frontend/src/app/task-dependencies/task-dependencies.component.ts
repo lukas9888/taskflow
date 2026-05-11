@@ -35,6 +35,7 @@ export class TaskDependenciesComponent implements OnChanges {
   @Input({ required: true }) task!: TaskItem;
   @Input({ required: true }) allTasks: TaskItem[] = [];
   @Output() readonly dependenciesChanged = new EventEmitter<void>();
+  @Output() readonly saveStateChanged = new EventEmitter<'saving' | 'saved' | 'error'>();
 
   dependencies: TaskDependency[] = [];
   selectedDependsOnId: number | null = null;
@@ -97,6 +98,7 @@ export class TaskDependenciesComponent implements OnChanges {
     if (this.selectedDependsOnId == null) return;
     this.adding = true;
     this.addError = null;
+    this.saveStateChanged.emit('saving');
     this.depService.add(this.task.id, this.selectedDependsOnId).pipe(
       switchMap(() => this.depService.loadAllForUser(true)),
       takeUntilDestroyed(this.destroyRef)
@@ -106,23 +108,30 @@ export class TaskDependenciesComponent implements OnChanges {
         this.selectedDependsOnId = null;
         this.searchText = '';
         this.dependenciesChanged.emit();
+        this.saveStateChanged.emit('saved');
       },
       error: () => {
         this.adding = false;
         this.addError = 'Could not add dependency.';
+        this.saveStateChanged.emit('error');
       }
     });
   }
 
   remove(dependsOnId: number): void {
+    this.saveStateChanged.emit('saving');
     this.depService.remove(this.task.id, dependsOnId).pipe(
       switchMap(() => this.depService.loadAllForUser(true)),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: () => {
         this.dependenciesChanged.emit();
+        this.saveStateChanged.emit('saved');
       },
-      error: () => (this.loadError = 'Could not remove dependency.')
+      error: () => {
+        this.loadError = 'Could not remove dependency.';
+        this.saveStateChanged.emit('error');
+      }
     });
   }
 }
