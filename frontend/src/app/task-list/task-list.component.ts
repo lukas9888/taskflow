@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatButtonModule } from '@angular/material/button';
-import { MatMenuModule } from '@angular/material/menu';
 import { MatNavList } from '@angular/material/list';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -36,8 +35,7 @@ export type DependencyFilter = 'all' | 'blocked' | 'blocking';
   MatIconModule,
   MatSelectModule,
   MatButtonModule,
-  MatMenuModule,
-],
+  ],
   templateUrl: './task-list.component.html',
   styleUrl: './task-list.component.css',
 })
@@ -53,6 +51,7 @@ export class TaskListComponent {
   @Output() readonly taskUpdated = new EventEmitter<void>();
 
   listFilter: TaskListFilter = 'today';
+  showFilters = false;
   selectedCategories: string[] = [];
   selectedPriorities: TaskPriorityLevel[] = [];
   dependencyFilter: DependencyFilter = 'all';
