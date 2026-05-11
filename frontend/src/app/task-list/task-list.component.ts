@@ -1,19 +1,43 @@
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatNavList } from '@angular/material/list';
 import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
 import { TaskRowComponent } from '../task-row/task-row.component';
-import { TaskItem } from '../models/task-item';
+import { TaskItem, TaskPriorityLevel } from '../models/task-item';
 import { DueDatetimeService } from '../services/due-datetime.service';
 import { TaskService } from '../services/task.service';
+import {
+  priorityIconCssColor,
+  priorityIconGlyph,
+  TASK_PRIORITY_OPTIONS,
+  taskCategoryFromModel,
+  taskPriorityFromModel,
+} from '../task-ux';
 
 export type TaskListFilter = 'today' | 'week' | 'all';
+export type DependencyFilter = 'all' | 'blocked' | 'blocking';
 
 @Component({
   selector: 'app-task-list',
   standalone: true,
-  imports: [TaskRowComponent, MatButtonToggleModule, MatNavList, MatCardModule, FormsModule,],
+  imports: [
+  TaskRowComponent,
+  MatButtonToggleModule,
+  MatNavList,
+  MatCardModule,
+  FormsModule,
+  MatFormFieldModule,
+  MatIconModule,
+  MatSelectModule,
+  MatButtonModule,
+  MatMenuModule,
+],
   templateUrl: './task-list.component.html',
   styleUrl: './task-list.component.css',
 })
@@ -29,17 +53,22 @@ export class TaskListComponent {
   @Output() readonly taskUpdated = new EventEmitter<void>();
 
   listFilter: TaskListFilter = 'today';
+  selectedCategories: string[] = [];
+  selectedPriorities: TaskPriorityLevel[] = [];
+  dependencyFilter: DependencyFilter = 'all';
+
+readonly priorityOptions = TASK_PRIORITY_OPTIONS;
 
   get visibleTasks(): TaskItem[] {
-  const list = this.filterByTab(this.tasks);
+  const list = this.filterByTab(this.filteredTasks);
   return [...list].sort((a, b) => this.compareTasks(a, b));
-  }
+}
 
   get overdueTasks(): TaskItem[] {
-    return this.tasks
-      .filter((t) => this.isOverdue(t))
-      .sort((a, b) => this.compareTasks(a, b));
-  }
+  return this.filteredTasks
+    .filter((t) => this.isOverdue(t))
+    .sort((a, b) => this.compareTasks(a, b));
+}
 
   get activeTasks(): TaskItem[] {
     return this.visibleTasks.filter((t) => !t.done && !this.isOverdue(t));
@@ -48,6 +77,24 @@ export class TaskListComponent {
   get doneTasks(): TaskItem[] {
     return this.visibleTasks.filter((t) => t.done);
   }
+
+  get categoryOptions(): string[] {
+  return [...new Set(this.tasks.map((t) => taskCategoryFromModel(t)).filter(Boolean))].sort();
+}
+
+priorityIcon(level: TaskPriorityLevel): string {
+  return priorityIconGlyph(level);
+}
+
+priorityColor(level: TaskPriorityLevel): string {
+  return priorityIconCssColor(level);
+}
+
+clearTaskFilters(): void {
+  this.selectedCategories = [];
+  this.selectedPriorities = [];
+  this.dependencyFilter = 'all';
+}
 
   onCompletedChange(task: TaskItem, done: boolean): void {
   this.taskService
@@ -64,6 +111,30 @@ export class TaskListComponent {
         this.tasks = this.tasks.map((t) => (t.id === updated.id ? updated : t));
         this.taskUpdated.emit();
       }
+    });
+  }
+
+  private get filteredTasks(): TaskItem[] {
+  return this.filterByTaskFilters(this.tasks);
+}
+
+  private filterByTaskFilters(all: TaskItem[]): TaskItem[] {
+    return all.filter((task) => {
+      const category = taskCategoryFromModel(task);
+      const priority = taskPriorityFromModel(task);
+
+      const matchesCategory =
+        this.selectedCategories.length === 0 || this.selectedCategories.includes(category);
+
+      const matchesPriority =
+        this.selectedPriorities.length === 0 || this.selectedPriorities.includes(priority);
+
+      const matchesDependency =
+        this.dependencyFilter === 'all' ||
+        (this.dependencyFilter === 'blocked' && this.blockedTaskIds.has(task.id)) ||
+        (this.dependencyFilter === 'blocking' && this.blockingTaskIds.has(task.id));
+
+      return matchesCategory && matchesPriority && matchesDependency;
     });
   }
 
