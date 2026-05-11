@@ -1,5 +1,19 @@
 <mat-toolbar class="detail-toolbar">
   <span class="detail-toolbar-title">Task Details</span>
+
+  <div class="autosave-status" aria-live="polite">
+      @if (saveState === 'saving') {
+        <mat-icon inline aria-hidden="true">sync</mat-icon>
+        <span>Saving…</span>
+      } @else if (saveState === 'saved') {
+        <mat-icon inline aria-hidden="true">check_circle</mat-icon>
+        <span>Saved</span>
+      } @else if (saveState === 'error') {
+        <mat-icon inline aria-hidden="true">error</mat-icon>
+        <span>Could not save</span>
+      }
+  </div>
+
   <span class="detail-toolbar-spacer"></span>
   <button
     mat-icon-button
@@ -9,10 +23,11 @@
   >
     <mat-icon>close</mat-icon>
   </button>
+
 </mat-toolbar>
 
 <section class="detail-body">
-  <form class="detail-form" (ngSubmit)="save()" novalidate>
+  <form class="detail-form" novalidate>
     <div class="detail-section">
       <mat-form-field appearance="outline" class="full-width" subscriptSizing="dynamic">
         <mat-label>Title</mat-label>
@@ -20,11 +35,15 @@
           matInput
           name="detailTitle"
           [(ngModel)]="title"
+          (ngModelChange)="onFieldChanged()"
           required
           minlength="2"
           maxlength="500"
           autocomplete="off"
         />
+        @if (titleError) {
+          <mat-error>{{ titleError }}</mat-error>
+        }
       </mat-form-field>
     </div>
 
@@ -37,7 +56,11 @@
             name="detailDueDate"
             [matDatepicker]="duePicker"
             [(ngModel)]="dueDate"
-            (ngModelChange)="onDueDateChange()"
+            (ngModelChange)="onDueDateSelected()"
+            readonly
+            inputmode="none"
+            (click)="duePicker.open()"
+            (focus)="duePicker.open()"
             autocomplete="off"
           />
           <mat-datepicker-toggle matIconSuffix [for]="duePicker"></mat-datepicker-toggle>
@@ -51,7 +74,12 @@
             name="detailDueTime"
             [matTimepicker]="timePicker"
             [(ngModel)]="dueTime"
+            (ngModelChange)="onDueTimeSelected()"
             [min]="timeMin"
+            readonly
+            inputmode="none"
+            (click)="timePicker.open()"
+            (focus)="timePicker.open()"
             autocomplete="off"
           />
           <mat-timepicker-toggle matIconSuffix [for]="timePicker"></mat-timepicker-toggle>
@@ -64,7 +92,7 @@
       <div class="detail-priority-category-row">
         <mat-form-field appearance="outline" class="detail-pc-field" subscriptSizing="dynamic">
           <mat-label>Priority</mat-label>
-          <mat-select name="detailPriority" [(ngModel)]="priority">
+          <mat-select name="detailPriority" [(ngModel)]="priority" (ngModelChange)="onFieldChanged()">
             <mat-select-trigger>
               <span class="detail-prio-option">
                 <mat-icon
@@ -103,18 +131,17 @@
                 </button>
               </mat-chip-row>
             }
+            <input
+              #categoryInputEl
+              name="detailCategory"
+              [(ngModel)]="categoryInput"
+              [matChipInputFor]="categoryChipGrid"
+              [matAutocomplete]="categoryAuto"
+              (blur)="onCategoryBlur()"
+              (keydown.enter)="$event.preventDefault()"
+              autocomplete="off"
+            />
           </mat-chip-grid>
-          <input
-            matInput
-            #categoryInputEl
-            name="detailCategory"
-            [(ngModel)]="categoryInput"
-            [matChipInputFor]="categoryChipGrid"
-            [matAutocomplete]="categoryAuto"
-            (blur)="onCategoryBlur()"
-            (keydown.enter)="$event.preventDefault()"
-            autocomplete="off"
-          />
           <mat-autocomplete
             #categoryAuto="matAutocomplete"
             autoActiveFirstOption
@@ -143,6 +170,7 @@
           matInput
           name="detailDescription"
           [(ngModel)]="description"
+          (ngModelChange)="onFieldChanged()"
           rows="4"
           placeholder="Add detailed notes here…"
           maxlength="8000"
@@ -151,32 +179,30 @@
       </mat-form-field>
     </div>
 
-    @if (formError) {
-      <p class="form-error" role="alert">{{ formError }}</p>
-    }
-    
-    <app-task-dependencies [task]="task" [allTasks]="allTasks" (dependenciesChanged)="dependenciesChanged.emit()" />
+    <app-task-dependencies
+      [task]="task"
+      [allTasks]="allTasks"
+      (saveStateChanged)="onDependencySaveStateChanged($event)"
+    />
 
     <div class="detail-footer">
       <button
         mat-flat-button
-        color="primary"
-        class="detail-save-btn"
-        type="submit"
-        [disabled]="saving || deleting"
-      >
-        {{ saving ? 'Saving…' : 'Save Changes' }}
-      </button>
-      <button
-        mat-icon-button
+        color="warn"
         type="button"
         class="detail-delete-btn"
         (click)="deleteTask()"
-        [disabled]="saving || deleting"
-        aria-label="Delete task"
+        [disabled]="deleting || saveState === 'saving'"
       >
         <mat-icon>delete</mat-icon>
+        {{ deleting ? 'Deleting…' : 'Delete' }}
       </button>
+      @if (deleteError) {
+        <span class="detail-delete-error" role="alert" aria-live="assertive">
+          <mat-icon inline aria-hidden="true">error</mat-icon>
+          {{ deleteError }}
+        </span>
+      }
     </div>
   </form>
 </section>
