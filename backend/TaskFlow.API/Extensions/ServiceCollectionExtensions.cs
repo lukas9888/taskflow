@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi; 
 using System.Text;
 using TaskFlow.Model.Repositories;
+using System.Collections.Generic;
 
 namespace TaskFlow.API.Extensions;
 
@@ -11,7 +13,28 @@ public static class ServiceCollectionExtensions
     {
         services.AddControllers();
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+        
+        services.AddSwaggerGen(options =>
+        {
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Description = "Enter your JWT token here. Example: 'Bearer {your_token}' (The 'Bearer ' prefix is added automatically by the Http scheme)",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Scheme = "Bearer",
+                BearerFormat = "JWT"
+            });
+
+            // Updated syntax: strictly requires a List<string> for the scopes
+            options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecuritySchemeReference("Bearer", document),
+                    new List<string>() 
+                }
+            });
+        });
 
         services.AddRepositories();
         services.AddTaskFlowJwtAuthentication(configuration);
@@ -67,4 +90,3 @@ public static class ServiceCollectionExtensions
         return services;
     }
 }
-
