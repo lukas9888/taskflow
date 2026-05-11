@@ -103,6 +103,11 @@
   min-width: 0;
 }
 
+.detail-pc-field .mat-mdc-chip-input {
+  flex: 1 1 60px;
+  min-width: 60px;
+}
+
 .detail-prio-option {
   display: inline-flex;
   align-items: center;
@@ -126,9 +131,9 @@
   flex-shrink: 0;
   background-color: var(--mat-sys-error);
 }
-
 .detail-delete-btn[disabled] {
-  color: color-mix(in srgb, var(--mat-sys-error) 38%, transparent);
+  background-color: color-mix(in srgb, var(--mat-sys-on-surface) 12%, transparent);
+  color: color-mix(in srgb, var(--mat-sys-on-surface) 38%, transparent);
 }
 
 .detail-delete-error {

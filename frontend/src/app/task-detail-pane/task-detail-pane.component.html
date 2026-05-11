@@ -131,18 +131,17 @@
                 </button>
               </mat-chip-row>
             }
+            <input
+              #categoryInputEl
+              name="detailCategory"
+              [(ngModel)]="categoryInput"
+              [matChipInputFor]="categoryChipGrid"
+              [matAutocomplete]="categoryAuto"
+              (blur)="onCategoryBlur()"
+              (keydown.enter)="$event.preventDefault()"
+              autocomplete="off"
+            />
           </mat-chip-grid>
-          <input
-            matInput
-            #categoryInputEl
-            name="detailCategory"
-            [(ngModel)]="categoryInput"
-            [matChipInputFor]="categoryChipGrid"
-            [matAutocomplete]="categoryAuto"
-            (blur)="onCategoryBlur()"
-            (keydown.enter)="$event.preventDefault()"
-            autocomplete="off"
-          />
           <mat-autocomplete
             #categoryAuto="matAutocomplete"
             autoActiveFirstOption
