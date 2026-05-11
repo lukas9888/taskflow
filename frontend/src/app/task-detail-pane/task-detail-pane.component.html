@@ -53,7 +53,6 @@
           <mat-label>Date</mat-label>
           <input
             matInput
-            #dueDateModel="ngModel"
             name="detailDueDate"
             [matDatepicker]="duePicker"
             [(ngModel)]="dueDate"
@@ -72,7 +71,6 @@
           <mat-label>Time</mat-label>
           <input
             matInput
-            #dueTimeModel="ngModel"
             name="detailDueTime"
             [matTimepicker]="timePicker"
             [(ngModel)]="dueTime"
@@ -195,7 +193,7 @@
         type="button"
         class="detail-delete-btn"
         (click)="deleteTask()"
-        [disabled]="deleting"
+        [disabled]="deleting || saveState === 'saving'"
       >
         <mat-icon>delete</mat-icon>
         {{ deleting ? 'Deleting…' : 'Delete' }}
