@@ -1,8 +1,5 @@
-.task-section-card {
-  border-radius: 12px;
-  overflow: hidden;
+.task-list-section {
   margin-bottom: 16px;
-  margin-top: 10px;
 }
 
 .list-toolbar {
@@ -14,117 +11,122 @@
   flex-wrap: wrap;
 }
 
+.list-empty {
+  margin: 0;
+  padding: 20px 16px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.task-section-card {
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.task-section-content {
+  padding: 0;
+}
+
+.active-section-card {
+  --mdc-elevated-card-container-color: var(--mat-sys-surface);
+  --mat-card-elevated-container-color: var(--mat-sys-surface);
+}
+
+.active-section-card .task-table {
+  background-color: var(--mat-sys-surface);
+}
+
+.overdue-section-card {
+  border: 1px solid color-mix(in srgb, var(--mat-sys-error) 20%, transparent);
+  background: color-mix(in srgb, var(--mat-sys-error) 8%, var(--mat-sys-surface));
+}
+
+.done-section-card {
+  background: var(--mat-sys-surface-container-high);
+}
+
+.filter-menu-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .task-filter-panel {
   display: flex;
   align-items: center;
-  gap: 12px;        
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: var(--mat-sys-surface-container-low);
   flex-wrap: wrap;
-  margin-bottom: 8px; 
 }
 
-.overdue-section-card.mat-mdc-card {
-  background-color: color-mix(in srgb, var(--mat-sys-error) 8%, var(--mat-sys-surface)) !important;
-  border: 1px solid color-mix(in srgb, var(--mat-sys-error) 20%, transparent);
+.filter-field {
+  width: 220px;
+  flex: 0 0 220px;
 }
 
-.done-section-card.mat-mdc-card {
-  background-color: var(--mat-sys-surface-container-high) !important;
-  border: 1px solid color-mix(in srgb, var(--mat-sys-outline) 20%, transparent);
+.priority-filter-icon,
+.blocked-filter-icon,
+.blocking-filter-icon {
+  margin-right: 12px;
+  vertical-align: middle;
 }
 
-.done-section-card .task-table .mat-mdc-row:hover {
-  background: color-mix(in srgb, var(--mat-sys-primary) 5%, transparent) !important;
-}
-
-.done-section-card .task-table .mat-mdc-row.row-selected {
-  background: color-mix(in srgb, var(--mat-sys-primary) 9%, var(--mat-sys-surface-container-high)) !important;
-  box-shadow: inset 4px 0 0 0 var(--mat-sys-primary);
-}
-
-.task-table,
-.task-table.mat-mdc-table,
-.task-table .mat-mdc-header-row,
-.task-table .mat-mdc-row,
-.task-table .mat-mdc-cell,
-.task-table .mat-mdc-header-cell,
-.task-table tbody,
-.task-table thead {
-  background: transparent !important;
-  border: none;
-  outline: none;
-  box-shadow: none;
-}
-
-.task-table-header {
-  display: none;
-}
-
-.task-table .mat-mdc-cell {
-  border-bottom: 1px solid color-mix(in srgb, var(--mat-sys-outline) 12%, transparent);
-}
-.task-table .mat-mdc-row:last-child .mat-mdc-cell {
-  border-bottom: none;
-}
-
-.task-table .mat-mdc-row {
-  cursor: pointer;
-}
-
-.task-table .mat-mdc-row:hover {
-  background: color-mix(in srgb, var(--mat-sys-primary) 6%, transparent) !important;
-}
-
-.task-table .mat-mdc-row.row-selected {
-  background: color-mix(in srgb, var(--mat-sys-primary) 10%, var(--mat-sys-surface)) !important;
-  box-shadow: inset 4px 0 0 0 var(--mat-sys-primary);
-}
-
-.overdue-section-card .task-table .mat-mdc-row:hover {
-  background: color-mix(in srgb, var(--mat-sys-error) 14%, transparent) !important;
-}
-
-.overdue-section-card .task-table .mat-mdc-row.row-selected {
-  background: color-mix(in srgb, var(--mat-sys-error) 18%, var(--mat-sys-surface)) !important;
-  box-shadow: inset 4px 0 0 0 var(--mat-sys-error);
-}
-
-.col-done     { width: 48px;  text-align: center; }
-.col-title    { width: auto;  font-size: 15px; }
-.col-icon     { width: 40px;  text-align: center; }
-.col-category { width: 130px; text-align: left; }
-.col-due      { width: 100px; text-align: right;
-                font-size: 12px;
-                color: var(--mat-sys-on-surface-variant); white-space: nowrap; }
-.col-chevron  { width: 36px;  text-align: center; }
-
-.task-table .mat-mdc-cell,
-.task-table .mat-mdc-header-cell {
-  padding: 0 8px;
-}
-
-.done-title {
-  text-decoration: line-through;
-  color: var(--mat-sys-on-surface-variant);
-  opacity: 0.5;
-}
-
-.task-table .mat-mdc-cell mat-icon {
-  font-size: 20px;
-  width: 20px;
-  height: 20px;
-  line-height: 20px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  overflow: visible;
-}
-
-.task-table mat-icon.icon-blocked {
+.blocked-filter-icon,
+.blocked-icon {
   color: var(--mat-sys-error);
 }
 
-.task-table mat-icon.icon-blocking {
-  color: #f5a524;
+.blocking-filter-icon,
+.blocking-icon {
+  color: #f5c000;
+}
+
+.task-table {
+  width: 100%;
+  background: transparent;
+}
+
+.task-table-row {
+  height: 48px;
+  cursor: pointer;
+}
+
+.task-table-row:hover .mat-mdc-cell {
+  background-color: color-mix(
+    in srgb,
+    var(--mat-sys-primary) 6%,
+    transparent
+  );
+}
+
+.overdue-section-card .task-table-row:hover .mat-mdc-cell {
+  background-color: color-mix(
+    in srgb,
+    var(--mat-sys-error) 12%,
+    transparent
+  );
+}
+
+.completed-cell {
+  width: 48px;
+  padding-left: 16px;
+}
+
+.icon-cell {
+  width: 48px;
+  text-align: center;
+}
+
+.category-cell {
+  width: 140px;
+}
+
+.due-cell {
+  width: 120px;
+  white-space: nowrap;
+  color: var(--mat-sys-on-surface-variant);
 }
 
 .task-row-chip {
@@ -133,21 +135,23 @@
   border-radius: 4px;
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.04em;
   text-transform: uppercase;
   background-color: color-mix(in srgb, var(--mat-sys-primary) 12%, transparent);
   color: var(--mat-sys-primary);
 }
 
-.task-row-chevron {
-  font-size: 22px;
-  width: 22px;
-  height: 22px;
-  pointer-events: none;
-  transition: opacity 120ms ease;
+.task-title-done {
+  text-decoration: line-through;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .task-row-chevron { opacity: 0; }
-  .task-table .mat-mdc-row:hover .task-row-chevron { opacity: 1; }
+@media (max-width: 800px) {
+  .filter-field {
+    width: 100%;
+    flex: 1 1 100%;
+  }
+
+  .category-cell,
+  .due-cell {
+    width: 100px;
+  }
 }
