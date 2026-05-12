@@ -92,3 +92,21 @@
   flex: 1 1 200px;
   min-width: 0;
 }
+
+mat-icon.deps-icon-blocked {
+  color: var(--mat-sys-error) !important;
+  font-size: 18px;
+}
+
+mat-icon.deps-icon-blocking {
+  color: #f5a524 !important;
+  font-size: 18px;
+}
+
+mat-list-item mat-icon.deps-icon-blocked {
+  color: var(--mat-sys-error) !important;
+}
+
+mat-list-item mat-icon.deps-icon-blocking {
+  color: #f5a524 !important;
+}

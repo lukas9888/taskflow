@@ -1,17 +1,9 @@
-/* ════════════════════════════════════════════════════════════════════════
-   Card containers
-   ════════════════════════════════════════════════════════════════════════ */
-
 .task-section-card {
   border-radius: 12px;
   overflow: hidden;
   margin-bottom: 16px;
   margin-top: 10px;
 }
-
-/* ════════════════════════════════════════════════════════════════════════
-   Toolbar / filters
-   ════════════════════════════════════════════════════════════════════════ */
 
 .list-toolbar {
   display: flex;
@@ -25,28 +17,21 @@
 .task-filter-panel {
   display: flex;
   align-items: center;
-  gap: 12px;        /* ← matches .detail-datetime-row & .detail-priority-category-row */
+  gap: 12px;        
   flex-wrap: wrap;
-  margin-bottom: 8px;   /* ← matches .detail-section spacing */
+  margin-bottom: 8px; 
 }
 
-/* ════════════════════════════════════════════════════════════════════════
-   mat-table column layout
-   ════════════════════════════════════════════════════════════════════════ */
-
-/* ── Overdue card: explicit background so the tint is always visible ── */
 .overdue-section-card.mat-mdc-card {
   background-color: color-mix(in srgb, var(--mat-sys-error) 8%, var(--mat-sys-surface)) !important;
   border: 1px solid color-mix(in srgb, var(--mat-sys-error) 20%, transparent);
 }
 
-/* ── Done card: muted surface background ── */
 .done-section-card.mat-mdc-card {
   background-color: var(--mat-sys-surface-container-high) !important;
   border: 1px solid color-mix(in srgb, var(--mat-sys-outline) 20%, transparent);
 }
 
-/* Done: slightly muted hover / selected so they blend with the darker surface */
 .done-section-card .task-table .mat-mdc-row:hover {
   background: color-mix(in srgb, var(--mat-sys-primary) 5%, transparent) !important;
 }
@@ -56,7 +41,6 @@
   box-shadow: inset 4px 0 0 0 var(--mat-sys-primary);
 }
 
-/* ── Table: force every level transparent so the card background shows ── */
 .task-table,
 .task-table.mat-mdc-table,
 .task-table .mat-mdc-header-row,
@@ -71,12 +55,10 @@
   box-shadow: none;
 }
 
-/* Hide the header row — column labels are self-explanatory */
 .task-table-header {
   display: none;
 }
 
-/* Subtle row divider (replaces the old mat-divider) */
 .task-table .mat-mdc-cell {
   border-bottom: 1px solid color-mix(in srgb, var(--mat-sys-outline) 12%, transparent);
 }
@@ -84,12 +66,10 @@
   border-bottom: none;
 }
 
-/* ── Row interaction states ── */
 .task-table .mat-mdc-row {
   cursor: pointer;
 }
 
-/* Normal card hover (primary tint) */
 .task-table .mat-mdc-row:hover {
   background: color-mix(in srgb, var(--mat-sys-primary) 6%, transparent) !important;
 }
@@ -99,7 +79,6 @@
   box-shadow: inset 4px 0 0 0 var(--mat-sys-primary);
 }
 
-/* Overdue card: error-coloured hover / selected */
 .overdue-section-card .task-table .mat-mdc-row:hover {
   background: color-mix(in srgb, var(--mat-sys-error) 14%, transparent) !important;
 }
@@ -109,7 +88,6 @@
   box-shadow: inset 4px 0 0 0 var(--mat-sys-error);
 }
 
-/* ── Column widths ── */
 .col-done     { width: 48px;  text-align: center; }
 .col-title    { width: auto;  font-size: 15px; }
 .col-icon     { width: 40px;  text-align: center; }
@@ -119,23 +97,18 @@
                 color: var(--mat-sys-on-surface-variant); white-space: nowrap; }
 .col-chevron  { width: 36px;  text-align: center; }
 
-/* Tighten cell padding */
 .task-table .mat-mdc-cell,
 .task-table .mat-mdc-header-cell {
   padding: 0 8px;
 }
 
-/* ── Completed task title ── */
 .done-title {
   text-decoration: line-through;
   color: var(--mat-sys-on-surface-variant);
   opacity: 0.5;
 }
 
-/* ── Icons: explicit box prevents clipping in flex cells ── */
-.task-table .mat-mdc-cell mat-icon,
-.task-table .mat-mdc-cell .mat-icon {
-  font-family: 'Material Icons', 'Material Icons Outlined';
+.task-table .mat-mdc-cell mat-icon {
   font-size: 20px;
   width: 20px;
   height: 20px;
@@ -146,10 +119,14 @@
   overflow: visible;
 }
 
-.icon-blocked  { color: var(--mat-sys-error); }
-.icon-blocking { color: #f5c000; }
+.task-table mat-icon.icon-blocked {
+  color: var(--mat-sys-error);
+}
 
-/* ── Category chip ── */
+.task-table mat-icon.icon-blocking {
+  color: #f5a524;
+}
+
 .task-row-chip {
   display: inline-block;
   padding: 2px 8px;
@@ -162,7 +139,6 @@
   color: var(--mat-sys-primary);
 }
 
-/* ── Chevron: hidden on desktop hover, always visible on touch ── */
 .task-row-chevron {
   font-size: 22px;
   width: 22px;
