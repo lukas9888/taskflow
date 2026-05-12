@@ -68,11 +68,12 @@ Similarly, you can pass `-PsqlPath` if needed.
 
 ### Connection string (API)
 
-Ensure the API connection string in your user/password/port does not differ:
+Ensure the API connection string matches your PostgreSQL user/password/port:
 
-- [`backend/TaskFlow.API/appsettings.Development.json`](backend/TaskFlow.API/appsettings.Development.json)
-- Key: **`TaskFlowDb`** — format:
-  `Host=localhost;Port=5432;Username=postgres;Password=1234;Database=taskflow`
+- [`backend/TaskFlow.API/appsettings.json`](backend/TaskFlow.API/appsettings.json)
+- Key: **`TaskFlowDb`** — default (local):  
+  `Host=localhost;Port=5432;Username=taskflow_app;Password=taskflow_app;Database=taskflow`  
+  (Apply migration `012_taskflow_app_role.sql` first so `taskflow_app` exists.)
 
 ## Run the backend
 

@@ -31,6 +31,7 @@ public class TaskDependencyRepository : BaseRepository
         cmd.Parameters.AddWithValue("user_id", userId);
 
         conn.Open();
+        SetUserId(conn, userId);
         using var reader = cmd.ExecuteReader();
         while (reader.Read())
         {
@@ -66,6 +67,7 @@ public class TaskDependencyRepository : BaseRepository
         cmd.Parameters.AddWithValue("user_id",    userId);
 
         conn.Open();
+        SetUserId(conn, userId);
         var affected = cmd.ExecuteNonQuery();
         return affected > 0;
     }
@@ -89,6 +91,7 @@ public class TaskDependencyRepository : BaseRepository
         cmd.Parameters.AddWithValue("user_id",    userId);
 
         conn.Open();
+        SetUserId(conn, userId);
         var affected = cmd.ExecuteNonQuery();
         return affected > 0;
     }
