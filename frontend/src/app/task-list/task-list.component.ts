@@ -29,8 +29,8 @@ export type DependencyFilter = 'all' | 'blocked' | 'blocking';
   imports: [
     CommonModule,
     FormsModule,
-    MatButtonToggleModule,
     MatButtonModule,
+    MatButtonToggleModule,
     MatCardModule,
     MatCheckboxModule,
     MatFormFieldModule,
@@ -59,7 +59,7 @@ export class TaskListComponent {
   selectedPriorities: TaskPriorityLevel[] = [];
   dependencyFilter: DependencyFilter = 'all';
 
-  displayedColumns: string[] = [
+  readonly displayedColumns: string[] = [
     'completed',
     'title',
     'dependency',
@@ -71,28 +71,27 @@ export class TaskListComponent {
   readonly priorityOptions = TASK_PRIORITY_OPTIONS;
 
   get visibleTasks(): TaskItem[] {
-    const list = this.filterByTab(this.filteredTasks);
-    return [...list].sort((a, b) => this.compareTasks(a, b));
+    return this.sortTasks(this.filterByTab(this.filteredTasks));
   }
 
   get overdueTasks(): TaskItem[] {
-    return this.filteredTasks
-      .filter((t) => this.isOverdue(t))
-      .sort((a, b) => this.compareTasks(a, b));
+    return this.sortTasks(this.filteredTasks.filter((task) => this.isOverdue(task)));
   }
 
   get activeTasks(): TaskItem[] {
-    return this.visibleTasks.filter((t) => !t.done && !this.isOverdue(t));
+    return this.visibleTasks.filter((task) => !task.done && !this.isOverdue(task));
   }
 
   get doneTasks(): TaskItem[] {
-    return this.visibleTasks.filter((t) => t.done);
+    return this.visibleTasks.filter((task) => task.done);
   }
 
   get categoryOptions(): string[] {
-    return [
-      ...new Set(this.tasks.map((t) => taskCategoryFromModel(t)).filter(Boolean)),
-    ].sort();
+    const categories = this.tasks
+      .map((task) => taskCategoryFromModel(task))
+      .filter((category): category is string => Boolean(category));
+
+    return [...new Set(categories)].sort();
   }
 
   priorityIcon(level: TaskPriorityLevel): string {
@@ -103,14 +102,8 @@ export class TaskListComponent {
     return priorityIconCssColor(level);
   }
 
-  clearTaskFilters(): void {
-    this.selectedCategories = [];
-    this.selectedPriorities = [];
-    this.dependencyFilter = 'all';
-  }
-
-  categoryLabel(task: TaskItem): string {
-    return taskCategoryFromModel(task);
+  priorityLabel(level: TaskPriorityLevel): string {
+    return level[0].toUpperCase() + level.slice(1);
   }
 
   priorityMarker(task: TaskItem): { icon: string; color: string } {
@@ -122,8 +115,18 @@ export class TaskListComponent {
     };
   }
 
+  categoryLabel(task: TaskItem): string {
+    return taskCategoryFromModel(task);
+  }
+
   selectTask(task: TaskItem): void {
     this.selectedTaskIdChange.emit(task.id);
+  }
+
+  clearTaskFilters(): void {
+    this.selectedCategories = [];
+    this.selectedPriorities = [];
+    this.dependencyFilter = 'all';
   }
 
   onCompletedChange(task: TaskItem, done: boolean): void {
@@ -137,78 +140,81 @@ export class TaskListComponent {
         done,
       })
       .subscribe({
-        next: (updated) => {
-          this.tasks = this.tasks.map((t) => (t.id === updated.id ? updated : t));
+        next: (updatedTask) => {
+          this.tasks = this.tasks.map((existingTask) =>
+            existingTask.id === updatedTask.id ? updatedTask : existingTask
+          );
+
           this.taskUpdated.emit();
         },
       });
   }
 
   private get filteredTasks(): TaskItem[] {
-    return this.filterByTaskFilters(this.tasks);
+    return this.tasks.filter((task) => this.matchesTaskFilters(task));
   }
 
-  private filterByTaskFilters(all: TaskItem[]): TaskItem[] {
-    return all.filter((task) => {
-      const category = taskCategoryFromModel(task);
-      const priority = taskPriorityFromModel(task);
+  private matchesTaskFilters(task: TaskItem): boolean {
+    const category = taskCategoryFromModel(task);
+    const priority = taskPriorityFromModel(task);
 
-      const matchesCategory =
-        this.selectedCategories.length === 0 ||
-        this.selectedCategories.includes(category);
+    const matchesCategory =
+      this.selectedCategories.length === 0 ||
+      this.selectedCategories.includes(category);
 
-      const matchesPriority =
-        this.selectedPriorities.length === 0 ||
-        this.selectedPriorities.includes(priority);
+    const matchesPriority =
+      this.selectedPriorities.length === 0 ||
+      this.selectedPriorities.includes(priority);
 
-      const matchesDependency =
-        this.dependencyFilter === 'all' ||
-        (this.dependencyFilter === 'blocked' && this.blockedTaskIds.has(task.id)) ||
-        (this.dependencyFilter === 'blocking' && this.blockingTaskIds.has(task.id));
+    const matchesDependency =
+      this.dependencyFilter === 'all' ||
+      (this.dependencyFilter === 'blocked' && this.blockedTaskIds.has(task.id)) ||
+      (this.dependencyFilter === 'blocking' && this.blockingTaskIds.has(task.id));
 
-      return matchesCategory && matchesPriority && matchesDependency;
-    });
+    return matchesCategory && matchesPriority && matchesDependency;
   }
 
-  private filterByTab(all: TaskItem[]): TaskItem[] {
+  private filterByTab(tasks: TaskItem[]): TaskItem[] {
     const today = this.due.startOfToday();
     const weekEnd = new Date(today);
     weekEnd.setDate(weekEnd.getDate() + 7);
 
     switch (this.listFilter) {
       case 'today':
-        return all.filter((t) => {
-          if (!t.dueAt) {
-            return false;
-          }
-
-          return this.due.isSameLocalDay(new Date(t.dueAt), today);
-        });
+        return tasks.filter((task) => this.isDueToday(task, today));
 
       case 'week':
-        return all.filter((t) => {
-          if (!t.dueAt) {
-            return false;
-          }
+        return tasks.filter((task) => this.isDueWithinWeek(task, today, weekEnd));
 
-          const day = this.due.startOfLocalDay(new Date(t.dueAt));
-          return (
-            day.getTime() >= today.getTime() &&
-            day.getTime() <= weekEnd.getTime()
-          );
-        });
-
-      default:
-        return all;
+      case 'all':
+        return tasks;
     }
   }
 
-  private isOverdue(task: TaskItem): boolean {
-    if (task.done || !task.dueAt) {
+  private isDueToday(task: TaskItem, today: Date): boolean {
+    if (!task.dueAt) {
       return false;
     }
 
-    return new Date(task.dueAt).getTime() < Date.now();
+    return this.due.isSameLocalDay(new Date(task.dueAt), today);
+  }
+
+  private isDueWithinWeek(task: TaskItem, today: Date, weekEnd: Date): boolean {
+    if (!task.dueAt) {
+      return false;
+    }
+
+    const dueDay = this.due.startOfLocalDay(new Date(task.dueAt));
+
+    return dueDay >= today && dueDay <= weekEnd;
+  }
+
+  private isOverdue(task: TaskItem): boolean {
+    return !task.done && Boolean(task.dueAt) && this.dueTime(task) < Date.now();
+  }
+
+  private sortTasks(tasks: TaskItem[]): TaskItem[] {
+    return [...tasks].sort((a, b) => this.compareTasks(a, b));
   }
 
   private compareTasks(a: TaskItem, b: TaskItem): number {
@@ -216,18 +222,17 @@ export class TaskListComponent {
       return a.done ? 1 : -1;
     }
 
-    if (a.dueAt && b.dueAt) {
-      return new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime();
-    }
+    const aDue = this.dueTime(a);
+    const bDue = this.dueTime(b);
 
-    if (a.dueAt) {
-      return -1;
-    }
-
-    if (b.dueAt) {
-      return 1;
+    if (aDue !== bDue) {
+      return aDue - bDue;
     }
 
     return a.title.localeCompare(b.title);
+  }
+
+  private dueTime(task: TaskItem): number {
+    return task.dueAt ? new Date(task.dueAt).getTime() : Number.POSITIVE_INFINITY;
   }
 }

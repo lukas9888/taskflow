@@ -18,7 +18,7 @@
       class="filter-menu-button"
       (click)="showFilters = !showFilters"
     >
-      <mat-icon>filter_list</mat-icon>
+      <mat-icon aria-hidden="true">filter_list</mat-icon>
       Filters
     </button>
   </div>
@@ -42,10 +42,11 @@
               <mat-icon
                 class="priority-filter-icon"
                 [style.color]="priorityColor(priority)"
+                aria-hidden="true"
               >
                 {{ priorityIcon(priority) }}
               </mat-icon>
-              <span>{{ priority[0].toUpperCase() + priority.slice(1) }}</span>
+              <span>{{ priorityLabel(priority) }}</span>
             </mat-option>
           }
         </mat-select>
@@ -57,12 +58,12 @@
           <mat-option value="all">All</mat-option>
 
           <mat-option value="blocked">
-            <mat-icon class="blocked-filter-icon">block</mat-icon>
+            <mat-icon class="blocked-icon" aria-hidden="true">block</mat-icon>
             <span>Blocked</span>
           </mat-option>
 
           <mat-option value="blocking">
-            <mat-icon class="blocking-filter-icon">warning</mat-icon>
+            <mat-icon class="blocking-icon" aria-hidden="true">warning</mat-icon>
             <span>Blocking other tasks</span>
           </mat-option>
         </mat-select>
@@ -88,12 +89,7 @@
       </ng-container>
 
       <ng-container matColumnDef="title">
-        <td
-          mat-cell
-          *matCellDef="let task"
-          class="title-cell"
-          [class.task-title-done]="task.done"
-        >
+        <td mat-cell *matCellDef="let task" class="title-cell">
           {{ task.title }}
         </td>
       </ng-container>
@@ -101,30 +97,31 @@
       <ng-container matColumnDef="dependency">
         <td mat-cell *matCellDef="let task" class="icon-cell">
           @if (blockedTaskIds.has(task.id)) {
-            <mat-icon class="blocked-icon">block</mat-icon>
+            <mat-icon class="blocked-icon" aria-hidden="true">block</mat-icon>
           } @else if (blockingTaskIds.has(task.id)) {
-            <mat-icon class="blocking-icon">warning</mat-icon>
+            <mat-icon class="blocking-icon" aria-hidden="true">warning</mat-icon>
           }
         </td>
       </ng-container>
 
       <ng-container matColumnDef="priority">
         <td mat-cell *matCellDef="let task" class="icon-cell">
-          @let pm = priorityMarker(task);
+          @let marker = priorityMarker(task);
           <mat-icon
             class="task-row-prio-icon"
-            [style.color]="pm.color"
+            [style.color]="marker.color"
             aria-hidden="true"
           >
-            {{ pm.icon }}
+            {{ marker.icon }}
           </mat-icon>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="category">
         <td mat-cell *matCellDef="let task" class="category-cell">
-          @if (categoryLabel(task)) {
-            <span class="task-row-chip">{{ categoryLabel(task) }}</span>
+          @let category = categoryLabel(task);
+          @if (category) {
+            <span class="task-row-chip">{{ category }}</span>
           }
         </td>
       </ng-container>
