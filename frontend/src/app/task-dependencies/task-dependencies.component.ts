@@ -85,18 +85,19 @@ export class TaskDependenciesComponent implements OnChanges {
 
   get filteredTasks(): TaskItem[] {
     const q = this.searchText.toLowerCase();
-    const blockerIds = new Set(this.blockedByDeps.map((d) => d.blockedBy));
-    const dependentIds = new Set(this.blocksDeps.map((d) => d.taskId));
+    // Exclude any task already linked to the current task in either direction,
+    // matching the DB unique pair (no A↔B as two directed edges).
+    const alreadyRelated = new Set<number>([
+      ...this.blockedByDeps.map((d) => d.blockedBy),
+      ...this.blocksDeps.map((d) => d.taskId),
+    ]);
 
     return this.allTasks.filter((t) => {
       if (t.id === this.task.id) return false;
-      if (this.viewTab === 'blockedBy') {
-        if (blockerIds.has(t.id)) return false;
-      } else if (this.viewTab === 'blocks') {
-        if (dependentIds.has(t.id)) return false;
-      } else {
+      if (this.viewTab !== 'blockedBy' && this.viewTab !== 'blocks') {
         return false;
       }
+      if (alreadyRelated.has(t.id)) return false;
       return t.title.toLowerCase().includes(q);
     });
   }

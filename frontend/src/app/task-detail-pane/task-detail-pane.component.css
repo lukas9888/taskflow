@@ -127,6 +127,21 @@
   margin-top: 12px;
 }
 
+.detail-dependencies-section .detail-delete-before-deps {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  width: 100%;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.detail-dependencies-section .detail-delete-error {
+  text-align: right;
+  max-width: 100%;
+}
+
 .detail-delete-btn {
   flex-shrink: 0;
   background-color: var(--mat-sys-error);
