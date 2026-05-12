@@ -4,14 +4,14 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { TaskItem } from '../models/task-item';
 
-export type UpdateTaskBody = {
+export interface UpdateTaskBody {
   title: string;
   dueAt: string | null;
   priority: string;
   category: string | null;
   description: string | null;
   done: boolean;
-};
+}
 
 @Injectable({
   providedIn: 'root'

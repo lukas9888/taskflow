@@ -54,9 +54,9 @@ public class TaskDependencyRepository : BaseRepository
               ON CONFLICT DO NOTHING",
             conn);
 
-        cmd.Parameters.AddWithValue("task_id",    taskId);
+        cmd.Parameters.AddWithValue("task_id", taskId);
         cmd.Parameters.AddWithValue("blocked_by", blockedById);
-        cmd.Parameters.AddWithValue("user_id",    userId);
+        cmd.Parameters.AddWithValue("user_id", userId);
 
         conn.Open();
         SetUserId(conn, userId);
@@ -74,9 +74,9 @@ public class TaskDependencyRepository : BaseRepository
                 AND EXISTS (SELECT 1 FROM tasks WHERE id = @task_id AND user_id = @user_id)",
             conn);
 
-        cmd.Parameters.AddWithValue("task_id",    taskId);
+        cmd.Parameters.AddWithValue("task_id", taskId);
         cmd.Parameters.AddWithValue("blocked_by", blockedById);
-        cmd.Parameters.AddWithValue("user_id",    userId);
+        cmd.Parameters.AddWithValue("user_id", userId);
 
         conn.Open();
         SetUserId(conn, userId);

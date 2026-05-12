@@ -202,8 +202,7 @@ export class TaskDetailPaneComponent implements OnChanges {
           this.allCategories = [...this.allCategories, n].sort((a, b) => a.localeCompare(b));
         }
       },
-      error: () => {
-      }
+      error: () => undefined
     });
   }
 

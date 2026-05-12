@@ -3,7 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 
-type RegisterResponse = { id: number; username: string };
+interface RegisterResponse {
+  id: number;
+  username: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {

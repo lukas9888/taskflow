@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi; 
+using Microsoft.OpenApi;
 using System.Text;
 using TaskFlow.Model.Repositories;
 using System.Collections.Generic;
@@ -13,7 +13,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddControllers();
         services.AddEndpointsApiExplorer();
-        
+
         services.AddSwaggerGen(options =>
         {
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -30,7 +30,7 @@ public static class ServiceCollectionExtensions
             {
                 {
                     new OpenApiSecuritySchemeReference("Bearer", document),
-                    new List<string>() 
+                    new List<string>()
                 }
             });
         });

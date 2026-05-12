@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -21,16 +21,14 @@ import { AuthService } from '../services/auth.service';
   styleUrl: './auth.css'
 })
 export class RegisterComponent {
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
+
   username = '';
   password = '';
   submitting = false;
   serverError: string | null = null;
   usernameServerError: string | null = null;
-
-  constructor(
-    private readonly auth: AuthService,
-    private readonly router: Router
-  ) {}
 
   submit(): void {
   const username = this.username.trim();
