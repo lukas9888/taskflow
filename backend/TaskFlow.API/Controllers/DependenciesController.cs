@@ -44,23 +44,23 @@ public class DependenciesController : ControllerBase
         if (!ModelState.IsValid)
             return ValidationProblem(ModelState);
 
-        if (body.DependsOnId == taskId)
+        if (body.BlockedById == taskId)
             return BadRequest("A task cannot depend on itself.");
 
         var userId = GetUserId();
-        var added = _deps.AddDependency(userId, taskId, body.DependsOnId);
+        var added = _deps.AddDependency(userId, taskId, body.BlockedById);
 
         return added
             ? StatusCode(201)
             : Conflict("Dependency already exists or one of the tasks was not found.");
     }
 
-    // DELETE /api/tasks/{taskId}/dependencies/{dependsOnId}
-    [HttpDelete("{taskId:int}/dependencies/{dependsOnId:int}")]
-    public ActionResult Remove(int taskId, int dependsOnId)
+    // DELETE /api/tasks/{taskId}/dependencies/{blockedById}
+    [HttpDelete("{taskId:int}/dependencies/{blockedById:int}")]
+    public ActionResult Remove(int taskId, int blockedById)
     {
         var userId = GetUserId();
-        var removed = _deps.RemoveDependency(userId, taskId, dependsOnId);
+        var removed = _deps.RemoveDependency(userId, taskId, blockedById);
         return removed ? NoContent() : NotFound();
     }
 
@@ -80,6 +80,6 @@ public class DependenciesController : ControllerBase
 public class AddDependencyDto
 {
     [Required]
-    [Range(1, int.MaxValue, ErrorMessage = "DependsOnId must be a valid task id.")]
-    public int DependsOnId { get; set; }
+    [Range(1, int.MaxValue, ErrorMessage = "BlockedById must be a valid task id.")]
+    public int BlockedById { get; set; }
 }

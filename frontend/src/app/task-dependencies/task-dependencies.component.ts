@@ -38,7 +38,7 @@ export class TaskDependenciesComponent implements OnChanges {
   @Output() readonly saveStateChanged = new EventEmitter<'saving' | 'saved' | 'error'>();
 
   dependencies: TaskDependency[] = [];
-  selectedDependsOnId: number | null = null;
+  selectedBlockedById: number | null = null;
   loadError: string | null = null;
   addError: string | null = null;
   adding = false;
@@ -66,7 +66,7 @@ export class TaskDependenciesComponent implements OnChanges {
 
   get filteredTasks(): TaskItem[] {
     const q = this.searchText.toLowerCase();
-    const linked = new Set(this.dependencies.map(d => d.dependsOn));
+    const linked = new Set(this.dependencies.map(d => d.blockedBy));
     return this.allTasks.filter(
       t => t.id !== this.task.id &&
            !linked.has(t.id) &&
@@ -75,12 +75,12 @@ export class TaskDependenciesComponent implements OnChanges {
   }
 
   selectTask(task: TaskItem): void {
-    this.selectedDependsOnId = task.id;
+    this.selectedBlockedById = task.id;
     this.searchText = task.title;
   }
 
   onSearchTextChange(): void {
-    this.selectedDependsOnId = null;
+    this.selectedBlockedById = null;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -95,17 +95,17 @@ export class TaskDependenciesComponent implements OnChanges {
   }
 
   add(): void {
-    if (this.selectedDependsOnId == null) return;
+    if (this.selectedBlockedById == null) return;
     this.adding = true;
     this.addError = null;
     this.saveStateChanged.emit('saving');
-    this.depService.add(this.task.id, this.selectedDependsOnId).pipe(
+    this.depService.add(this.task.id, this.selectedBlockedById).pipe(
       switchMap(() => this.depService.loadAllForUser(true)),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: () => {
         this.adding = false;
-        this.selectedDependsOnId = null;
+        this.selectedBlockedById = null;
         this.searchText = '';
         this.dependenciesChanged.emit();
         this.saveStateChanged.emit('saved');
@@ -118,9 +118,9 @@ export class TaskDependenciesComponent implements OnChanges {
     });
   }
 
-  remove(dependsOnId: number): void {
+  remove(blockedById: number): void {
     this.saveStateChanged.emit('saving');
-    this.depService.remove(this.task.id, dependsOnId).pipe(
+    this.depService.remove(this.task.id, blockedById).pipe(
       switchMap(() => this.depService.loadAllForUser(true)),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({

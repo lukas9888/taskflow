@@ -9,12 +9,12 @@
     <p class="deps-empty">Choose tasks that need to be completed first.</p>
   } @else {
     <mat-list dense>
-      @for (dep of dependencies; track dep.dependsOn) {
+      @for (dep of dependencies; track dep.blockedBy) {
         <mat-list-item>
           <mat-icon matListItemIcon>link</mat-icon>
-          <span matListItemTitle>{{ dep.dependsOnTitle }}</span>
+          <span matListItemTitle>{{ dep.blockedByTitle }}</span>
           <button mat-icon-button matListItemMeta
-                  (click)="remove(dep.dependsOn)"
+                  (click)="remove(dep.blockedBy)"
                   aria-label="Remove dependency">
             <mat-icon>close</mat-icon>
           </button>
@@ -43,7 +43,7 @@
     </mat-autocomplete>
   </mat-form-field>
   <button mat-flat-button
-          [disabled]="selectedDependsOnId == null || adding"
+          [disabled]="selectedBlockedById == null || adding"
           (click)="add()">
     <mat-icon>add</mat-icon>
     {{ adding ? 'Adding…' : 'Add' }}
