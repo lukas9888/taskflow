@@ -95,7 +95,7 @@ export class TasksPageComponent implements OnInit {
     this.loadError = null;
     forkJoin({
       tasks: this.taskService.getTasks(),
-      dependencies: this.deps.loadAllForUser()
+      dependencies: this.deps.getAllForUser()
     }).subscribe({
       next: ({ tasks, dependencies }) => {
         this.tasks = tasks;
@@ -116,7 +116,7 @@ export class TasksPageComponent implements OnInit {
 
   refreshDependencies(): void {
     this.deps
-      .loadAllForUser(true)
+      .getAllForUser()
       .subscribe((deps) => this.applyDependencyState(this.tasks, deps));
   }
 
