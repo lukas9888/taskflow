@@ -122,7 +122,7 @@ export class TasksPageComponent implements OnInit {
 
   private applyDependencyState(
     tasks: TaskItem[],
-    deps: { taskId: number; dependsOn: number }[]
+    deps: { taskId: number; blockedBy: number }[]
   ): void {
     if (tasks.length === 0) {
       this.blockedTaskIds = new Set<number>();
@@ -135,9 +135,9 @@ export class TasksPageComponent implements OnInit {
     const blocking = new Set<number>();
 
     for (const dep of deps) {
-      if (doneByTaskId.get(dep.dependsOn) === false) {
+      if (doneByTaskId.get(dep.blockedBy) === false) {
         blocked.add(dep.taskId);
-        blocking.add(dep.dependsOn);
+        blocking.add(dep.blockedBy);
       }
     }
 

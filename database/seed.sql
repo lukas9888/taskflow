@@ -81,7 +81,7 @@ JOIN user_categories uc
  AND uc.name = s.category;
 
 
-INSERT INTO task_dependencies (task_id, depends_on) VALUES
+INSERT INTO task_dependencies (task_id, blocked_by) VALUES
    (3,2),
    (8,2),
    (8,6),

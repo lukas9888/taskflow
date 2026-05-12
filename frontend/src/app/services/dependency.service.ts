@@ -48,11 +48,11 @@ export class DependencyService {
     return this.http.get<TaskDependency[]>(`${this.baseUrl}/dependencies`);
   }
 
-  add(taskId: number, dependsOnId: number): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/${taskId}/dependencies`, { dependsOnId });
+  add(taskId: number, blockedById: number): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${taskId}/dependencies`, { blockedById });
   }
 
-  remove(taskId: number, dependsOnId: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${taskId}/dependencies/${dependsOnId}`);
+  remove(taskId: number, blockedById: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${taskId}/dependencies/${blockedById}`);
   }
 }

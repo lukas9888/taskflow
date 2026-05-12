@@ -1,55 +1,116 @@
 <div class="deps-section">
-  <span class="detail-section-label">Blocking tasks</span>
-
   @if (loadError) {
     <p class="deps-error">{{ loadError }}</p>
   }
 
-  @if (dependencies.length === 0) {
-    <p class="deps-empty">Choose tasks that need to be completed first.</p>
-  } @else {
-    <mat-list dense>
-      @for (dep of dependencies; track dep.dependsOn) {
-        <mat-list-item>
-          <mat-icon matListItemIcon>link</mat-icon>
-          <span matListItemTitle>{{ dep.dependsOnTitle }}</span>
-          <button mat-icon-button matListItemMeta
-                  (click)="remove(dep.dependsOn)"
-                  aria-label="Remove dependency">
-            <mat-icon>close</mat-icon>
-          </button>
-        </mat-list-item>
-      }
-    </mat-list>
+  <mat-button-toggle-group
+    class="deps-view-tabs"
+    [(ngModel)]="viewTab"
+    (ngModelChange)="onViewTabChange()"
+    hideSingleSelectionIndicator
+  >
+    <mat-button-toggle value="all">All dependencies</mat-button-toggle>
+    <mat-button-toggle value="blockedBy">Blocked by</mat-button-toggle>
+    <mat-button-toggle value="blocks">Blocking</mat-button-toggle>
+  </mat-button-toggle-group>
+
+  @if (viewTab === 'all') {
+    <p class="deps-all-explainer">Switch to Blocked by or Blocking to add new dependencies.</p>
   }
 
-  <div class="deps-add-row">
-  <mat-form-field appearance="outline" class="deps-select">
-    <mat-label>Add blocking tasks</mat-label>
-    <input
-      matInput
-      [(ngModel)]="searchText"
-      [matAutocomplete]="auto"
-      (ngModelChange)="onSearchTextChange()"
-      placeholder="Search tasks…"
-    />
-    <mat-autocomplete
-      #auto="matAutocomplete"
-      (optionSelected)="selectTask($event.option.value)"
-    >
-      @for (t of filteredTasks; track t.id) {
-        <mat-option [value]="t">{{ t.title }}</mat-option>
+  @if (viewTab === 'all' || viewTab === 'blockedBy') {
+    <div class="deps-subsection">
+      <div class="deps-type-header">
+        <mat-icon class="deps-type-header-icon deps-icon-blocked" matTooltip="Blocked">block</mat-icon>
+        <span class="deps-type-title">Blocked by</span>
+      </div>
+      <p class="deps-hint">The tasks shown here must be completed before the current task.</p>
+      @if (blockedByDeps.length === 0) {
+        <p class="deps-empty">The current task is not blocked by any other tasks yet.</p>
+      } @else {
+        <mat-list dense>
+          @for (dep of blockedByDeps; track dep.blockedBy) {
+            <mat-list-item>
+              <mat-icon matListItemIcon class="deps-icon-blocked">block</mat-icon>
+              <span matListItemTitle>{{ dep.blockedByTitle }}</span>
+              <button mat-icon-button matListItemMeta
+                      (click)="removeBlockedBy(dep.blockedBy)"
+                      aria-label="Remove blocker">
+                <mat-icon>close</mat-icon>
+              </button>
+            </mat-list-item>
+          }
+        </mat-list>
       }
-    </mat-autocomplete>
-  </mat-form-field>
-  <button mat-flat-button
-          [disabled]="selectedDependsOnId == null || adding"
-          (click)="add()">
-    <mat-icon>add</mat-icon>
-    {{ adding ? 'Adding…' : 'Add' }}
-  </button>
-</div>
-@if (addError) {
-  <p class="deps-error">{{ addError }}</p>
-}
+    </div>
+  }
+
+  @if (viewTab === 'all') {
+    <mat-divider class="deps-section-divider" />
+  }
+
+  @if (viewTab === 'all' || viewTab === 'blocks') {
+    <div class="deps-subsection">
+      <div class="deps-type-header">
+        <mat-icon class="deps-type-header-icon deps-icon-blocking" matTooltip="Blocking other tasks">warning</mat-icon>
+        <span class="deps-type-title">Blocking</span>
+      </div>
+      <p class="deps-hint">The tasks shown here are waiting on the current task to be completed.</p>
+      @if (blocksDeps.length === 0) {
+        <p class="deps-empty">The current task is not blocking any other tasks yet.</p>
+      } @else {
+        <mat-list dense>
+          @for (dep of blocksDeps; track dep.taskId) {
+            <mat-list-item>
+              <mat-icon matListItemIcon class="deps-icon-blocking">warning</mat-icon>
+              <span matListItemTitle>{{ dependentTitle(dep.taskId) }}</span>
+              <button mat-icon-button matListItemMeta
+                      (click)="removeBlocks(dep.taskId)"
+                      aria-label="Remove blocked task">
+                <mat-icon>close</mat-icon>
+              </button>
+            </mat-list-item>
+          }
+        </mat-list>
+      }
+    </div>
+  }
+
+  @if (canAddDependency) {
+    <div class="deps-add-row">
+      <mat-form-field appearance="outline" class="deps-select">
+        <mat-label>{{
+          viewTab === 'blockedBy'
+            ? 'Add a task blocking this one'
+            : 'Add task blocked by this one'
+        }}</mat-label>
+        <input
+          matInput
+          [(ngModel)]="searchText"
+          [matAutocomplete]="auto"
+          (ngModelChange)="onSearchTextChange()"
+          placeholder="Search tasks…"
+        />
+        <mat-autocomplete
+          #auto="matAutocomplete"
+          (optionSelected)="selectTask($event.option.value)"
+        >
+          @for (t of filteredTasks; track t.id) {
+            <mat-option [value]="t">{{ t.title }}</mat-option>
+          }
+        </mat-autocomplete>
+      </mat-form-field>
+
+      <button mat-flat-button
+              [disabled]="selectedOtherTaskId == null || adding"
+              (click)="add()">
+        <mat-icon>add</mat-icon>
+        {{ adding ? 'Adding…' : 'Add' }}
+      </button>
+    </div>
+  }
+
+  @if (addError) {
+    <p class="deps-error">{{ addError }}</p>
+  }
 </div>

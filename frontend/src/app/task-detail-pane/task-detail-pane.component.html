@@ -179,30 +179,33 @@
       </mat-form-field>
     </div>
 
-    <app-task-dependencies
-      [task]="task"
-      [allTasks]="allTasks"
-      (saveStateChanged)="onDependencySaveStateChanged($event)"
-    />
+    <div class="detail-section detail-dependencies-section">
+      <div class="detail-delete-before-deps">
+        <button
+          mat-flat-button
+          color="warn"
+          type="button"
+          class="detail-delete-btn"
+          (click)="deleteTask()"
+          [disabled]="deleting || saveState === 'saving'"
+        >
+          <mat-icon>delete</mat-icon>
+          {{ deleting ? 'Deleting…' : 'Delete task' }}
+        </button>
+        @if (deleteError) {
+          <span class="detail-delete-error" role="alert" aria-live="assertive">
+            <mat-icon inline aria-hidden="true">error</mat-icon>
+            {{ deleteError }}
+          </span>
+        }
+      </div>
 
-    <div class="detail-footer">
-      <button
-        mat-flat-button
-        color="warn"
-        type="button"
-        class="detail-delete-btn"
-        (click)="deleteTask()"
-        [disabled]="deleting || saveState === 'saving'"
-      >
-        <mat-icon>delete</mat-icon>
-        {{ deleting ? 'Deleting…' : 'Delete' }}
-      </button>
-      @if (deleteError) {
-        <span class="detail-delete-error" role="alert" aria-live="assertive">
-          <mat-icon inline aria-hidden="true">error</mat-icon>
-          {{ deleteError }}
-        </span>
-      }
+      <span class="detail-section-label">Task dependencies</span>
+      <app-task-dependencies
+        [task]="task"
+        [allTasks]="allTasks"
+        (saveStateChanged)="onDependencySaveStateChanged($event)"
+      />
     </div>
   </form>
 </section>
