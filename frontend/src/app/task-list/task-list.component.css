@@ -1,6 +1,17 @@
-.task-list-section {
+/* ════════════════════════════════════════════════════════════════════════
+   Card containers
+   ════════════════════════════════════════════════════════════════════════ */
+
+.task-section-card {
+  border-radius: 12px;
+  overflow: hidden;
   margin-bottom: 16px;
+  margin-top: 10px;
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+   Toolbar / filters
+   ════════════════════════════════════════════════════════════════════════ */
 
 .list-toolbar {
   display: flex;
@@ -11,135 +22,156 @@
   flex-wrap: wrap;
 }
 
-.list-filter-toggle {
-  --mat-standard-button-toggle-divider-color: transparent;
-  border-radius: 8px;
-  background-color: var(--mat-sys-surface-container-high);
-  padding: 4px;
-}
-
-.list-filter-toggle .mat-button-toggle-checked {
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-primary);
-  border-radius: 6px;
-  font-weight: 700;
-}
-
-.list-empty {
-  margin: 0;
-  padding: 20px 16px;
-  color: var(--mat-sys-on-surface-variant);
-  font-size: 15px;
-}
-
-/* Match card-style rows: flat active strip + bold title (Material nav list defaults to pill). */
-.task-rows {
-  padding: 0;
-  --mat-list-active-indicator-shape: 0;
-  --mat-list-active-indicator-color: color-mix(in srgb, var(--mat-sys-primary) 6%, var(--mat-sys-surface));
-}
-
-.task-rows .mat-mdc-list-item-title {
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.task-rows .mat-mdc-list-item.mdc-list-item--activated {
-  box-shadow: inset 4px 0 0 0 var(--mat-sys-primary);
-}
-
-.task-section-card {
-  margin-bottom: 16px;
-  overflow: hidden;
-
-  /* Angular Material card container styling */
-  --mdc-elevated-card-container-color: var(--mat-sys-surface);
-  --mat-card-elevated-container-color: var(--mat-sys-surface);
-}
-
-.done-section-card {
-  /* Slightly muted Material surface for completed tasks */
-  --mdc-elevated-card-container-color: var(--mat-sys-surface-container-high);
-  --mat-card-elevated-container-color: var(--mat-sys-surface-container-high);
-}
-
-.task-section-content {
-  padding: 0;
-}
-
-/*Overdue card CSS START*/
-.overdue-section-card {
-  --mdc-elevated-card-container-color: color-mix(
-    in srgb,
-    var(--mat-sys-error) 8%,
-    var(--mat-sys-surface)
-  );
-  --mat-card-elevated-container-color: color-mix(
-    in srgb,
-    var(--mat-sys-error) 8%,
-    var(--mat-sys-surface)
-  );
-
-  border: 1px solid color-mix(in srgb, var(--mat-sys-error) 20%, transparent);
-}
-
-.overdue-section-card .task-rows {
-  --mat-list-active-indicator-color: color-mix(
-    in srgb,
-    var(--mat-sys-error) 20%,
-    var(--mat-sys-surface)
-  );
-}
-/*Overdue card CSS END*/
-
-.filter-menu-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
 .task-filter-panel {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-  padding: 12px;
-  border-radius: 8px;
-  background-color: var(--mat-sys-surface-container-low);
+  gap: 12px;        /* ← matches .detail-datetime-row & .detail-priority-category-row */
   flex-wrap: wrap;
+  margin-bottom: 8px;   /* ← matches .detail-section spacing */
 }
 
-.filter-field {
-  width: 220px;
-  flex: 0 0 220px;
+/* ════════════════════════════════════════════════════════════════════════
+   mat-table column layout
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ── Overdue card: explicit background so the tint is always visible ── */
+.overdue-section-card.mat-mdc-card {
+  background-color: color-mix(in srgb, var(--mat-sys-error) 8%, var(--mat-sys-surface)) !important;
+  border: 1px solid color-mix(in srgb, var(--mat-sys-error) 20%, transparent);
 }
 
-.task-filter-panel button {
-  flex: 0 0 auto;
+/* ── Done card: muted surface background ── */
+.done-section-card.mat-mdc-card {
+  background-color: var(--mat-sys-surface-container-high) !important;
+  border: 1px solid color-mix(in srgb, var(--mat-sys-outline) 20%, transparent);
 }
 
-@media (max-width: 800px) {
-  .filter-field {
-    width: 100%;
-    flex: 1 1 100%;
-  }
+/* Done: slightly muted hover / selected so they blend with the darker surface */
+.done-section-card .task-table .mat-mdc-row:hover {
+  background: color-mix(in srgb, var(--mat-sys-primary) 5%, transparent) !important;
 }
 
-.priority-filter-icon {
-  margin-right: 12px;
-  vertical-align: middle;
+.done-section-card .task-table .mat-mdc-row.row-selected {
+  background: color-mix(in srgb, var(--mat-sys-primary) 9%, var(--mat-sys-surface-container-high)) !important;
+  box-shadow: inset 4px 0 0 0 var(--mat-sys-primary);
 }
 
-.blocked-filter-icon,
-.blocking-filter-icon {
-  margin-right: 12px;
-  vertical-align: middle;
+/* ── Table: force every level transparent so the card background shows ── */
+.task-table,
+.task-table.mat-mdc-table,
+.task-table .mat-mdc-header-row,
+.task-table .mat-mdc-row,
+.task-table .mat-mdc-cell,
+.task-table .mat-mdc-header-cell,
+.task-table tbody,
+.task-table thead {
+  background: transparent !important;
+  border: none;
+  outline: none;
+  box-shadow: none;
 }
 
-.blocked-filter-icon {
-  color: var(--mat-sys-error);
+/* Hide the header row — column labels are self-explanatory */
+.task-table-header {
+  display: none;
 }
 
-.blocking-filter-icon {
-  color: #f5c000;
+/* Subtle row divider (replaces the old mat-divider) */
+.task-table .mat-mdc-cell {
+  border-bottom: 1px solid color-mix(in srgb, var(--mat-sys-outline) 12%, transparent);
+}
+.task-table .mat-mdc-row:last-child .mat-mdc-cell {
+  border-bottom: none;
+}
+
+/* ── Row interaction states ── */
+.task-table .mat-mdc-row {
+  cursor: pointer;
+}
+
+/* Normal card hover (primary tint) */
+.task-table .mat-mdc-row:hover {
+  background: color-mix(in srgb, var(--mat-sys-primary) 6%, transparent) !important;
+}
+
+.task-table .mat-mdc-row.row-selected {
+  background: color-mix(in srgb, var(--mat-sys-primary) 10%, var(--mat-sys-surface)) !important;
+  box-shadow: inset 4px 0 0 0 var(--mat-sys-primary);
+}
+
+/* Overdue card: error-coloured hover / selected */
+.overdue-section-card .task-table .mat-mdc-row:hover {
+  background: color-mix(in srgb, var(--mat-sys-error) 14%, transparent) !important;
+}
+
+.overdue-section-card .task-table .mat-mdc-row.row-selected {
+  background: color-mix(in srgb, var(--mat-sys-error) 18%, var(--mat-sys-surface)) !important;
+  box-shadow: inset 4px 0 0 0 var(--mat-sys-error);
+}
+
+/* ── Column widths ── */
+.col-done     { width: 48px;  text-align: center; }
+.col-title    { width: auto;  font-size: 15px; }
+.col-icon     { width: 40px;  text-align: center; }
+.col-category { width: 130px; text-align: left; }
+.col-due      { width: 100px; text-align: right;
+                font-size: 12px;
+                color: var(--mat-sys-on-surface-variant); white-space: nowrap; }
+.col-chevron  { width: 36px;  text-align: center; }
+
+/* Tighten cell padding */
+.task-table .mat-mdc-cell,
+.task-table .mat-mdc-header-cell {
+  padding: 0 8px;
+}
+
+/* ── Completed task title ── */
+.done-title {
+  text-decoration: line-through;
+  color: var(--mat-sys-on-surface-variant);
+  opacity: 0.5;
+}
+
+/* ── Icons: explicit box prevents clipping in flex cells ── */
+.task-table .mat-mdc-cell mat-icon,
+.task-table .mat-mdc-cell .mat-icon {
+  font-family: 'Material Icons', 'Material Icons Outlined';
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.icon-blocked  { color: var(--mat-sys-error); }
+.icon-blocking { color: #f5c000; }
+
+/* ── Category chip ── */
+.task-row-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background-color: color-mix(in srgb, var(--mat-sys-primary) 12%, transparent);
+  color: var(--mat-sys-primary);
+}
+
+/* ── Chevron: hidden on desktop hover, always visible on touch ── */
+.task-row-chevron {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .task-row-chevron { opacity: 0; }
+  .task-table .mat-mdc-row:hover .task-row-chevron { opacity: 1; }
 }
