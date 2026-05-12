@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { finalize, map, shareReplay, tap } from 'rxjs/operators';
+import { finalize, shareReplay, tap } from 'rxjs/operators';
 import { TaskDependency } from '../models/task-dependency';
 
 @Injectable({ providedIn: 'root' })
@@ -10,7 +10,6 @@ export class DependencyService {
   private readonly baseUrl = 'http://localhost:5046/api/tasks';
 
   private readonly depsSubject = new BehaviorSubject<TaskDependency[] | null>(null);
-  readonly dependencies$ = this.depsSubject.pipe(map((v) => v ?? []));
 
   private inFlight$: Observable<TaskDependency[]> | null = null;
 
@@ -38,10 +37,6 @@ export class DependencyService {
 
     this.inFlight$ = req$;
     return req$;
-  }
-
-  getForTask(taskId: number): Observable<TaskDependency[]> {
-    return this.dependencies$.pipe(map((deps) => deps.filter((d) => d.taskId === taskId)));
   }
 
   getAllForUser(): Observable<TaskDependency[]> {

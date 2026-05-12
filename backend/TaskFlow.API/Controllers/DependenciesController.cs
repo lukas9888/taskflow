@@ -26,15 +26,6 @@ public class DependenciesController : AuthorizedControllerBase
         return Ok(result);
     }
 
-    // GET /api/tasks/{taskId}/dependencies
-    [HttpGet("{taskId:int}/dependencies")]
-    public ActionResult GetAll(int taskId)
-    {
-        var userId = GetUserId();
-        var result = _deps.GetDependencies(userId, taskId);
-        return Ok(result);
-    }
-
     // POST /api/tasks/{taskId}/dependencies
     [HttpPost("{taskId:int}/dependencies")]
     public ActionResult Add(int taskId, [FromBody] AddDependencyDto body)

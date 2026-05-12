@@ -46,45 +46,6 @@ public class TaskDependencyRepository : BaseRepository
     }
 
     /// <summary>
-    /// Returns all tasks that the given task depends on.
-    /// Also checks that the task belongs to the requesting user (ownership guard).
-    /// </summary>
-    public List<TaskDependency> GetDependencies(int userId, int taskId)
-    {
-        var list = new List<TaskDependency>();
-
-        using var conn = new NpgsqlConnection(ConnectionString);
-        using var cmd = new NpgsqlCommand(
-            @"SELECT td.task_id, td.blocked_by, t2.title
-              FROM task_dependencies td
-              JOIN tasks t2 ON t2.id = td.blocked_by
-              WHERE td.task_id = @task_id
-                AND EXISTS (
-                    SELECT 1 FROM tasks t1
-                    WHERE t1.id = @task_id AND t1.user_id = @user_id
-                )
-              ORDER BY td.blocked_by",
-            conn);
-
-        cmd.Parameters.AddWithValue("task_id", taskId);
-        cmd.Parameters.AddWithValue("user_id", userId);
-
-        conn.Open();
-        using var reader = cmd.ExecuteReader();
-        while (reader.Read())
-        {
-            list.Add(new TaskDependency
-            {
-                TaskId    = reader.GetInt32(0),
-                BlockedBy = reader.GetInt32(1),
-                BlockedByTitle = reader.GetString(2)
-            });
-        }
-
-        return list;
-    }
-
-    /// <summary>
     /// Adds a dependency: taskId depends on blockedById.
     /// Returns false if the row already exists (duplicate), true on success.
     /// Both tasks must belong to the requesting user.
