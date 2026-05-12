@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Model.Repositories;
+using TaskFlow.API.Helpers;
 
 namespace TaskFlow.API.Controllers;
 
@@ -30,20 +31,12 @@ public class CategoriesController : AuthorizedControllerBase
             return ValidationProblem(ModelState);
 
         var userId = GetUserId();
-        var name = NormalizeCategory(body.Name);
+        var name = TaskFlowNormalization.NormalizeCategory(body.Name);
         if (name is null)
             return BadRequest("Category name cannot be empty.");
 
         var created = _categories.UpsertName(userId, name);
         return Ok(created);
-    }
-
-    private static string? NormalizeCategory(string? c)
-    {
-        if (string.IsNullOrWhiteSpace(c))
-            return null;
-        var t = c.Trim().ToUpperInvariant();
-        return t.Length > 64 ? t[..64] : t;
     }
 }
 
