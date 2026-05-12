@@ -71,13 +71,6 @@ export class DueDatetimeService {
     return { date, time };
   }
 
-  isBeforeNow(combined: Date | null): boolean {
-    if (!combined) {
-      return false;
-    }
-    return combined.getTime() < Date.now();
-  }
-
   /**
    * Minimum selectable time when the chosen date is today (otherwise null = no extra bound).
    */
