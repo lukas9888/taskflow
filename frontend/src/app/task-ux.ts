@@ -1,9 +1,7 @@
 import { TaskItem, TaskPriorityLevel } from './models/task-item';
 
-/** Priority values for selects (API order). */
 export const TASK_PRIORITY_OPTIONS: readonly TaskPriorityLevel[] = ['high', 'medium', 'low'];
 
-/** Material Icons ligature: 3 bars, 2-bar handle, single bar (low / medium / high). */
 export function priorityIconGlyph(level: TaskPriorityLevel): string {
   switch (level) {
     case 'high':
@@ -15,7 +13,6 @@ export function priorityIconGlyph(level: TaskPriorityLevel): string {
   }
 }
 
-/** Same palette as the previous custom bar indicator. */
 export function priorityIconCssColor(level: TaskPriorityLevel): string {
   switch (level) {
     case 'high':
@@ -27,7 +24,6 @@ export function priorityIconCssColor(level: TaskPriorityLevel): string {
   }
 }
 
-/** Normalize API / legacy values for list row display. */
 export function taskPriorityFromModel(task: TaskItem): TaskPriorityLevel {
   const p = task.priority;
   if (p === 'high' || p === 'medium' || p === 'low') {

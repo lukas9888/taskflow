@@ -1,7 +1,3 @@
--- Non-superuser API role (RLS applies). Run as superuser (e.g. postgres).
--- Username=taskflow_app; password=taskflow_app (local only — change in production).
--- If the role already exists: ALTER ROLE taskflow_app PASSWORD 'taskflow_app';
-
 BEGIN;
 
 DO $body$

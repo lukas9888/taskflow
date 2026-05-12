@@ -54,7 +54,6 @@ export class TaskDependenciesComponent implements OnChanges {
 
   searchText = '';
 
-  /** Emits the task id to load edges for; each emission runs GET /api/tasks/dependencies and filters. */
   private readonly loadTrigger$ = new Subject<number>();
 
   constructor() {
@@ -78,8 +77,6 @@ export class TaskDependenciesComponent implements OnChanges {
 
   get filteredTasks(): TaskItem[] {
     const q = this.searchText.toLowerCase();
-    // Exclude any task already linked to the current task in either direction,
-    // matching the DB unique pair (no A↔B as two directed edges).
     const alreadyRelated = new Set<number>([
       ...this.blockedByDeps.map((d) => d.blockedBy),
       ...this.blocksDeps.map((d) => d.taskId),

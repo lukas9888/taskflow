@@ -1,9 +1,3 @@
--- TaskFlow migrations
--- 001_init_schema.sql
---
--- Baseline schema (no sample data).
--- Apply with: database/apply-migrations.ps1
-
 BEGIN;
 
 CREATE TABLE IF NOT EXISTS schema_migrations (

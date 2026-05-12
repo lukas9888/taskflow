@@ -13,7 +13,6 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideAnimations(),
-    // DateFnsAdapter requires a date-fns Locale object, not LOCALE_ID string (breaks calendar + time list)
     { provide: MAT_DATE_LOCALE, useValue: enUS },
     provideDateFnsAdapter(),
     provideHttpClient(withInterceptors([authInterceptor, authErrorInterceptor])),

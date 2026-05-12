@@ -1,8 +1,3 @@
--- TaskFlow migrations
--- 004_task_dependencies.sql
---
--- Task dependencies (directed edges between tasks).
-
 BEGIN;
 
 CREATE TABLE IF NOT EXISTS task_dependencies (
@@ -17,4 +12,3 @@ CREATE TABLE IF NOT EXISTS task_dependencies (
 );
 
 COMMIT;
-

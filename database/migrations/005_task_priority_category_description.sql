@@ -1,6 +1,3 @@
--- TaskFlow migrations
--- 005_task_priority_category_description.sql
-
 BEGIN;
 
 ALTER TABLE tasks ADD COLUMN IF NOT EXISTS priority VARCHAR(10) NOT NULL DEFAULT 'medium';

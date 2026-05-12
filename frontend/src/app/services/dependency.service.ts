@@ -9,7 +9,6 @@ export class DependencyService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiBaseUrl}/tasks`;
 
-  /** GET /api/tasks/dependencies — all dependency edges for the current user (no client-side cache). */
   getAllForUser(): Observable<TaskDependency[]> {
     return this.http.get<TaskDependency[]>(`${this.baseUrl}/dependencies`);
   }

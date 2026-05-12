@@ -14,12 +14,10 @@ public class TasksControllerTests
     [Fact]
     public void Create_ReturnsCreatedAtAction_WhenModelStateIsValid()
     {
-        // Arrange
         var config = new ConfigurationBuilder()
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
-                    // Needed because TaskRepository's base ctor reads a connection string.
                     ["ConnectionStrings:TaskFlowDb"] =
                         "Host=localhost;Database=test;Username=test;Password=test"
                 })
@@ -48,10 +46,8 @@ public class TasksControllerTests
 
         var body = new CreateTaskDto { Title = "  My new task  " };
 
-        // Act
         var result = controller.Create(body);
 
-        // Assert
         var createdAt = Assert.IsType<CreatedAtActionResult>(result.Result);
         Assert.Equal(nameof(TasksController.GetById), createdAt.ActionName);
         Assert.Equal(created.Id, createdAt.RouteValues?["id"]);

@@ -31,19 +31,16 @@ export class TasksPageComponent implements OnInit {
   private readonly taskService = inject(TaskService);
   private readonly breakpoint = inject(BreakpointObserver);
 
-  /** Matches task-detail-pane / list responsive breakpoint. */
   readonly isNarrow = toSignal(
     this.breakpoint.observe('(max-width: 900px)').pipe(map((r) => r.matches)),
     { initialValue: false }
   );
 
-  /** Pixels under the sticky app toolbar (see `styles.scss` `--app-toolbar-total-height`). */
   readonly toolbarTopGapPx = 64;
 
   tasks: TaskItem[] = [];
   loadError: string | null = null;
   selectedTaskId: number | null = null;
-  
 
   get selectedTask(): TaskItem | null {
     if (this.selectedTaskId == null) {

@@ -62,7 +62,7 @@ export class TaskDetailPaneComponent implements OnChanges {
   private readonly destroyRef = inject(DestroyRef);
   private readonly autosaveTrigger$ = new Subject<void>();
 
-    constructor() {
+  constructor() {
     this.autosaveTrigger$
       .pipe(
         debounceTime(1000),
@@ -89,7 +89,6 @@ export class TaskDetailPaneComponent implements OnChanges {
   @Output() readonly taskUpdated = new EventEmitter<void>();
   @Output() readonly taskDeleted = new EventEmitter<void>();
   @Output() readonly dependenciesChanged = new EventEmitter<void>();
-  /** Close/dismiss the sheet (clears selection in parent). */
   @Output() readonly closed = new EventEmitter<void>();
 
   requestClose(): void {
@@ -101,9 +100,7 @@ export class TaskDetailPaneComponent implements OnChanges {
   dueTime: Date | null = null;
   timeMin: Date | null = null;
   priority: TaskPriorityLevel = 'medium';
-  /** Selected category (renders as a chip). */
   category = '';
-  /** Free text input bound to the autocomplete input. */
   categoryInput = '';
   description = '';
 
@@ -136,9 +133,7 @@ export class TaskDetailPaneComponent implements OnChanges {
     return priorityIconCssColor(level);
   }
 
-  /** Autocomplete options: fetched categories filtered by current input, plus current value if custom. */
   get categoryOptions(): string[] {
-    // Filter by what the user is typing, not by the selected chip value.
     const raw = (this.categoryInput ?? '').trim();
     const q = raw.toUpperCase();
 
@@ -161,31 +156,30 @@ export class TaskDetailPaneComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-  if (!changes['task']) {
-    return;
+    if (!changes['task']) {
+      return;
+    }
+
+    const openedDifferentTask = this.currentTaskId !== this.task.id;
+    this.currentTaskId = this.task.id;
+
+    this.patchFormFromTask();
+    this.ensureCategoriesLoaded();
+
+    this.titleError = null;
+    this.deleteError = null;
+    this.deleting = false;
+
+    if (openedDifferentTask) {
+      this.saveState = 'idle';
+    }
   }
-
-  const openedDifferentTask = this.currentTaskId !== this.task.id;
-  this.currentTaskId = this.task.id;
-
-  this.patchFormFromTask();
-  this.ensureCategoriesLoaded();
-
-  this.titleError = null;
-  this.deleteError = null;
-  this.deleting = false;
-
-  if (openedDifferentTask) {
-    this.saveState = 'idle';
-  }
-}
 
   onDueDateChange(): void {
     this.timeMin = this.due.timeMinForDate(this.dueDate);
   }
 
   onCategoryBlur(): void {
-    // Normalize typed text (visual consistency), but don't create/commit.
     this.categoryInput = this.normalizeCategoryOrEmpty(this.categoryInput);
   }
 
@@ -194,8 +188,6 @@ export class TaskDetailPaneComponent implements OnChanges {
     this.category = normalized;
     this.categoryInput = '';
     this.onFieldChanged();
-    // MatAutocomplete may write the selected option back into the input after handlers run.
-    // Clear again in a microtask so the chip visually replaces the text.
     queueMicrotask(() => {
       this.categoryInput = '';
       const el = this.categoryInputEl?.nativeElement;
@@ -203,7 +195,6 @@ export class TaskDetailPaneComponent implements OnChanges {
     });
     if (!normalized) return;
 
-    // Create immediately (idempotent on backend). Also keep local suggestions fresh.
     this.categoriesApi.createCategory(normalized).subscribe({
       next: (name) => {
         const n = this.normalizeCategoryOrEmpty(name);
@@ -212,7 +203,6 @@ export class TaskDetailPaneComponent implements OnChanges {
         }
       },
       error: () => {
-        // If it fails, we still keep the selected chip; saving the task will try again.
       }
     });
   }
@@ -234,7 +224,6 @@ export class TaskDetailPaneComponent implements OnChanges {
   }
 
   categoryDisplay(): string {
-    // Keep the input visually empty after selecting an option.
     return '';
   }
 
@@ -247,7 +236,6 @@ export class TaskDetailPaneComponent implements OnChanges {
   onFieldChanged(): void {
     const trimmed = this.title.trim();
 
-    // Title validation (autosave-only UX)
     if (trimmed.length < 2) {
       this.titleError = 'Enter at least 2 characters.';
       this.saveState = 'error';
@@ -255,7 +243,6 @@ export class TaskDetailPaneComponent implements OnChanges {
     }
     this.titleError = null;
 
-    // Due date/time must be either both set or both cleared
     if ((this.dueDate && !this.dueTime) || (!this.dueDate && this.dueTime)) {
       this.saveState = 'error';
       return;
@@ -348,18 +335,15 @@ export class TaskDetailPaneComponent implements OnChanges {
     if (this.allCategories.length > 0) return;
     this.categoriesApi.getCategories().subscribe({
       next: (cats) => {
-        // Normalize to the same format as the backend/UI.
         const normalized = cats.map((c) => this.normalizeCategoryOrEmpty(c)).filter(Boolean);
         this.allCategories = Array.from(new Set(normalized));
       },
       error: () => {
-        // Autocomplete still works with free text; just no suggestions.
         this.allCategories = [];
       }
     });
   }
 
-  // Used by template to construct the "Create" option label/value.
   normalizeCategoryOrEmpty(c: string | null | undefined): string {
     const t = (c ?? '').trim().toUpperCase();
     if (!t) return '';

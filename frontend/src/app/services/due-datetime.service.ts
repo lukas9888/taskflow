@@ -1,17 +1,11 @@
 import { Injectable } from '@angular/core';
 
-/**
- * Merges Material datepicker + timepicker values into one local Date and API ISO strings.
- * Date and time are separate `Date` instances (Material pattern); time uses clock fields only.
- */
 @Injectable({ providedIn: 'root' })
 export class DueDatetimeService {
-  /** Start of local calendar day (00:00:00.000). */
   startOfLocalDay(d: Date): Date {
     return new Date(d.getFullYear(), d.getMonth(), d.getDate());
   }
 
-  /** Today at local midnight. */
   startOfToday(): Date {
     return this.startOfLocalDay(new Date());
   }
@@ -24,10 +18,6 @@ export class DueDatetimeService {
     );
   }
 
-  /**
-   * @param datePart from mat-datepicker (calendar day)
-   * @param timePart from mat-timepicker (only H/M/S are used; date part ignored)
-   */
   combine(datePart: Date | null, timePart: Date | null): Date | null {
     if (!datePart && !timePart) {
       return null;
@@ -55,9 +45,6 @@ export class DueDatetimeService {
     return c ? c.toISOString() : null;
   }
 
-  /**
-   * Split API / ISO string into two Dates for pickers (time anchored to 1970-01-01 local for display).
-   */
   fromIso(iso: string | null | undefined): { date: Date | null; time: Date | null } {
     if (!iso) {
       return { date: null, time: null };
@@ -71,9 +58,13 @@ export class DueDatetimeService {
     return { date, time };
   }
 
-  /**
-   * Minimum selectable time when the chosen date is today (otherwise null = no extra bound).
-   */
+  isBeforeNow(combined: Date | null): boolean {
+    if (!combined) {
+      return false;
+    }
+    return combined.getTime() < Date.now();
+  }
+
   timeMinForDate(datePart: Date | null): Date | null {
     if (!datePart) {
       return null;

@@ -17,7 +17,6 @@ public class DependenciesController : AuthorizedControllerBase
         _deps = deps;
     }
 
-    // GET /api/tasks/dependencies
     [HttpGet("dependencies")]
     public ActionResult GetAllForUser()
     {
@@ -26,7 +25,6 @@ public class DependenciesController : AuthorizedControllerBase
         return Ok(result);
     }
 
-    // POST /api/tasks/{taskId}/dependencies
     [HttpPost("{taskId:int}/dependencies")]
     public ActionResult Add(int taskId, [FromBody] AddDependencyDto body)
     {
@@ -44,7 +42,6 @@ public class DependenciesController : AuthorizedControllerBase
             : Conflict("Dependency already exists or one of the tasks was not found.");
     }
 
-    // DELETE /api/tasks/{taskId}/dependencies/{blockedById}
     [HttpDelete("{taskId:int}/dependencies/{blockedById:int}")]
     public ActionResult Remove(int taskId, int blockedById)
     {

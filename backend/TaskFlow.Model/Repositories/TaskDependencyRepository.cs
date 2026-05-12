@@ -10,9 +10,6 @@ public class TaskDependencyRepository : BaseRepository
     {
     }
 
-    /// <summary>
-    /// Returns all dependency relationships between the requesting user's tasks.
-    /// </summary>
     public List<TaskDependency> GetAllForUser(int userId)
     {
         var list = new List<TaskDependency>();
@@ -46,11 +43,6 @@ public class TaskDependencyRepository : BaseRepository
         return list;
     }
 
-    /// <summary>
-    /// Adds a dependency: taskId depends on blockedById.
-    /// Returns false if the row already exists (duplicate), true on success.
-    /// Both tasks must belong to the requesting user.
-    /// </summary>
     public bool AddDependency(int userId, int taskId, int blockedById)
     {
         using var conn = new NpgsqlConnection(ConnectionString);
@@ -72,10 +64,6 @@ public class TaskDependencyRepository : BaseRepository
         return affected > 0;
     }
 
-    /// <summary>
-    /// Removes a dependency. Returns true if a row was deleted, false if it didn't exist.
-    /// Ownership is enforced: the task must belong to the requesting user.
-    /// </summary>
     public bool RemoveDependency(int userId, int taskId, int blockedById)
     {
         using var conn = new NpgsqlConnection(ConnectionString);

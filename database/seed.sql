@@ -1,14 +1,7 @@
--- TaskFlow seed data
---
--- Dev/demo data. Safe to re-run: it clears the table first.
-
 BEGIN;
 
--- Used only for generating bcrypt hashes in SQL seeds.
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
--- Truncate ALL user tables (future-proof as you add more).
--- Excludes schema_migrations so applied migrations remain tracked.
 DO $$
 DECLARE
   truncate_stmt text;
@@ -26,11 +19,9 @@ BEGIN
   END IF;
 END $$;
 
--- Default demo user. Password: demo1234
 INSERT INTO users (username, password_hash)
 VALUES ('demo', crypt('demo1234', gen_salt('bf')));
 
--- Demo categories (scoped to the demo user).
 INSERT INTO user_categories (user_id, name)
 SELECT u.id, c.name
 FROM users u
@@ -47,7 +38,6 @@ CROSS JOIN (
 WHERE u.username = 'demo'
 ON CONFLICT (user_id, name) DO NOTHING;
 
--- due_at: nearest 15-minute boundary to "now", then +0 / +1 / +2 calendar days with small slot offsets.
 WITH anchor AS (
   SELECT (
     timestamptz 'epoch'
@@ -96,14 +86,13 @@ JOIN user_categories uc
 
 
 INSERT INTO task_dependencies (task_id, blocked_by) VALUES
-  (5, 6),    -- Submit assignment is blocked until essay draft is finished
-  (2, 3),    -- Prepare for presentation is blocked until lecture slides are read
-  (10, 9),   -- Do laundry is blocked until apartment is cleaned
-  (19, 2),   -- Reply to group chat is blocked until presentation is prepared
-  (20, 1),   -- Confirm shift at work is blocked until exam schedule is checked
-  (11, 12),  -- Transfer money to savings is blocked until rent is paid
+  (5, 6),
+  (2, 3),
+  (10, 9),
+  (19, 2),
+  (20, 1),
+  (11, 12),
   (15, 16)
 ON CONFLICT DO NOTHING;
 
 COMMIT;
-
