@@ -1,17 +1,16 @@
 using System.ComponentModel.DataAnnotations;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Model.Entities;
 using TaskFlow.Model.Repositories;
+using TaskFlow.API.Helpers;
 
 namespace TaskFlow.API.Controllers;
 
 [ApiController]
 [Route("api/tasks")]
 [Authorize]
-public class TasksController : ControllerBase
+public class TasksController : AuthorizedControllerBase
 {
     private readonly TaskRepository _tasks;
 
@@ -25,6 +24,14 @@ public class TasksController : ControllerBase
     {
         var userId = GetUserId();
         return Ok(_tasks.GetAll(userId));
+    }
+
+    [HttpGet("{id:int}")]
+    public ActionResult<TaskItem> GetById(int id)
+    {
+        var userId = GetUserId();
+        var task = _tasks.GetById(userId, id);
+        return task is null ? NotFound() : Ok(task);
     }
 
     [HttpPost]
@@ -44,9 +51,9 @@ public class TasksController : ControllerBase
             trimmed,
             body.DueAt,
             NormalizePriority(body.Priority),
-            NormalizeCategory(body.Category),
+            TaskFlowNormalization.NormalizeCategory(body.Category),
             NormalizeDescription(body.Description));
-        return CreatedAtAction(nameof(GetAll), new { id = created.Id }, created);
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
     [HttpPut("{id}")]
@@ -67,7 +74,7 @@ public class TasksController : ControllerBase
             trimmed,
             body.DueAt,
             NormalizePriority(body.Priority),
-            NormalizeCategory(body.Category),
+            TaskFlowNormalization.NormalizeCategory(body.Category),
             NormalizeDescription(body.Description),
             body.Done);
         return updated is null ? NotFound() : Ok(updated);
@@ -81,16 +88,6 @@ public class TasksController : ControllerBase
         return deleted ? NoContent() : NotFound();
     }
 
-    private int GetUserId()
-    {
-        var raw =
-            User.FindFirstValue(ClaimTypes.NameIdentifier)
-            ?? User.FindFirstValue(JwtRegisteredClaimNames.Sub);
-        if (string.IsNullOrWhiteSpace(raw) || !int.TryParse(raw, out var userId))
-            throw new InvalidOperationException("Missing or invalid user id claim.");
-        return userId;
-    }
-
     private static string NormalizePriority(string? p) =>
         p?.ToLowerInvariant() switch
         {
@@ -98,14 +95,6 @@ public class TasksController : ControllerBase
             "low" => "low",
             _ => "medium"
         };
-
-    private static string? NormalizeCategory(string? c)
-    {
-        if (string.IsNullOrWhiteSpace(c))
-            return null;
-        var t = c.Trim().ToUpperInvariant();
-        return t.Length > 64 ? t[..64] : t;
-    }
 
     private static string? NormalizeDescription(string? d)
     {

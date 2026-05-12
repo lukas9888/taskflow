@@ -1,5 +1,3 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +8,7 @@ namespace TaskFlow.API.Controllers;
 [ApiController]
 [Route("api/tasks")]
 [Authorize]
-public class DependenciesController : ControllerBase
+public class DependenciesController : AuthorizedControllerBase
 {
     private readonly TaskDependencyRepository _deps;
 
@@ -25,15 +23,6 @@ public class DependenciesController : ControllerBase
     {
         var userId = GetUserId();
         var result = _deps.GetAllForUser(userId);
-        return Ok(result);
-    }
-
-    // GET /api/tasks/{taskId}/dependencies
-    [HttpGet("{taskId:int}/dependencies")]
-    public ActionResult GetAll(int taskId)
-    {
-        var userId = GetUserId();
-        var result = _deps.GetDependencies(userId, taskId);
         return Ok(result);
     }
 
@@ -62,18 +51,6 @@ public class DependenciesController : ControllerBase
         var userId = GetUserId();
         var removed = _deps.RemoveDependency(userId, taskId, blockedById);
         return removed ? NoContent() : NotFound();
-    }
-
-    private int GetUserId()
-    {
-        var raw =
-            User.FindFirstValue(ClaimTypes.NameIdentifier)
-            ?? User.FindFirstValue(JwtRegisteredClaimNames.Sub);
-
-        if (string.IsNullOrWhiteSpace(raw) || !int.TryParse(raw, out var userId))
-            throw new InvalidOperationException("Missing or invalid user id claim.");
-
-        return userId;
     }
 }
 

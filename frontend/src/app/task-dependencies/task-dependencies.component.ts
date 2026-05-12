@@ -10,7 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subject, of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError, switchMap, tap } from 'rxjs/operators';
 import { TaskItem } from '../models/task-item';
 import { TaskDependency } from '../models/task-dependency';
 import { DependencyService } from '../services/dependency.service';
@@ -42,7 +42,6 @@ export class TaskDependenciesComponent implements OnChanges {
 
   @Input({ required: true }) task!: TaskItem;
   @Input({ required: true }) allTasks: TaskItem[] = [];
-  @Output() readonly dependenciesChanged = new EventEmitter<void>();
   @Output() readonly saveStateChanged = new EventEmitter<'saving' | 'saved' | 'error'>();
 
   blockedByDeps: TaskDependency[] = [];
@@ -56,27 +55,22 @@ export class TaskDependenciesComponent implements OnChanges {
 
   searchText = '';
 
-  private readonly loadTrigger$ = new Subject<{ taskId: number; force: boolean }>();
+  /** Emits the task id to load edges for; each emission runs GET /api/tasks/dependencies and filters. */
+  private readonly loadTrigger$ = new Subject<number>();
 
   constructor() {
     this.loadTrigger$.pipe(
-      switchMap(({ taskId, force }) =>
-        this.depService.loadAllForUser(force).pipe(
-          map((deps) => ({
-            blockedBy: deps.filter((d) => d.taskId === taskId),
-            blocks: deps.filter((d) => d.blockedBy === taskId),
-          })),
+      switchMap((taskId) =>
+        this.depService.getAllForUser().pipe(
           catchError(() => {
             this.loadError = 'Could not load dependencies.';
-            return of({ blockedBy: [] as TaskDependency[], blocks: [] as TaskDependency[] });
-          })
+            return of([] as TaskDependency[]);
+          }),
+          tap((deps) => this.applyDepsForTask(deps, taskId))
         )
       ),
       takeUntilDestroyed(this.destroyRef)
-    ).subscribe(({ blockedBy, blocks }) => {
-      this.blockedByDeps = blockedBy;
-      this.blocksDeps = blocks;
-    });
+    ).subscribe();
   }
 
   get canAddDependency(): boolean {
@@ -127,9 +121,9 @@ export class TaskDependenciesComponent implements OnChanges {
     }
   }
 
-  load(force = false): void {
+  load(): void {
     this.loadError = null;
-    this.loadTrigger$.next({ taskId: this.task.id, force });
+    this.loadTrigger$.next(this.task.id);
   }
 
   add(): void {
@@ -144,14 +138,14 @@ export class TaskDependenciesComponent implements OnChanges {
         : this.depService.add(this.selectedOtherTaskId, this.task.id);
 
     req$.pipe(
-      switchMap(() => this.depService.loadAllForUser(true)),
+      switchMap(() => this.depService.getAllForUser()),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
-      next: () => {
+      next: (deps) => {
+        this.applyDepsForTask(deps, this.task.id);
         this.adding = false;
         this.selectedOtherTaskId = null;
         this.searchText = '';
-        this.dependenciesChanged.emit();
         this.saveStateChanged.emit('saved');
       },
       error: () => {
@@ -166,11 +160,11 @@ export class TaskDependenciesComponent implements OnChanges {
     this.loadError = null;
     this.saveStateChanged.emit('saving');
     this.depService.remove(this.task.id, blockerId).pipe(
-      switchMap(() => this.depService.loadAllForUser(true)),
+      switchMap(() => this.depService.getAllForUser()),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
-      next: () => {
-        this.dependenciesChanged.emit();
+      next: (deps) => {
+        this.applyDepsForTask(deps, this.task.id);
         this.saveStateChanged.emit('saved');
       },
       error: () => {
@@ -184,11 +178,11 @@ export class TaskDependenciesComponent implements OnChanges {
     this.loadError = null;
     this.saveStateChanged.emit('saving');
     this.depService.remove(dependentTaskId, this.task.id).pipe(
-      switchMap(() => this.depService.loadAllForUser(true)),
+      switchMap(() => this.depService.getAllForUser()),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
-      next: () => {
-        this.dependenciesChanged.emit();
+      next: (deps) => {
+        this.applyDepsForTask(deps, this.task.id);
         this.saveStateChanged.emit('saved');
       },
       error: () => {
@@ -196,5 +190,10 @@ export class TaskDependenciesComponent implements OnChanges {
         this.saveStateChanged.emit('error');
       }
     });
+  }
+
+  private applyDepsForTask(deps: TaskDependency[], taskId: number): void {
+    this.blockedByDeps = deps.filter((d) => d.taskId === taskId);
+    this.blocksDeps = deps.filter((d) => d.blockedBy === taskId);
   }
 }

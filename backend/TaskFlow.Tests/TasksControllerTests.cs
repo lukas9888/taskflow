@@ -53,7 +53,8 @@ public class TasksControllerTests
 
         // Assert
         var createdAt = Assert.IsType<CreatedAtActionResult>(result.Result);
-        Assert.Equal(nameof(TasksController.GetAll), createdAt.ActionName);
+        Assert.Equal(nameof(TasksController.GetById), createdAt.ActionName);
+        Assert.Equal(created.Id, createdAt.RouteValues?["id"]);
         Assert.Equal(created, createdAt.Value);
     }
 

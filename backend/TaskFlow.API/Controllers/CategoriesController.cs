@@ -1,15 +1,14 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Model.Repositories;
+using TaskFlow.API.Helpers;
 
 namespace TaskFlow.API.Controllers;
 
 [ApiController]
 [Route("api/categories")]
 [Authorize]
-public class CategoriesController : ControllerBase
+public class CategoriesController : AuthorizedControllerBase
 {
     private readonly CategoryRepository _categories;
 
@@ -32,30 +31,12 @@ public class CategoriesController : ControllerBase
             return ValidationProblem(ModelState);
 
         var userId = GetUserId();
-        var name = NormalizeCategory(body.Name);
+        var name = TaskFlowNormalization.NormalizeCategory(body.Name);
         if (name is null)
             return BadRequest("Category name cannot be empty.");
 
         var created = _categories.UpsertName(userId, name);
         return Ok(created);
-    }
-
-    private int GetUserId()
-    {
-        var raw =
-            User.FindFirstValue(ClaimTypes.NameIdentifier)
-            ?? User.FindFirstValue(JwtRegisteredClaimNames.Sub);
-        if (string.IsNullOrWhiteSpace(raw) || !int.TryParse(raw, out var userId))
-            throw new InvalidOperationException("Missing or invalid user id claim.");
-        return userId;
-    }
-
-    private static string? NormalizeCategory(string? c)
-    {
-        if (string.IsNullOrWhiteSpace(c))
-            return null;
-        var t = c.Trim().ToUpperInvariant();
-        return t.Length > 64 ? t[..64] : t;
     }
 }
 
