@@ -16,6 +16,6 @@ export const appConfig: ApplicationConfig = {
     { provide: MAT_DATE_LOCALE, useValue: enUS },
     provideDateFnsAdapter(),
     provideHttpClient(withInterceptors([authInterceptor, authErrorInterceptor])),
-    provideRouter(routes)
-  ]
+    provideRouter(routes),
+  ],
 };

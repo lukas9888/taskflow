@@ -19,10 +19,10 @@ import { DependencyService } from '../services/dependency.service';
     TaskListComponent,
     TaskDetailPaneComponent,
     MatCardModule,
-    MatSidenavModule
+    MatSidenavModule,
   ],
   templateUrl: './tasks-page.component.html',
-  styleUrl: './tasks-page.component.css'
+  styleUrl: './tasks-page.component.css',
 })
 export class TasksPageComponent implements OnInit {
   blockedTaskIds = new Set<number>();
@@ -33,7 +33,7 @@ export class TasksPageComponent implements OnInit {
 
   readonly isNarrow = toSignal(
     this.breakpoint.observe('(max-width: 900px)').pipe(map((r) => r.matches)),
-    { initialValue: false }
+    { initialValue: false },
   );
 
   readonly toolbarTopGapPx = 64;
@@ -67,8 +67,7 @@ export class TasksPageComponent implements OnInit {
   }
 
   onOpenNewTaskDetail(prefillTitle: string): void {
-    const title =
-      prefillTitle.trim().length >= 2 ? prefillTitle.trim() : 'New Task';
+    const title = prefillTitle.trim().length >= 2 ? prefillTitle.trim() : 'New Task';
 
     this.taskService.createTask(title, null).subscribe({
       next: (created) => {
@@ -78,7 +77,7 @@ export class TasksPageComponent implements OnInit {
       },
       error: () => {
         this.loadError = 'Could not create task.';
-      }
+      },
     });
   }
 
@@ -92,34 +91,28 @@ export class TasksPageComponent implements OnInit {
     this.loadError = null;
     forkJoin({
       tasks: this.taskService.getTasks(),
-      dependencies: this.deps.getAllForUser()
+      dependencies: this.deps.getAllForUser(),
     }).subscribe({
       next: ({ tasks, dependencies }) => {
         this.tasks = tasks;
-        if (
-          this.selectedTaskId != null &&
-          !tasks.some((t) => t.id === this.selectedTaskId)
-        ) {
+        if (this.selectedTaskId != null && !tasks.some((t) => t.id === this.selectedTaskId)) {
           this.selectedTaskId = null;
         }
 
         this.applyDependencyState(tasks, dependencies);
       },
       error: () =>
-        (this.loadError =
-          'Could not load tasks. Are you logged in, and is the API running?')
+        (this.loadError = 'Could not load tasks. Are you logged in, and is the API running?'),
     });
   }
 
   refreshDependencies(): void {
-    this.deps
-      .getAllForUser()
-      .subscribe((deps) => this.applyDependencyState(this.tasks, deps));
+    this.deps.getAllForUser().subscribe((deps) => this.applyDependencyState(this.tasks, deps));
   }
 
   private applyDependencyState(
     tasks: TaskItem[],
-    deps: { taskId: number; blockedBy: number }[]
+    deps: { taskId: number; blockedBy: number }[],
   ): void {
     if (tasks.length === 0) {
       this.blockedTaskIds = new Set<number>();

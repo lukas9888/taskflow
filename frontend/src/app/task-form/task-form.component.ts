@@ -10,9 +10,9 @@ import { TaskItem } from '../models/task-item';
 
 @Component({
   selector: 'app-task-form',
-  imports: [FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule,],
+  imports: [FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule],
   templateUrl: './task-form.component.html',
-  styleUrl: './task-form.component.css'
+  styleUrl: './task-form.component.css',
 })
 export class TaskFormComponent {
   private readonly taskService = inject(TaskService);
@@ -37,7 +37,14 @@ export class TaskFormComponent {
     this.submitting = true;
     this.submitError = null;
     const today = new Date();
-    const todayIso = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 45, 0).toISOString();
+    const todayIso = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      23,
+      45,
+      0,
+    ).toISOString();
     this.taskService.createTask(trimmed, todayIso).subscribe({
       next: (created) => {
         this.title = '';
@@ -49,7 +56,7 @@ export class TaskFormComponent {
       error: () => {
         this.submitting = false;
         this.submitError = 'Could not save task. Check API and database.';
-      }
+      },
     });
   }
 

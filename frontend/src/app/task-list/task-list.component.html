@@ -38,10 +38,7 @@
         <mat-select [(ngModel)]="selectedPriorities" multiple>
           @for (priority of priorityOptions; track priority) {
             <mat-option [value]="priority">
-              <mat-icon
-                class="priority-filter-icon"
-                [style.color]="priorityColor(priority)"
-              >
+              <mat-icon class="priority-filter-icon" [style.color]="priorityColor(priority)">
                 {{ priorityIcon(priority) }}
               </mat-icon>
               <span>{{ priority[0].toUpperCase() + priority.slice(1) }}</span>
@@ -67,9 +64,7 @@
         </mat-select>
       </mat-form-field>
 
-      <button type="button" mat-button (click)="clearTaskFilters()">
-        Clear filters
-      </button>
+      <button type="button" mat-button (click)="clearTaskFilters()">Clear filters</button>
     </div>
   }
 
@@ -87,11 +82,7 @@
       </ng-container>
 
       <ng-container matColumnDef="title">
-        <td
-          mat-cell
-          *matCellDef="let task"
-          [class.task-title-done]="task.done"
-        >
+        <td mat-cell *matCellDef="let task" [class.task-title-done]="task.done">
           {{ task.title }}
         </td>
       </ng-container>

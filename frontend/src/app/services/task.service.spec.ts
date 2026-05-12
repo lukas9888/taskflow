@@ -1,8 +1,5 @@
 import { provideHttpClient } from '@angular/common/http';
-import {
-  provideHttpClientTesting,
-  HttpTestingController,
-} from '@angular/common/http/testing';
+import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
 import { TaskService } from './task.service';
@@ -50,4 +47,3 @@ describe('TaskService', () => {
     expect(actual).toEqual(expected);
   });
 });
-

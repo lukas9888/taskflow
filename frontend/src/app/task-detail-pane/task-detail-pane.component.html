@@ -2,28 +2,22 @@
   <span class="detail-toolbar-title">Task Details</span>
 
   <div class="autosave-status" aria-live="polite">
-      @if (saveState === 'saving') {
-        <mat-icon inline aria-hidden="true">sync</mat-icon>
-        <span>Saving…</span>
-      } @else if (saveState === 'saved') {
-        <mat-icon inline aria-hidden="true">check_circle</mat-icon>
-        <span>Saved</span>
-      } @else if (saveState === 'error') {
-        <mat-icon inline aria-hidden="true">error</mat-icon>
-        <span>Could not save</span>
-      }
+    @if (saveState === 'saving') {
+      <mat-icon inline aria-hidden="true">sync</mat-icon>
+      <span>Saving…</span>
+    } @else if (saveState === 'saved') {
+      <mat-icon inline aria-hidden="true">check_circle</mat-icon>
+      <span>Saved</span>
+    } @else if (saveState === 'error') {
+      <mat-icon inline aria-hidden="true">error</mat-icon>
+      <span>Could not save</span>
+    }
   </div>
 
   <span class="detail-toolbar-spacer"></span>
-  <button
-    mat-icon-button
-    type="button"
-    (click)="requestClose()"
-    aria-label="Close task details"
-  >
+  <button mat-icon-button type="button" (click)="requestClose()" aria-label="Close task details">
     <mat-icon>close</mat-icon>
   </button>
-
 </mat-toolbar>
 
 <section class="detail-body">
@@ -92,7 +86,11 @@
       <div class="detail-priority-category-row">
         <mat-form-field appearance="outline" class="detail-pc-field" subscriptSizing="dynamic">
           <mat-label>Priority</mat-label>
-          <mat-select name="detailPriority" [(ngModel)]="priority" (ngModelChange)="onFieldChanged()">
+          <mat-select
+            name="detailPriority"
+            [(ngModel)]="priority"
+            (ngModelChange)="onFieldChanged()"
+          >
             <mat-select-trigger>
               <span class="detail-prio-option">
                 <mat-icon
@@ -100,7 +98,8 @@
                   inline
                   [style.color]="priorityColor(priority)"
                   aria-hidden="true"
-                >{{ priorityIcon(priority) }}</mat-icon>
+                  >{{ priorityIcon(priority) }}</mat-icon
+                >
                 {{ priorityLabel(priority) }}
               </span>
             </mat-select-trigger>
@@ -112,7 +111,8 @@
                     inline
                     [style.color]="priorityColor(p)"
                     aria-hidden="true"
-                  >{{ priorityIcon(p) }}</mat-icon>
+                    >{{ priorityIcon(p) }}</mat-icon
+                  >
                   {{ priorityLabel(p) }}
                 </span>
               </mat-option>
@@ -152,9 +152,7 @@
               <mat-option [value]="c">{{ c }}</mat-option>
             }
             @if (canCreateCategory) {
-              <mat-option
-                [value]="'__create__:' + normalizeCategoryOrEmpty(categoryInput)"
-              >
+              <mat-option [value]="'__create__:' + normalizeCategoryOrEmpty(categoryInput)">
                 {{ createCategoryLabel }}
               </mat-option>
             }

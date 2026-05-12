@@ -1,7 +1,4 @@
-import {
-  HttpErrorResponse,
-  HttpInterceptorFn,
-} from '@angular/common/http';
+import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
@@ -18,6 +15,6 @@ export const authErrorInterceptor: HttpInterceptorFn = (req, next) => {
         void router.navigateByUrl('/login');
       }
       return throwError(() => err);
-    })
+    }),
   );
 };

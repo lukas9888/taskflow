@@ -32,7 +32,7 @@ export class AuthService {
   register(username: string, password: string) {
     return this.http.post<RegisterResponse>(`${this.baseUrl}/register`, {
       username,
-      password
+      password,
     });
   }
 
@@ -40,4 +40,3 @@ export class AuthService {
     localStorage.removeItem(this.tokenKey);
   }
 }
-

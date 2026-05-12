@@ -54,14 +54,7 @@ export class TaskListComponent {
   @Output() readonly selectedTaskIdChange = new EventEmitter<number | null>();
   @Output() readonly taskUpdated = new EventEmitter<void>();
 
-  readonly displayedColumns = [
-    'completed',
-    'title',
-    'dependency',
-    'priority',
-    'category',
-    'dueAt',
-  ];
+  readonly displayedColumns = ['completed', 'title', 'dependency', 'priority', 'category', 'dueAt'];
 
   listFilter: TaskListFilter = 'today';
   showFilters = false;
@@ -140,7 +133,7 @@ export class TaskListComponent {
       .subscribe({
         next: (updated) => {
           this.tasks = this.tasks.map((existing) =>
-            existing.id === updated.id ? updated : existing
+            existing.id === updated.id ? updated : existing,
           );
           this.taskUpdated.emit();
         },
@@ -157,12 +150,10 @@ export class TaskListComponent {
       const priority = taskPriorityFromModel(task);
 
       const matchesCategory =
-        this.selectedCategories.length === 0 ||
-        this.selectedCategories.includes(category);
+        this.selectedCategories.length === 0 || this.selectedCategories.includes(category);
 
       const matchesPriority =
-        this.selectedPriorities.length === 0 ||
-        this.selectedPriorities.includes(priority);
+        this.selectedPriorities.length === 0 || this.selectedPriorities.includes(priority);
 
       const matchesDependency =
         this.dependencyFilter === 'all' ||
@@ -195,10 +186,7 @@ export class TaskListComponent {
           }
 
           const day = this.due.startOfLocalDay(new Date(task.dueAt));
-          return (
-            day.getTime() >= today.getTime() &&
-            day.getTime() <= weekEnd.getTime()
-          );
+          return day.getTime() >= today.getTime() && day.getTime() <= weekEnd.getTime();
         });
 
       default:

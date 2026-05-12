@@ -55,9 +55,7 @@ describe('TaskFormComponent', () => {
 
   it('shows an error when createTask fails', () => {
     const taskService = createTaskServiceMock();
-    taskService.createTask.and.returnValue(
-      throwError(() => new Error('API down'))
-    );
+    taskService.createTask.and.returnValue(throwError(() => new Error('API down')));
 
     TestBed.configureTestingModule({
       imports: [TaskFormComponent],
@@ -76,9 +74,6 @@ describe('TaskFormComponent', () => {
     fixture.detectChanges();
 
     expect(component.submitting).toBeFalse();
-    expect(component.submitError).toBe(
-      'Could not save task. Check API and database.'
-    );
+    expect(component.submitError).toBe('Could not save task. Check API and database.');
   });
 });
-

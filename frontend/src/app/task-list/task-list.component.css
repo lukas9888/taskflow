@@ -94,19 +94,11 @@
 }
 
 .task-table-row:hover .mat-mdc-cell {
-  background-color: color-mix(
-    in srgb,
-    var(--mat-sys-primary) 6%,
-    transparent
-  );
+  background-color: color-mix(in srgb, var(--mat-sys-primary) 6%, transparent);
 }
 
 .overdue-section-card .task-table-row:hover .mat-mdc-cell {
-  background-color: color-mix(
-    in srgb,
-    var(--mat-sys-error) 12%,
-    transparent
-  );
+  background-color: color-mix(in srgb, var(--mat-sys-error) 12%, transparent);
 }
 
 .completed-cell {

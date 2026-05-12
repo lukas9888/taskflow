@@ -15,10 +15,10 @@ import { AuthService } from '../services/auth.service';
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule
+    MatButtonModule,
   ],
   templateUrl: './register.component.html',
-  styleUrl: './auth.css'
+  styleUrl: './auth.css',
 })
 export class RegisterComponent {
   private readonly auth = inject(AuthService);
@@ -31,35 +31,33 @@ export class RegisterComponent {
   usernameServerError: string | null = null;
 
   submit(): void {
-  const username = this.username.trim();
+    const username = this.username.trim();
 
-  this.serverError = null;
-  this.usernameServerError = null;
+    this.serverError = null;
+    this.usernameServerError = null;
 
-  if (!username || !this.password) return;
+    if (!username || !this.password) return;
 
-  this.submitting = true;
+    this.submitting = true;
 
-  this.auth.register(username, this.password).subscribe({
-    next: () => {
-      this.submitting = false;
-      this.router.navigateByUrl('/login');
-    },
-    error: (err) => {
-      this.submitting = false;
+    this.auth.register(username, this.password).subscribe({
+      next: () => {
+        this.submitting = false;
+        this.router.navigateByUrl('/login');
+      },
+      error: (err) => {
+        this.submitting = false;
 
-      if (err?.status === 409) {
-        this.usernameServerError = 'Username already exists.';
-      } else {
-        this.serverError = 'Could not register. Please try again.';
-      }
-    }
+        if (err?.status === 409) {
+          this.usernameServerError = 'Username already exists.';
+        } else {
+          this.serverError = 'Could not register. Please try again.';
+        }
+      },
     });
   }
 
   clearUsernameServerError(): void {
     this.usernameServerError = null;
   }
-  
 }
-

@@ -35,7 +35,11 @@
 
   <mat-sidenav-content>
     <div class="tasks-page-content">
-      <app-task-form (created)="onQuickCreated($event)" (openDetail)="onOpenNewTaskDetail($event)" (focused)="onDetailClosed()" />
+      <app-task-form
+        (created)="onQuickCreated($event)"
+        (openDetail)="onOpenNewTaskDetail($event)"
+        (focused)="onDetailClosed()"
+      />
 
       <app-task-list
         [tasks]="tasks"

@@ -9,4 +9,3 @@ export const authGuard: CanActivateFn = () => {
   const router = inject(Router);
   return router.parseUrl('/login');
 };
-

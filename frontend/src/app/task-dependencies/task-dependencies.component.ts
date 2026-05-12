@@ -1,4 +1,13 @@
-import { Component, DestroyRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+  inject,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -33,7 +42,7 @@ export type DependencyViewTab = 'all' | 'blockedBy' | 'blocks';
     MatTooltipModule,
   ],
   templateUrl: './task-dependencies.component.html',
-  styleUrl: './task-dependencies.component.css'
+  styleUrl: './task-dependencies.component.css',
 })
 export class TaskDependenciesComponent implements OnChanges {
   private readonly depService = inject(DependencyService);
@@ -57,18 +66,20 @@ export class TaskDependenciesComponent implements OnChanges {
   private readonly loadTrigger$ = new Subject<number>();
 
   constructor() {
-    this.loadTrigger$.pipe(
-      switchMap((taskId) =>
-        this.depService.getAllForUser().pipe(
-          catchError(() => {
-            this.loadError = 'Could not load dependencies.';
-            return of([] as TaskDependency[]);
-          }),
-          tap((deps) => this.applyDepsForTask(deps, taskId))
-        )
-      ),
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe();
+    this.loadTrigger$
+      .pipe(
+        switchMap((taskId) =>
+          this.depService.getAllForUser().pipe(
+            catchError(() => {
+              this.loadError = 'Could not load dependencies.';
+              return of([] as TaskDependency[]);
+            }),
+            tap((deps) => this.applyDepsForTask(deps, taskId)),
+          ),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe();
   }
 
   get canAddDependency(): boolean {
@@ -133,59 +144,67 @@ export class TaskDependenciesComponent implements OnChanges {
         ? this.depService.add(this.task.id, this.selectedOtherTaskId)
         : this.depService.add(this.selectedOtherTaskId, this.task.id);
 
-    req$.pipe(
-      switchMap(() => this.depService.getAllForUser()),
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe({
-      next: (deps) => {
-        this.applyDepsForTask(deps, this.task.id);
-        this.adding = false;
-        this.selectedOtherTaskId = null;
-        this.searchText = '';
-        this.saveStateChanged.emit('saved');
-      },
-      error: () => {
-        this.adding = false;
-        this.addError = 'Could not add dependency.';
-        this.saveStateChanged.emit('error');
-      }
-    });
+    req$
+      .pipe(
+        switchMap(() => this.depService.getAllForUser()),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (deps) => {
+          this.applyDepsForTask(deps, this.task.id);
+          this.adding = false;
+          this.selectedOtherTaskId = null;
+          this.searchText = '';
+          this.saveStateChanged.emit('saved');
+        },
+        error: () => {
+          this.adding = false;
+          this.addError = 'Could not add dependency.';
+          this.saveStateChanged.emit('error');
+        },
+      });
   }
 
   removeBlockedBy(blockerId: number): void {
     this.loadError = null;
     this.saveStateChanged.emit('saving');
-    this.depService.remove(this.task.id, blockerId).pipe(
-      switchMap(() => this.depService.getAllForUser()),
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe({
-      next: (deps) => {
-        this.applyDepsForTask(deps, this.task.id);
-        this.saveStateChanged.emit('saved');
-      },
-      error: () => {
-        this.loadError = 'Could not remove dependency.';
-        this.saveStateChanged.emit('error');
-      }
-    });
+    this.depService
+      .remove(this.task.id, blockerId)
+      .pipe(
+        switchMap(() => this.depService.getAllForUser()),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (deps) => {
+          this.applyDepsForTask(deps, this.task.id);
+          this.saveStateChanged.emit('saved');
+        },
+        error: () => {
+          this.loadError = 'Could not remove dependency.';
+          this.saveStateChanged.emit('error');
+        },
+      });
   }
 
   removeBlocks(dependentTaskId: number): void {
     this.loadError = null;
     this.saveStateChanged.emit('saving');
-    this.depService.remove(dependentTaskId, this.task.id).pipe(
-      switchMap(() => this.depService.getAllForUser()),
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe({
-      next: (deps) => {
-        this.applyDepsForTask(deps, this.task.id);
-        this.saveStateChanged.emit('saved');
-      },
-      error: () => {
-        this.loadError = 'Could not remove dependency.';
-        this.saveStateChanged.emit('error');
-      }
-    });
+    this.depService
+      .remove(dependentTaskId, this.task.id)
+      .pipe(
+        switchMap(() => this.depService.getAllForUser()),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (deps) => {
+          this.applyDepsForTask(deps, this.task.id);
+          this.saveStateChanged.emit('saved');
+        },
+        error: () => {
+          this.loadError = 'Could not remove dependency.';
+          this.saveStateChanged.emit('error');
+        },
+      });
   }
 
   private applyDepsForTask(deps: TaskDependency[], taskId: number): void {

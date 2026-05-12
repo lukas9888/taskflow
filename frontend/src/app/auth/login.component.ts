@@ -15,10 +15,10 @@ import { AuthService } from '../services/auth.service';
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule
+    MatButtonModule,
   ],
   templateUrl: './login.component.html',
-  styleUrl: './auth.css'
+  styleUrl: './auth.css',
 })
 export class LoginComponent {
   private readonly auth = inject(AuthService);
@@ -43,8 +43,7 @@ export class LoginComponent {
       error: () => {
         this.submitting = false;
         this.error = 'Invalid login or password.';
-      }
+      },
     });
   }
 }
-

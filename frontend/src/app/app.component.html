@@ -1,9 +1,5 @@
 <mat-toolbar color="primary" class="app-toolbar">
-  <img
-    class="app-toolbar-logo"
-    src="logo-taskflow.png"
-    alt="TaskFlow"
-  />
+  <img class="app-toolbar-logo" src="logo-taskflow.png" alt="TaskFlow" />
   <span class="spacer"></span>
   @if (auth.isLoggedIn()) {
     <button mat-stroked-button type="button" class="app-logout-btn" (click)="logout()">

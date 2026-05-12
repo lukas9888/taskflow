@@ -14,49 +14,53 @@ html {
   color-scheme: light;
   background-color: var(--app-canvas-background);
 
-  @include mat.theme((
-    color: (
-      theme-type: light,
-      primary: mat.$violet-palette,
-      tertiary: mat.$orange-palette,
-    ),
-    typography: (
-      plain-family: 'Inter, sans-serif',
-      brand-family: 'Inter, sans-serif',
-      bold-weight: 700,
-      medium-weight: 500,
-      regular-weight: 400,
-    ),
-    density: 0,
-  ));
+  @include mat.theme(
+    (
+      color: (
+        theme-type: light,
+        primary: mat.$violet-palette,
+        tertiary: mat.$orange-palette,
+      ),
+      typography: (
+        plain-family: 'Inter, sans-serif',
+        brand-family: 'Inter, sans-serif',
+        bold-weight: 700,
+        medium-weight: 500,
+        regular-weight: 400,
+      ),
+      density: 0,
+    )
+  );
 
-  @include mat.theme-overrides((
-    primary: #3525cd,
-    on-primary: #ffffff,
-    tertiary: #7e3000,
-    background: #f8f9fb,
-    surface: #ffffff,
-    surface-bright: #ffffff,
-    surface-variant: #ffffff,
-    surface-tint: #ffffff,
-    surface-container-lowest: #ffffff,
-    surface-container-low: #f8f9fb,
-    surface-container: #f3f4f6,
-    surface-container-high: #eff0f3,
-    surface-container-highest: #e7e9ee,
-    corner-none: 0,
-    corner-extra-small: 6px,
-    corner-extra-small-top: 6px 6px 0 0,
-    corner-small: 4px,
-    corner-medium: 8px,
-    corner-large: 12px,
-    corner-large-top: 12px 12px 0 0,
-    corner-large-end: 0 12px 12px 0,
-    corner-large-start: 12px 0 0 12px,
-    corner-extra-large: 12px,
-    corner-extra-large-top: 12px 12px 0 0,
-    corner-full: 6px,
-  ));
+  @include mat.theme-overrides(
+    (
+      primary: #3525cd,
+      on-primary: #ffffff,
+      tertiary: #7e3000,
+      background: #f8f9fb,
+      surface: #ffffff,
+      surface-bright: #ffffff,
+      surface-variant: #ffffff,
+      surface-tint: #ffffff,
+      surface-container-lowest: #ffffff,
+      surface-container-low: #f8f9fb,
+      surface-container: #f3f4f6,
+      surface-container-high: #eff0f3,
+      surface-container-highest: #e7e9ee,
+      corner-none: 0,
+      corner-extra-small: 6px,
+      corner-extra-small-top: 6px 6px 0 0,
+      corner-small: 4px,
+      corner-medium: 8px,
+      corner-large: 12px,
+      corner-large-top: 12px 12px 0 0,
+      corner-large-end: 0 12px 12px 0,
+      corner-large-start: 12px 0 0 12px,
+      corner-extra-large: 12px,
+      corner-extra-large-top: 12px 12px 0 0,
+      corner-full: 6px,
+    )
+  );
 }
 
 html,

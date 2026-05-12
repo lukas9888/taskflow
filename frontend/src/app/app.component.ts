@@ -8,7 +8,7 @@ import { AuthService } from './services/auth.service';
   selector: 'app-root',
   imports: [RouterOutlet, MatToolbarModule, MatButtonModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrl: './app.component.css',
 })
 export class AppComponent {
   readonly auth = inject(AuthService);

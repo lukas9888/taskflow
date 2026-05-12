@@ -20,4 +20,3 @@ export class CategoryService {
     return this.http.post<string>(this.baseUrl, { name } satisfies CreateCategoryBody);
   }
 }
-

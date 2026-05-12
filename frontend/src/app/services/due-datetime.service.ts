@@ -36,7 +36,7 @@ export class DueDatetimeService {
       timePart.getHours(),
       timePart.getMinutes(),
       timePart.getSeconds(),
-      0
+      0,
     );
   }
 

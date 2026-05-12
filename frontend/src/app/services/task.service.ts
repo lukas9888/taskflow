@@ -14,7 +14,7 @@ export interface UpdateTaskBody {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TaskService {
   private readonly http = inject(HttpClient);

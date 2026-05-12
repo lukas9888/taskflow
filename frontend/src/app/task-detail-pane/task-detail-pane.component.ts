@@ -8,7 +8,7 @@ import {
   ViewChild,
   ElementRef,
   inject,
-  DestroyRef
+  DestroyRef,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -30,7 +30,7 @@ import {
   TASK_PRIORITY_OPTIONS,
   priorityIconCssColor,
   priorityIconGlyph,
-  taskPriorityFromModel
+  taskPriorityFromModel,
 } from '../task-ux';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EMPTY, Subject } from 'rxjs';
@@ -53,7 +53,7 @@ import { catchError, debounceTime, switchMap } from 'rxjs/operators';
     TaskDependenciesComponent,
   ],
   templateUrl: './task-detail-pane.component.html',
-  styleUrl: './task-detail-pane.component.css'
+  styleUrl: './task-detail-pane.component.css',
 })
 export class TaskDetailPaneComponent implements OnChanges {
   private readonly tasksApi = inject(TaskService);
@@ -71,10 +71,10 @@ export class TaskDetailPaneComponent implements OnChanges {
             catchError(() => {
               this.saveState = 'error';
               return EMPTY;
-            })
-          )
+            }),
+          ),
         ),
-        takeUntilDestroyed(this.destroyRef)
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe(() => {
         this.saveState = 'saved';
@@ -202,7 +202,7 @@ export class TaskDetailPaneComponent implements OnChanges {
           this.allCategories = [...this.allCategories, n].sort((a, b) => a.localeCompare(b));
         }
       },
-      error: () => undefined
+      error: () => undefined,
     });
   }
 
@@ -286,7 +286,7 @@ export class TaskDetailPaneComponent implements OnChanges {
       priority: this.priority,
       category: this.toApiCategoryOrNull(this.category),
       description: desc.length > 0 ? desc : null,
-      done: this.task.done
+      done: this.task.done,
     });
   }
 
@@ -304,7 +304,7 @@ export class TaskDetailPaneComponent implements OnChanges {
       error: () => {
         this.deleting = false;
         this.deleteError = 'Could not delete task. Please try again.';
-      }
+      },
     });
   }
 
@@ -339,7 +339,7 @@ export class TaskDetailPaneComponent implements OnChanges {
       },
       error: () => {
         this.allCategories = [];
-      }
+      },
     });
   }
 
@@ -353,5 +353,4 @@ export class TaskDetailPaneComponent implements OnChanges {
     const t = this.normalizeCategoryOrEmpty(c);
     return t.length > 0 ? t : null;
   }
-
 }
