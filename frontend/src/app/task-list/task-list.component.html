@@ -74,7 +74,7 @@
   }
 
   <ng-template #taskTable let-tableTasks="tasks">
-    <table mat-table [dataSource]="tableTasks" class="task-table">
+    <table mat-table [dataSource]="tableTasks" [trackBy]="trackTaskById" class="task-table">
       <ng-container matColumnDef="completed">
         <td mat-cell *matCellDef="let task" class="completed-cell">
           <mat-checkbox

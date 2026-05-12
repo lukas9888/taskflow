@@ -20,7 +20,6 @@ export type DependencyViewTab = 'all' | 'blockedBy' | 'blocks';
 
 @Component({
   selector: 'app-task-dependencies',
-  standalone: true,
   imports: [
     FormsModule,
     MatButtonModule,
