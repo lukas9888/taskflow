@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 type RegisterResponse = { id: number; username: string };
 
@@ -9,7 +10,7 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly tokenKey = 'taskflow.accessToken';
 
-  readonly baseUrl = 'http://localhost:5046/api/auth';
+  readonly baseUrl = `${environment.apiBaseUrl}/auth`;
 
   getAccessToken(): string | null {
     return localStorage.getItem(this.tokenKey);
