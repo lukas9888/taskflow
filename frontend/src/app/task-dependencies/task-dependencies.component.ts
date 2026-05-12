@@ -163,6 +163,7 @@ export class TaskDependenciesComponent implements OnChanges {
   }
 
   removeBlockedBy(blockerId: number): void {
+    this.loadError = null;
     this.saveStateChanged.emit('saving');
     this.depService.remove(this.task.id, blockerId).pipe(
       switchMap(() => this.depService.loadAllForUser(true)),
@@ -180,6 +181,7 @@ export class TaskDependenciesComponent implements OnChanges {
   }
 
   removeBlocks(dependentTaskId: number): void {
+    this.loadError = null;
     this.saveStateChanged.emit('saving');
     this.depService.remove(dependentTaskId, this.task.id).pipe(
       switchMap(() => this.depService.loadAllForUser(true)),
