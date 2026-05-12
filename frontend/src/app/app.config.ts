@@ -7,6 +7,7 @@ import { provideDateFnsAdapter } from '@angular/material-date-fns-adapter';
 import { enUS } from 'date-fns/locale';
 import { routes } from './app.routes';
 import { authInterceptor } from './interceptors/auth.interceptor';
+import { authErrorInterceptor } from './interceptors/auth-error.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -15,7 +16,7 @@ export const appConfig: ApplicationConfig = {
     // DateFnsAdapter requires a date-fns Locale object, not LOCALE_ID string (breaks calendar + time list)
     { provide: MAT_DATE_LOCALE, useValue: enUS },
     provideDateFnsAdapter(),
-    provideHttpClient(withInterceptors([authInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, authErrorInterceptor])),
     provideRouter(routes)
   ]
 };
