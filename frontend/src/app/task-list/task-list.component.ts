@@ -25,7 +25,6 @@ export type DependencyFilter = 'all' | 'blocked' | 'blocking';
 
 @Component({
   selector: 'app-task-list',
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
@@ -44,6 +43,8 @@ export type DependencyFilter = 'all' | 'blocked' | 'blocking';
 export class TaskListComponent {
   private readonly due = inject(DueDatetimeService);
   private readonly taskService = inject(TaskService);
+
+  trackTaskById = (_: number, task: TaskItem) => task.id;
 
   @Input() tasks: TaskItem[] = [];
   @Input() selectedTaskId: number | null = null;
