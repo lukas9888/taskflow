@@ -45,6 +45,27 @@ public class TaskRepository : BaseRepository
         return list;
     }
 
+    public virtual TaskItem? GetById(int userId, int id)
+    {
+        using var conn = new NpgsqlConnection(ConnectionString);
+
+        using var cmd = new NpgsqlCommand(
+            @"SELECT t.id, t.title, t.created_at, t.due_at, t.priority::text, uc.name AS category, t.description, t.done
+              FROM tasks t
+              LEFT JOIN user_categories uc ON uc.id = t.user_category_id
+              WHERE t.user_id = @user_id AND t.id = @id",
+            conn);
+        cmd.Parameters.AddWithValue("user_id", userId);
+        cmd.Parameters.AddWithValue("id", id);
+        conn.Open();
+        SetUserId(conn, userId);
+        using var reader = cmd.ExecuteReader();
+        if (!reader.Read())
+            return null;
+
+        return ReadTaskRow(reader);
+    }
+
     public virtual TaskItem Create(
         int userId,
         string title,

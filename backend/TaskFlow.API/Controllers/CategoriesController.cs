@@ -1,5 +1,3 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Model.Repositories;
@@ -9,7 +7,7 @@ namespace TaskFlow.API.Controllers;
 [ApiController]
 [Route("api/categories")]
 [Authorize]
-public class CategoriesController : ControllerBase
+public class CategoriesController : AuthorizedControllerBase
 {
     private readonly CategoryRepository _categories;
 
@@ -38,16 +36,6 @@ public class CategoriesController : ControllerBase
 
         var created = _categories.UpsertName(userId, name);
         return Ok(created);
-    }
-
-    private int GetUserId()
-    {
-        var raw =
-            User.FindFirstValue(ClaimTypes.NameIdentifier)
-            ?? User.FindFirstValue(JwtRegisteredClaimNames.Sub);
-        if (string.IsNullOrWhiteSpace(raw) || !int.TryParse(raw, out var userId))
-            throw new InvalidOperationException("Missing or invalid user id claim.");
-        return userId;
     }
 
     private static string? NormalizeCategory(string? c)
