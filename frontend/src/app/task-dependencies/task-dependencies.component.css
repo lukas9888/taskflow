@@ -92,3 +92,15 @@
   flex: 1 1 200px;
   min-width: 0;
 }
+
+.deps-task-icon,
+mat-icon.deps-task-icon {
+  color: #f5c000 !important;
+  font-size: 18px;
+}
+
+.deps-icon-blocked,
+mat-icon.deps-icon-blocked {
+  color: var(--mat-sys-error) !important;
+  font-size: 18px;
+}

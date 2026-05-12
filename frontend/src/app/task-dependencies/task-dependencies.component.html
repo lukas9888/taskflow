@@ -62,7 +62,7 @@
         <mat-list dense>
           @for (dep of blocksDeps; track dep.taskId) {
             <mat-list-item>
-              <mat-icon matListItemIcon class="deps-icon-blocking">warning</mat-icon>
+              <mat-icon matListItemIcon class="deps-task-icon">warning</mat-icon>
               <span matListItemTitle>{{ dependentTitle(dep.taskId) }}</span>
               <button mat-icon-button matListItemMeta
                       (click)="removeBlocks(dep.taskId)"
