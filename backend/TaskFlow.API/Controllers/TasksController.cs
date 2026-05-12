@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Model.Entities;
 using TaskFlow.Model.Repositories;
+using TaskFlow.API.Helpers;
 
 namespace TaskFlow.API.Controllers;
 
@@ -50,7 +51,7 @@ public class TasksController : AuthorizedControllerBase
             trimmed,
             body.DueAt,
             NormalizePriority(body.Priority),
-            NormalizeCategory(body.Category),
+            TaskFlowNormalization.NormalizeCategory(body.Category),
             NormalizeDescription(body.Description));
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
@@ -73,7 +74,7 @@ public class TasksController : AuthorizedControllerBase
             trimmed,
             body.DueAt,
             NormalizePriority(body.Priority),
-            NormalizeCategory(body.Category),
+            TaskFlowNormalization.NormalizeCategory(body.Category),
             NormalizeDescription(body.Description),
             body.Done);
         return updated is null ? NotFound() : Ok(updated);
@@ -94,14 +95,6 @@ public class TasksController : AuthorizedControllerBase
             "low" => "low",
             _ => "medium"
         };
-
-    private static string? NormalizeCategory(string? c)
-    {
-        if (string.IsNullOrWhiteSpace(c))
-            return null;
-        var t = c.Trim().ToUpperInvariant();
-        return t.Length > 64 ? t[..64] : t;
-    }
 
     private static string? NormalizeDescription(string? d)
     {
