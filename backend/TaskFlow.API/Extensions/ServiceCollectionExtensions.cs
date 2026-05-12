@@ -26,7 +26,6 @@ public static class ServiceCollectionExtensions
                 BearerFormat = "JWT"
             });
 
-            // Updated syntax: strictly requires a List<string> for the scopes
             options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
             {
                 {

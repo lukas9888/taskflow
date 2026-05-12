@@ -9,7 +9,7 @@
         <p class="form-error" role="alert">{{ error }}</p>
       }
 
-      <form (ngSubmit)="submit()" class="form-stack auth-form">
+      <form #loginForm="ngForm" (ngSubmit)="submit()" class="form-stack auth-form">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Username</mat-label>
           <input
@@ -41,7 +41,7 @@
           color="primary"
           type="submit"
           class="full-width"
-          [disabled]="submitting"
+          [disabled]="submitting || loginForm.invalid"
         >
           {{ submitting ? 'Signing in…' : 'Sign in' }}
         </button>

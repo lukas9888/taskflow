@@ -65,13 +65,13 @@
 .deps-hint {
   font-size: 12px;
   color: var(--mat-sys-on-surface-variant);
-  margin: 2px 0 6px;
+  margin: 10px 0 6px;
 }
 
 .deps-empty {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--mat-sys-on-surface-variant);
-  margin: 4px 0 8px;
+  margin: 4px 0 6px;
 }
 
 .deps-error {
@@ -91,4 +91,22 @@
 .deps-select {
   flex: 1 1 200px;
   min-width: 0;
+}
+
+mat-icon.deps-icon-blocked {
+  color: var(--mat-sys-error) !important;
+  font-size: 18px;
+}
+
+mat-icon.deps-icon-blocking {
+  color: #f5a524 !important;
+  font-size: 18px;
+}
+
+mat-list-item mat-icon.deps-icon-blocked {
+  color: var(--mat-sys-error) !important;
+}
+
+mat-list-item mat-icon.deps-icon-blocking {
+  color: #f5a524 !important;
 }

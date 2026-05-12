@@ -1,8 +1,8 @@
+import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
-import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -25,9 +25,8 @@ export type DependencyFilter = 'all' | 'blocked' | 'blocking';
 
 @Component({
   selector: 'app-task-list',
-  standalone: true,
   imports: [
-    DatePipe,
+    CommonModule,
     FormsModule,
     MatButtonToggleModule,
     MatButtonModule,
@@ -45,67 +44,87 @@ export class TaskListComponent {
   private readonly due = inject(DueDatetimeService);
   private readonly taskService = inject(TaskService);
 
+  trackTaskById = (_: number, task: TaskItem) => task.id;
+
   @Input() tasks: TaskItem[] = [];
   @Input() selectedTaskId: number | null = null;
   @Input() blockedTaskIds = new Set<number>();
   @Input() blockingTaskIds = new Set<number>();
+
   @Output() readonly selectedTaskIdChange = new EventEmitter<number | null>();
   @Output() readonly taskUpdated = new EventEmitter<void>();
 
-  readonly displayedColumns = ['done', 'title', 'dependency', 'priority', 'category', 'due', 'chevron'];
+  readonly displayedColumns = [
+    'completed',
+    'title',
+    'dependency',
+    'priority',
+    'category',
+    'dueAt',
+  ];
 
   listFilter: TaskListFilter = 'today';
   showFilters = false;
   selectedCategories: string[] = [];
   selectedPriorities: TaskPriorityLevel[] = [];
   dependencyFilter: DependencyFilter = 'all';
+
   readonly priorityOptions = TASK_PRIORITY_OPTIONS;
 
   get visibleTasks(): TaskItem[] {
     const list = this.filterByTab(this.filteredTasks);
     return [...list].sort((a, b) => this.compareTasks(a, b));
   }
+
   get overdueTasks(): TaskItem[] {
     return this.filteredTasks
-      .filter((t) => this.isOverdue(t))
+      .filter((task) => this.isOverdue(task))
       .sort((a, b) => this.compareTasks(a, b));
   }
+
   get activeTasks(): TaskItem[] {
-    return this.visibleTasks.filter((t) => !t.done && !this.isOverdue(t));
+    return this.visibleTasks.filter((task) => !task.done && !this.isOverdue(task));
   }
+
   get doneTasks(): TaskItem[] {
-    return this.visibleTasks.filter((t) => t.done);
+    return this.visibleTasks.filter((task) => task.done);
   }
+
   get categoryOptions(): string[] {
-    return [...new Set(this.tasks.map((t) => taskCategoryFromModel(t)).filter(Boolean))].sort();
+    return [
+      ...new Set(this.tasks.map((task) => taskCategoryFromModel(task)).filter(Boolean)),
+    ].sort();
   }
 
   priorityIcon(level: TaskPriorityLevel): string {
     return priorityIconGlyph(level);
   }
+
   priorityColor(level: TaskPriorityLevel): string {
     return priorityIconCssColor(level);
   }
-  taskPriorityIcon(task: TaskItem): string {
-    return priorityIconGlyph(taskPriorityFromModel(task));
-  }
-  taskPriorityColor(task: TaskItem): string {
-    return priorityIconCssColor(taskPriorityFromModel(task));
-  }
-  taskCategory(task: TaskItem): string {
+
+  categoryLabel(task: TaskItem): string {
     return taskCategoryFromModel(task);
   }
-  isBlocked(task: TaskItem): boolean {
-    return this.blockedTaskIds.has(task.id);
-  }
-  isBlocking(task: TaskItem): boolean {
-    return this.blockingTaskIds.has(task.id);
+
+  priorityMarker(task: TaskItem): { icon: string; color: string } {
+    const level = taskPriorityFromModel(task);
+
+    return {
+      icon: priorityIconGlyph(level),
+      color: priorityIconCssColor(level),
+    };
   }
 
   clearTaskFilters(): void {
     this.selectedCategories = [];
     this.selectedPriorities = [];
     this.dependencyFilter = 'all';
+  }
+
+  selectTask(task: TaskItem): void {
+    this.selectedTaskIdChange.emit(task.id);
   }
 
   onCompletedChange(task: TaskItem, done: boolean): void {
@@ -120,18 +139,12 @@ export class TaskListComponent {
       })
       .subscribe({
         next: (updated) => {
-          this.tasks = this.tasks.map((t) => (t.id === updated.id ? updated : t));
+          this.tasks = this.tasks.map((existing) =>
+            existing.id === updated.id ? updated : existing
+          );
           this.taskUpdated.emit();
         },
       });
-  }
-
-  onRowClick(task: TaskItem, event: MouseEvent): void {
-    const t = event.target as HTMLElement | null;
-    if (t?.closest('button, a, input, mat-checkbox, .mdc-checkbox')) {
-      return;
-    }
-    this.selectedTaskIdChange.emit(task.id);
   }
 
   private get filteredTasks(): TaskItem[] {
@@ -142,14 +155,20 @@ export class TaskListComponent {
     return all.filter((task) => {
       const category = taskCategoryFromModel(task);
       const priority = taskPriorityFromModel(task);
+
       const matchesCategory =
-        this.selectedCategories.length === 0 || this.selectedCategories.includes(category);
+        this.selectedCategories.length === 0 ||
+        this.selectedCategories.includes(category);
+
       const matchesPriority =
-        this.selectedPriorities.length === 0 || this.selectedPriorities.includes(priority);
+        this.selectedPriorities.length === 0 ||
+        this.selectedPriorities.includes(priority);
+
       const matchesDependency =
         this.dependencyFilter === 'all' ||
         (this.dependencyFilter === 'blocked' && this.blockedTaskIds.has(task.id)) ||
         (this.dependencyFilter === 'blocking' && this.blockingTaskIds.has(task.id));
+
       return matchesCategory && matchesPriority && matchesDependency;
     });
   }
@@ -158,33 +177,60 @@ export class TaskListComponent {
     const today = this.due.startOfToday();
     const weekEnd = new Date(today);
     weekEnd.setDate(weekEnd.getDate() + 7);
+
     switch (this.listFilter) {
       case 'today':
-        return all.filter((t) => {
-          if (!t.dueAt) return false;
-          return this.due.isSameLocalDay(new Date(t.dueAt), today);
+        return all.filter((task) => {
+          if (!task.dueAt) {
+            return false;
+          }
+
+          return this.due.isSameLocalDay(new Date(task.dueAt), today);
         });
+
       case 'week':
-        return all.filter((t) => {
-          if (!t.dueAt) return false;
-          const day = this.due.startOfLocalDay(new Date(t.dueAt));
-          return day.getTime() >= today.getTime() && day.getTime() <= weekEnd.getTime();
+        return all.filter((task) => {
+          if (!task.dueAt) {
+            return false;
+          }
+
+          const day = this.due.startOfLocalDay(new Date(task.dueAt));
+          return (
+            day.getTime() >= today.getTime() &&
+            day.getTime() <= weekEnd.getTime()
+          );
         });
+
       default:
         return all;
     }
   }
 
   private isOverdue(task: TaskItem): boolean {
-    if (task.done || !task.dueAt) return false;
+    if (task.done || !task.dueAt) {
+      return false;
+    }
+
     return new Date(task.dueAt).getTime() < Date.now();
   }
 
   private compareTasks(a: TaskItem, b: TaskItem): number {
-    if (a.done !== b.done) return a.done ? 1 : -1;
-    if (a.dueAt && b.dueAt) return new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime();
-    if (a.dueAt) return -1;
-    if (b.dueAt) return 1;
+    if (a.done !== b.done) {
+      return a.done ? 1 : -1;
+    }
+
+    if (a.dueAt && b.dueAt) {
+      return new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime();
+    }
+
+    if (a.dueAt) {
+      return -1;
+    }
+
+    if (b.dueAt) {
+      return 1;
+    }
+
     return a.title.localeCompare(b.title);
   }
 }

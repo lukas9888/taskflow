@@ -6,6 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { TaskService } from '../services/task.service';
 import { MatButtonModule } from '@angular/material/button';
 import { NgForm } from '@angular/forms';
+import { TaskItem } from '../models/task-item';
 
 @Component({
   selector: 'app-task-form',
@@ -17,7 +18,7 @@ export class TaskFormComponent {
   private readonly taskService = inject(TaskService);
 
   @ViewChild('composerInput') composerInput!: ElementRef<HTMLInputElement>;
-  @Output() readonly created = new EventEmitter<any>();
+  @Output() readonly created = new EventEmitter<TaskItem>();
   @Output() readonly openDetail = new EventEmitter<string>();
   @Output() readonly focused = new EventEmitter<void>();
 

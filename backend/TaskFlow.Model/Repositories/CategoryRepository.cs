@@ -22,6 +22,7 @@ public class CategoryRepository : BaseRepository
         cmd.Parameters.AddWithValue("name", name);
 
         conn.Open();
+        SetUserId(conn, userId);
         var result = cmd.ExecuteScalar();
         return (result as string) ?? name;
     }
@@ -39,6 +40,7 @@ public class CategoryRepository : BaseRepository
         cmd.Parameters.AddWithValue("user_id", userId);
 
         conn.Open();
+        SetUserId(conn, userId);
         using var reader = cmd.ExecuteReader();
         while (reader.Read())
         {

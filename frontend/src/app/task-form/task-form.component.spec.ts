@@ -39,15 +39,12 @@ describe('TaskFormComponent', () => {
 
     fixture.detectChanges();
 
-    // Arrange: valid title (with extra whitespace)
     component.title = '  My new task  ';
     fixture.detectChanges();
 
-    // Act: submit the form (same as pressing Enter in the input)
     const form = fixture.debugElement.query(By.css('form'));
     form.triggerEventHandler('ngSubmit', {});
 
-    // Assert: service called with trimmed title
     expect(taskService.createTask).toHaveBeenCalledTimes(1);
     expect(taskService.createTask.calls.mostRecent().args[0]).toBe('My new task');
 

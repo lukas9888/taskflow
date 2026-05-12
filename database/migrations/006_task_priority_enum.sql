@@ -1,12 +1,3 @@
--- Replace VARCHAR + CHECK with a native PostgreSQL enum for `priority`.
---
--- Why ENUM here: the label set is stable, matches API/UI, and the column stores only those
--- values. CHECK+VARCHAR is fine too; ENUM adds a single DB-level type and clearer catalogs.
--- Adding a new priority later: ALTER TYPE task_priority ADD VALUE 'urgent' (before/after);
--- re-check app + migrations that expect the old set.
---
--- Npgsql + C#: the app still maps priority as string; SQL casts to text on read (see TaskRepository).
-
 BEGIN;
 
 ALTER TABLE tasks DROP CONSTRAINT IF EXISTS tasks_priority_check;

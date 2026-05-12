@@ -49,12 +49,10 @@ fi
 
 echo "Target DB: ${USERNAME}@${HOSTNAME}:${PORT}/${DATABASE}"
 
-# Convenience for this project: supply password to psql via env var.
 export PGPASSWORD="$PASSWORD"
 
 psql_base=( "$PSQL_PATH" -v ON_ERROR_STOP=1 -h "$HOSTNAME" -p "$PORT" -U "$USERNAME" -d "$DATABASE" )
 
-# Ensure migration tracking table exists (idempotent).
 "${psql_base[@]}" -c "CREATE TABLE IF NOT EXISTS schema_migrations (version TEXT PRIMARY KEY, applied_at TIMESTAMPTZ NOT NULL DEFAULT now());" >/dev/null
 
 applied="$("${psql_base[@]}" -X -A -t -c "SELECT version FROM schema_migrations ORDER BY version;" || true)"
@@ -76,10 +74,9 @@ for f in "${sorted[@]}"; do
     continue
   fi
 
-echo "Applying: $f"
-"${psql_base[@]}" -f "$f"
+  echo "Applying: $f"
+  "${psql_base[@]}" -f "$f"
 
-  # Safety net in case a migration forgets to insert into schema_migrations.
   "${psql_base[@]}" -c "INSERT INTO schema_migrations(version) VALUES ('$version') ON CONFLICT (version) DO NOTHING;" >/dev/null
   echo "Applied: $version"
 done

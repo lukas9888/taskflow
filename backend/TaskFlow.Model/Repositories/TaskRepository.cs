@@ -208,11 +208,4 @@ public class TaskRepository : BaseRepository
             Done = reader.GetBoolean(7)
         };
     }
-
-    private static void SetUserId(NpgsqlConnection conn, int userId)
-    {
-        using var cmd = new NpgsqlCommand("SELECT set_config('app.current_user_id', @uid, true)", conn);
-        cmd.Parameters.AddWithValue("uid", userId.ToString());
-        cmd.ExecuteNonQuery();
-    }
 }
