@@ -36,11 +36,13 @@ SELECT u.id, c.name
 FROM users u
 CROSS JOIN (
   VALUES
-    ('DEVELOPMENT'),
-    ('TECHNICAL'),
-    ('API'),
-    ('DESIGN'),
-    ('GENERAL')
+    ('SCHOOL'),
+    ('HOME'),
+    ('FINANCE'),
+    ('ERRANDS'),
+    ('HEALTH'),
+    ('SOCIAL'),
+    ('WORK')
 ) AS c(name)
 WHERE u.username = 'demo'
 ON CONFLICT (user_id, name) DO NOTHING;
@@ -52,27 +54,39 @@ WITH anchor AS (
     + round(extract(epoch FROM now()) / 900.0) * 900 * interval '1 second'
   ) AS q
 ),
-seed_tasks(title, category, day_off, slot) AS (
+seed_tasks(title, category, priority, done, day_off, slot) AS (
   VALUES
-    ('Set up PostgreSQL', 'TECHNICAL', 0, 0),
-    ('Set up the API and Swagger', 'API', 0, 1),
-    ('Connect Angular to backend', 'DEVELOPMENT', 0, 2),
-    ('Write project report draft', 'GENERAL', 0, 3),
-    ('Design second entity and FK', 'DESIGN', 1, 0),
-    ('Add PUT and DELETE endpoints', 'API', 1, 1),
-    ('Add form validation messages', 'DEVELOPMENT', 1, 2),
-    ('Test CRUD in Swagger', 'TECHNICAL', 2, 0),
-    ('Prepare oral exam demo', 'GENERAL', 2, 1),
-    ('Zip source without node_modules', 'GENERAL', 2, 2)
+    ('Finish essay draft','SCHOOL','high',false,-1,0),
+    ('Submit assignment','SCHOOL','high',false,-1,1),
+    ('Buy groceries','ERRANDS','medium',false,0,0),
+    ('Do laundry','HOME','low',false,0,1),
+    ('Pack bag for class','SCHOOL','low',true,0,2),
+    ('Reply to group chat','SOCIAL','medium',false,0,3),
+    ('Go for a run','HEALTH','medium',false,0,4),
+    ('Pay rent','FINANCE','high',true,0,5),
+    ('Clean the apartment','HOME','low',false,1,0),
+    ('Read lecture slides','SCHOOL','medium',false,1,1),
+    ('Prepare for presentation','SCHOOL','high',false,1,2),
+    ('Book dentist appointment','HEALTH','medium',false,1,3),
+    ('Call parents','SOCIAL','low',false,2,0),
+    ('Return library books','ERRANDS','medium',false,2,1),
+    ('Cook dinner','HOME','low',true,2,2),
+    ('Check exam schedule','SCHOOL','high',true,2,3),
+    ('Transfer money to savings','FINANCE','medium',false,3,0),
+    ('Pick up prescription','HEALTH','medium',false,3,1),
+    ('Confirm shift at work','WORK','high',false,3,2),
+    ('Tidy up desk','HOME','low',false,4,0)
 )
-INSERT INTO tasks (user_id, title, due_at, user_category_id)
+INSERT INTO tasks (user_id, title, due_at, user_category_id, priority, done)
 SELECT
   u.id,
   s.title,
   a.q
     + make_interval(days => s.day_off)
     + make_interval(mins => (s.slot * 15)),
-  uc.id
+  uc.id,
+  CAST(s.priority AS task_priority),
+  s.done
 FROM seed_tasks s
 CROSS JOIN anchor a
 JOIN users u ON u.username = 'demo'
@@ -82,18 +96,14 @@ JOIN user_categories uc
 
 
 INSERT INTO task_dependencies (task_id, blocked_by) VALUES
-   (3,2),
-   (8,2),
-   (8,6),
-   (5,1), 
-   (10,1),
-   (10,2),
-   (10,3),
-   (10,5),
-   (10,6),
-   (10,7),
-   (10,8)
-  ON CONFLICT DO NOTHING;
+  (5, 6),    -- Submit assignment is blocked until essay draft is finished
+  (2, 3),    -- Prepare for presentation is blocked until lecture slides are read
+  (10, 9),   -- Do laundry is blocked until apartment is cleaned
+  (19, 2),   -- Reply to group chat is blocked until presentation is prepared
+  (20, 1),   -- Confirm shift at work is blocked until exam schedule is checked
+  (11, 12),  -- Transfer money to savings is blocked until rent is paid
+  (15, 16)
+ON CONFLICT DO NOTHING;
 
 COMMIT;
 
